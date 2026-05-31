@@ -1943,15 +1943,207 @@ const GENERIC_TIPS = [
   "<strong>Breathe out on exertion, in on the way down.</strong> Don't hold your breath unless going maximal.",
   "<strong>Full range of motion every rep.</strong> Half-reps hide weak ranges and limit growth."
 ];
+
+// Aliases so partial exercise names still match a tip pool
+const TIP_ALIASES = {
+  "shoulder press":   "overhead press",
+  "incline press":    "bench press",
+  "incline dumbbell": "bench press",
+  "tricep pushdown":  "tricep extension",
+  "pushdown":         "tricep extension",
+  "rope pushdown":    "tricep extension",
+  "split squat":      "bulgarian split squat",
+  "back squat":       "squat",
+  "front squat":      "squat",
+  "deadlift":         "deadlift",
+  "stiff-leg":        "romanian deadlift"
+};
+
+// Large fallback pool — tracked individually so a tip never repeats until the whole pool is exhausted
+const EDUCATION_TIPS = [
+  // SLEEP — negative effects + tips (14)
+  "<strong>One bad night drops your strength 5–10% the next day.</strong> Worth that late-night scroll?",
+  "<strong>Less than 6h sleep for a week cuts testosterone by 10–15%.</strong> Sleep is your free anabolic.",
+  "<strong>Sleep deprivation spikes cortisol</strong>, which breaks down muscle and stores belly fat.",
+  "<strong>Poor sleep slashes glycogen replenishment.</strong> You'll feel flat halfway through tomorrow's session.",
+  "<strong>Bad sleep raises hunger (ghrelin) and kills fullness (leptin).</strong> You'll out-eat your training.",
+  "<strong>Growth hormone peaks in deep sleep.</strong> Cut sleep short, cut the recovery hormone.",
+  "<strong>Caffeine has a 6–8h half-life.</strong> 2pm coffee = caffeine still in your system at 10pm.",
+  "<strong>Screens 2h before bed delay melatonin by 90 min.</strong> Wind down on paper instead.",
+  "<strong>Cool dark room is optimal for sleep.</strong> Body temp drops as you enter deep stages.",
+  "<strong>Sleep consistency matters more than total hours.</strong> Same bedtime daily beats sleeping in on weekends.",
+  "<strong>Sleep before midnight is more restorative</strong> than the same hours after midnight.",
+  "<strong>If you snore loudly, get tested for sleep apnea.</strong> Silent gains killer most people ignore.",
+  "<strong>Alcohol within 3h of bed wrecks REM sleep</strong> — recovery and memory consolidation suffer.",
+  "<strong>Magnesium glycinate before bed</strong> helps both sleep onset and morning soreness for many lifters.",
+
+  // ALCOHOL — negative effects (10)
+  "<strong>Alcohol suppresses muscle protein synthesis for 24 hours.</strong> One night out = one day of building gone.",
+  "<strong>3+ drinks can drop tomorrow's training output by 20%.</strong> Strength, endurance, focus — all hit.",
+  "<strong>Alcohol raises estrogen and drops testosterone.</strong> The literal opposite of what you want for muscle.",
+  "<strong>Alcohol dehydrates muscle</strong>, reducing performance and recovery for up to 48h after.",
+  "<strong>Your body burns alcohol before fat.</strong> Until it's gone, fat loss is paused completely.",
+  "<strong>\"Falling asleep faster\" with alcohol is a lie</strong> — REM and deep sleep are both slashed.",
+  "<strong>One standard drink = ~100 cal.</strong> 4 drinks = an extra meal you didn't account for.",
+  "<strong>Alcohol wrecks glycogen storage</strong> — less fuel available for the next day's session.",
+  "<strong>\"Beer belly\" is visceral fat</strong>, the most metabolically harmful kind of body fat.",
+  "<strong>Sober January boosts most peoples' lifts</strong> noticeably within 2 weeks. Cheap experiment.",
+
+  // BAD FOOD — negative effects (12)
+  "<strong>Ultra-processed foods cause ~500 extra cal/day eaten</strong> vs whole-food equivalent meals.",
+  "<strong>High sodium causes water retention that masks fat loss.</strong> The scale lies after a takeaway.",
+  "<strong>Sugar spikes train your brain to crave more sugar.</strong> Each binge makes the next harder to resist.",
+  "<strong>Low-protein meals leave you hungry an hour later.</strong> Protein satiates better than fat or carbs.",
+  "<strong>Chips, fries, cookies override fullness signals.</strong> They're engineered to be eaten in excess.",
+  "<strong>Diet drinks may increase real-sugar cravings</strong> despite being calorie-free. Studies mixed but worth knowing.",
+  "<strong>Eating fast = overeating.</strong> Your brain needs 20 min to register fullness — chew slower.",
+  "<strong>Skipping meals leads to bingeing later.</strong> Steady fuel beats yo-yo eating for both gains and fat loss.",
+  "<strong>Most fast food meals hit 1500+ cal in one sitting.</strong> Easy to torch a whole day's deficit.",
+  "<strong>Trans fats (in fried foods + cheap baked goods) increase inflammation</strong> and slow recovery.",
+  "<strong>Liquid calories barely register as \"food\"</strong> to your brain. Juice, soda, sweetened lattes add up fast.",
+  "<strong>Late-night snacks ≠ stored as fat automatically</strong>, but they crowd out morning hunger and skew your meal pattern.",
+
+  // HIGH-CALORIE FOODS often missed (18)
+  "<strong>Whole milk: 600 cal/L, 32g protein, naturally rich in casein.</strong> Easiest \"liquid gains\" out there.",
+  "<strong>Olive oil = 120 cal/tbsp.</strong> Drizzle 2 tbsp on dinner = 240 free calories you barely taste.",
+  "<strong>Peanut butter: 95 cal/tbsp + 4g protein.</strong> A spoonful in your shake or on toast is dense fuel.",
+  "<strong>Whole eggs beat egg whites for growth.</strong> Yolk has healthy fats, choline, B12 — don't waste it.",
+  "<strong>Greek yogurt + honey = 250 cal of protein + quick carbs.</strong> Perfect post-workout snack.",
+  "<strong>Avocados: 240 cal of healthy fat each.</strong> Easy to add to any meal without feeling overstuffed.",
+  "<strong>Trail mix beats protein bars.</strong> 200–300 cal in a handful, no plastic aftertaste.",
+  "<strong>Bagels around training are gold.</strong> 250–300 cal of clean carbs fuels the session and refills glycogen.",
+  "<strong>Dried fruit (dates, raisins) — 100 cal per small handful.</strong> Easy carbs that don't fill you up.",
+  "<strong>Cheese: 100+ cal/oz, ~7g protein.</strong> Grate over pasta or snack on cubes — dense and satisfying.",
+  "<strong>Coconut milk: 450 cal per can.</strong> Pour into shakes or curries for stealth calories.",
+  "<strong>Almonds: 160 cal per 30g.</strong> Pocketable, no prep, perfect between-meal snack.",
+  "<strong>Cashews: 155 cal per 30g</strong> + good copper, magnesium, and zinc.",
+  "<strong>Smoked salmon: 117 cal/100g + 25g protein</strong> + omega-3s. Add to eggs or rice.",
+  "<strong>Pasta: 220 cal per cooked cup</strong> + iron + B vitamins. Don't fear the carb.",
+  "<strong>Lean steak: 250 cal + 26g protein per 100g.</strong> Plus heme iron, zinc, creatine naturally.",
+  "<strong>Lentils: 230 cal + 18g protein per cooked cup.</strong> Cheap, dense, fiber-rich plant protein.",
+  "<strong>Tahini: 90 cal/tbsp + 2.5g protein.</strong> Add to sauces, dressings, or eat off the spoon.",
+
+  // RECOVERY (12)
+  "<strong>Walk 10–15 min after a heavy session</strong> — clears lactate faster than sitting still.",
+  "<strong>Stretch tomorrow, not now.</strong> Post-workout static stretching can blunt strength gains for 24h.",
+  "<strong>Cold shower OK on rest days, skip post-lift if hypertrophy is your goal.</strong> Cold blunts the inflammation that builds muscle.",
+  "<strong>Foam rolling improves mobility, not really recovery.</strong> Useful for warmup, not magic.",
+  "<strong>Eat 30–50g of protein within 60 min of finishing.</strong> Muscle protein synthesis is elevated 2–3h post-workout.",
+  "<strong>Don't skip carbs after training.</strong> They refill the glycogen you just spent.",
+  "<strong>Active recovery beats total rest</strong> for reducing soreness 24–48h post-session.",
+  "<strong>Heat (sauna, hot shower) after 48h, ice within 48h</strong> if at all. Most ice baths are overrated for hypertrophy.",
+  "<strong>Sauna 15–20 min</strong> can modestly increase growth hormone and improve cardiovascular health.",
+  "<strong>Take a full deload week every 6–8 weeks</strong> of hard training. Same volume at 60–70% intensity.",
+  "<strong>Tart cherry juice has decent evidence for reducing soreness</strong> if consumed post-workout.",
+  "<strong>Sleep 7–9h tonight</strong> — recovery happens between sessions, not just after.",
+
+  // HYDRATION (6)
+  "<strong>Dehydration of just 2% body weight drops strength by 10%.</strong> Sip throughout the day, not just at the gym.",
+  "<strong>Add electrolytes if you sweat heavily.</strong> Plain water can dilute sodium and worsen performance.",
+  "<strong>Pre-workout: 500ml water 1–2h before, another 250ml 15 min before.</strong>",
+  "<strong>Pee yellow? Drink more. Pee clear? You're probably over-hydrated</strong> and washing out electrolytes.",
+  "<strong>Coffee and tea count toward hydration</strong> — the \"caffeine dehydrates\" myth is overstated.",
+  "<strong>Sip during workout, don't chug.</strong> 100–200ml every 15 min keeps performance steady.",
+
+  // STRESS + MINDSET (10)
+  "<strong>Chronic stress = chronic cortisol = stalled gains.</strong> Manage stress or it manages you.",
+  "<strong>5 min of slow nasal breathing drops cortisol noticeably.</strong> 4-second inhale, 6-second exhale.",
+  "<strong>10 min of daily meditation</strong> has shown lower stress hormones in multiple studies.",
+  "<strong>Comparison is the thief of joy.</strong> Track your own progress, not your gym neighbor's.",
+  "<strong>Consistency beats intensity.</strong> 4 average sessions/week beats 1 perfect one.",
+  "<strong>Bad day at the gym? Reps still count.</strong> Showing up is the actual lift.",
+  "<strong>Plateaus are normal.</strong> Deload, change rep range, or wait. Don't panic.",
+  "<strong>Discipline > motivation.</strong> Motivation is fickle — you can't out-feel a bad day.",
+  "<strong>Reduce decisions: same training time, same days.</strong> Willpower is a finite resource.",
+  "<strong>Track everything.</strong> Memory lies, paper (or this app) doesn't.",
+
+  // SUPPLEMENTS (8)
+  "<strong>Creatine 5g daily — most studied supplement, real effect.</strong> Timing doesn't matter, consistency does.",
+  "<strong>Caffeine 30–45 min pre-lift: 5–8% strength boost.</strong> Cycle off occasionally to keep sensitivity high.",
+  "<strong>Protein powder = convenience, not magic.</strong> Real food first; whey to fill gaps.",
+  "<strong>Fish oil 1–2g/day for inflammation</strong> if you don't eat fatty fish 2x/week.",
+  "<strong>Vitamin D if you're indoors most days</strong> — 2000 IU/day is a safe baseline. Get blood tested annually.",
+  "<strong>Beta-alanine helps high-rep sets (12+).</strong> Causes tingling, that's normal and harmless.",
+  "<strong>BCAAs are mostly pointless</strong> if you eat enough complete protein.",
+  "<strong>Pre-workouts are 90% caffeine + placebo.</strong> Save money — just take 200mg caffeine.",
+
+  // TRAINING PRINCIPLES (14)
+  "<strong>Volume drives growth.</strong> 10–20 hard sets per muscle per week is the hypertrophy sweet spot.",
+  "<strong>Train each muscle 2x/week</strong> beats 1x/week for hypertrophy in most studies.",
+  "<strong>Rep ranges 5–30 all build muscle</strong> if taken close to failure.",
+  "<strong>Eccentric (lowering) phase is where most muscle damage happens.</strong> Slow it down.",
+  "<strong>Compound lifts first, isolation second.</strong> You don't want to bench after flying.",
+  "<strong>Track top set weight + reps</strong> as your measure of progressive overload.",
+  "<strong>RIR (reps in reserve): leave 1–3 reps in the tank, not zero.</strong> Failure on every set kills recovery.",
+  "<strong>Form > load.</strong> A clean 10kg curl builds more than a sloppy 20kg curl.",
+  "<strong>Progressive overload = beat last session on ONE number.</strong> Doesn't have to be every number.",
+  "<strong>Deload every 6–8 weeks: drop weight 10%, same reps.</strong> Your body and joints need it.",
+  "<strong>Full range of motion every rep.</strong> Half reps = half gains.",
+  "<strong>Slow eccentric (2–3s lowering) builds more muscle</strong> than fast lowering. Pick your battles.",
+  "<strong>Rest 90–120s for hypertrophy, 2–3 min for max strength.</strong>",
+  "<strong>Train when you're fresh.</strong> Lifting after 16h awake + bad sleep = injury risk + no progress.",
+
+  // NUTRITION BASELINES (8)
+  "<strong>Aim for ~1g protein per pound of bodyweight</strong> for hypertrophy. Round to 0.8g if maintaining.",
+  "<strong>Eat carbs around your training</strong>, not just protein. Carbs spare protein for muscle building.",
+  "<strong>Don't fear fat.</strong> It's hormonal building blocks — 0.3–0.5g per lb bodyweight minimum.",
+  "<strong>Fasted training works for some, hurts others.</strong> Test it for 2 weeks before deciding.",
+  "<strong>Strong glutes = better squats, deadlifts, posture, less back pain.</strong> Don't skip glute work.",
+  "<strong>Your weakest lift tells you what to focus on next.</strong> Build the foundation, not the showcase.",
+  "<strong>Variation < progression.</strong> Same exercises with rising weights beat constant exercise changes.",
+  "<strong>Stop comparing your week 4 to someone's year 4.</strong> Their before photo would shock you."
+];
+function shuffleArr(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Pulls `count` fallback tips that the user hasn't seen yet. Once the pool's
+// exhausted, the seen-map resets so we don't run out forever.
+function getFreshFallbackTips(count) {
+  if (!data.shownEduTips) data.shownEduTips = {};
+  let unshown = EDUCATION_TIPS.filter(t => !data.shownEduTips[t]);
+  if (unshown.length < count) {
+    // Pool fully cycled — reset and start a fresh rotation
+    data.shownEduTips = {};
+    unshown = EDUCATION_TIPS.slice();
+  }
+  shuffleArr(unshown);
+  const picked = unshown.slice(0, count);
+  picked.forEach(t => { data.shownEduTips[t] = true; });
+  saveData();
+  return picked;
+}
+
 function getTipsForExercise(name) {
   const key = (name || "").toLowerCase().trim();
-  if (!key) return GENERIC_TIPS.slice();
-  if (EXERCISE_TIPS[key]) return EXERCISE_TIPS[key].slice();
-  // Partial match — find a known key that appears in the exercise name
-  for (const exKey of Object.keys(EXERCISE_TIPS)) {
-    if (key.includes(exKey)) return EXERCISE_TIPS[exKey].slice();
+  let specific = null;
+  if (key) {
+    if (EXERCISE_TIPS[key]) specific = EXERCISE_TIPS[key];
+    else {
+      for (const exKey of Object.keys(EXERCISE_TIPS)) {
+        if (key.includes(exKey)) { specific = EXERCISE_TIPS[exKey]; break; }
+      }
+    }
+    if (!specific) {
+      for (const alias of Object.keys(TIP_ALIASES)) {
+        if (key.includes(alias)) {
+          specific = EXERCISE_TIPS[TIP_ALIASES[alias]];
+          if (specific) break;
+        }
+      }
+    }
   }
-  return GENERIC_TIPS.slice();
+  // Lift-specific tips can repeat freely across sessions (user is fine with that)
+  const lift = shuffleArr((specific || GENERIC_TIPS).slice());
+  const TOTAL = 9;
+  if (lift.length >= TOTAL) return lift.slice(0, TOTAL);
+  // Top up with fresh, never-before-seen fallback tips
+  const fallback = getFreshFallbackTips(TOTAL - lift.length);
+  return lift.concat(fallback);
 }
 
 let __tipTimeouts = [];
@@ -1963,12 +2155,9 @@ function showTipOverlay(exerciseName) {
   const overlay = document.getElementById("tip-overlay");
   if (!overlay) return;
   clearTipTimeouts();
-  // Shuffle the tip pool so the same lift doesn't repeat tip 1 every session
+  // Already shuffled + deduped inside getTipsForExercise
   const tips = getTipsForExercise(exerciseName);
-  for (let i = tips.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [tips[i], tips[j]] = [tips[j], tips[i]];
-  }
+  if (tips.length === 0) return;
   document.getElementById("tip-exname").textContent = exerciseName || "Form cue";
   // Backdrop fades in
   overlay.classList.remove("hiding");
@@ -1978,17 +2167,18 @@ function showTipOverlay(exerciseName) {
 
   const card = overlay.querySelector(".tip-card");
   let idx = 0;
+  // Max 9 slots in a 90s rest, but never more than the unique tips we have
+  const slots = Math.min(9, tips.length);
 
   const showOne = () => {
-    document.getElementById("tip-content").innerHTML = tips[idx % tips.length];
+    document.getElementById("tip-content").innerHTML = tips[idx];
     card.classList.add("tip-in");
     // Hide this tip after 8.5s (leaves 1.5s for fade out before next one shows)
     __tipTimeouts.push(setTimeout(() => {
       card.classList.remove("tip-in");
     }, 8500));
     idx++;
-    // Schedule next tip in 10s — up to 9 rotations max for a 90s rest
-    if (idx < 9) {
+    if (idx < slots) {
       __tipTimeouts.push(setTimeout(showOne, 10000));
     }
   };
