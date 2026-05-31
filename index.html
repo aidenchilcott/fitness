@@ -364,6 +364,142 @@
     font-family: inherit;
   }
 
+  /* Quote splash on app open */
+  .quote-splash {
+    position: fixed; inset: 0;
+    background: #ffffff;
+    z-index: 500;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 32px;
+    text-align: center;
+    transition: opacity 0.6s ease;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .quote-splash.show { opacity: 1; pointer-events: auto; }
+  .quote-splash .qmark {
+    font-size: 56px; color: var(--accent); line-height: 1;
+    margin-bottom: 18px;
+  }
+  .quote-splash .qtext {
+    font-family: var(--font-serif, Georgia, "Times New Roman", serif);
+    font-size: 22px; font-weight: 500;
+    line-height: 1.35; letter-spacing: -0.01em;
+    color: var(--text); max-width: 320px;
+  }
+  .quote-splash .qsub {
+    font-size: 12px; color: var(--muted);
+    margin-top: 24px;
+    text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600;
+  }
+
+  /* DND confirmation modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 400;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-card {
+    background: white;
+    border-radius: 18px;
+    padding: 24px 20px 16px;
+    width: 100%; max-width: 320px;
+    text-align: center;
+  }
+  .modal-card .mc-icon {
+    font-size: 38px; color: var(--accent);
+    line-height: 1; margin-bottom: 8px;
+  }
+  .modal-card h3 {
+    font-size: 18px; font-weight: 700;
+    margin: 4px 0 6px;
+  }
+  .modal-card p {
+    font-size: 14px; color: var(--muted);
+    margin: 0 0 18px;
+    line-height: 1.45;
+  }
+  .modal-card .mc-btns { display: flex; gap: 10px; }
+  .modal-card .mc-btns button {
+    flex: 1;
+    padding: 12px;
+    font-size: 14px; font-weight: 700;
+    border-radius: 10px;
+    border: none; cursor: pointer;
+    font-family: inherit;
+  }
+  .modal-card .mc-cancel {
+    background: var(--card-2); color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .modal-card .mc-confirm {
+    background: var(--accent); color: white;
+  }
+
+  /* Tip overlay during rest */
+  .tip-overlay {
+    position: fixed; inset: 0;
+    z-index: 180;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 24px;
+    pointer-events: none;
+  }
+  .tip-overlay.show, .tip-overlay.hiding { display: flex; }
+  .tip-overlay .tip-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(28, 28, 30, 0.7);
+    opacity: 0;
+    transition: opacity 5s ease;
+  }
+  .tip-overlay.show .tip-backdrop { opacity: 1; }
+  .tip-overlay.hiding .tip-backdrop {
+    opacity: 0;
+    transition: opacity 5s ease;
+  }
+  .tip-overlay .tip-card {
+    position: relative;
+    background: white;
+    border-radius: 18px;
+    padding: 22px 20px 22px;
+    max-width: 340px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 5s ease, transform 5s ease;
+  }
+  .tip-overlay.show .tip-card { opacity: 1; transform: translateY(0); }
+  .tip-overlay.hiding .tip-card {
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 5s ease, transform 5s ease;
+  }
+  .tip-overlay .tip-cap {
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--accent);
+    margin: 0 0 4px;
+  }
+  .tip-overlay .tip-exname {
+    font-size: 18px; font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0 0 12px;
+    color: var(--text);
+  }
+  .tip-overlay .tip-content {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .tip-overlay .tip-content strong {
+    font-weight: 700;
+  }
+
   /* Lift section */
 
   /* Generic icon buttons (used in Lift) */
@@ -694,6 +830,36 @@
     </div>
   </section>
 
+  <!-- Quote splash (appears on app open) -->
+  <div id="quote-splash" class="quote-splash" role="dialog" aria-label="Daily quote">
+    <div class="qmark"><i class="ti ti-quote"></i></div>
+    <div class="qtext" id="quote-text"></div>
+    <div class="qsub">Aiden's playbook</div>
+  </div>
+
+  <!-- DND confirmation modal (before first set) -->
+  <div id="dnd-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="mc-icon"><i class="ti ti-bell-off"></i></div>
+      <h3>Quiet time</h3>
+      <p>Switch your phone to Do Not Disturb before your first set, then tap confirm. No distractions during the work.</p>
+      <div class="mc-btns">
+        <button id="dnd-cancel" class="mc-cancel">Not yet</button>
+        <button id="dnd-confirm" class="mc-confirm">DND is on</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tip overlay (during rest timer) -->
+  <div id="tip-overlay" class="tip-overlay" aria-hidden="true">
+    <div class="tip-backdrop"></div>
+    <div class="tip-card">
+      <div class="tip-cap">Form cue</div>
+      <div class="tip-exname" id="tip-exname"></div>
+      <div class="tip-content" id="tip-content"></div>
+    </div>
+  </div>
+
   <!-- Rest timer overlay (floats during lift sessions) -->
   <div id="rest-timer-overlay" class="rest-timer-overlay" role="status" aria-live="polite">
     <div class="timer-ready">Get ready for your next set</div>
@@ -958,6 +1124,7 @@ document.getElementById("save-weight").addEventListener("click", () => {
   if (logWeight(v)) {
     document.getElementById("weight-input").value = "";
     renderAll();
+    startRestTimer(); // 90s timer post-weigh-in
   }
 });
 
@@ -966,6 +1133,7 @@ document.getElementById("quick-save-weight").addEventListener("click", () => {
   if (logWeight(v)) {
     document.getElementById("quick-weight").value = "";
     renderAll();
+    startRestTimer(); // 90s timer post-weigh-in
   }
 });
 document.getElementById("quick-weight").addEventListener("keydown", e => {
@@ -1159,6 +1327,249 @@ document.getElementById("add-habit").addEventListener("click", () => {
   renderAll();
 });
 
+// ============ QUOTES (Aiden's playbook) ============
+const QUOTES = [
+  "Discipline beats motivation every single day.",
+  "Show up. Especially on the days you don't want to.",
+  "Consistency over intensity, always.",
+  "Train hard. Recover harder.",
+  "Sleep is a free anabolic steroid. Use it.",
+  "Your only competition is yesterday's you.",
+  "The work you do when nobody's watching is what builds you.",
+  "Don't count the reps. Make the reps count.",
+  "Rest isn't weakness. It's where growth happens.",
+  "The hardest rep is the one before the easy one.",
+  "Strong is harder than skinny. Worth it though.",
+  "Eat for the body you want, not the body you have."
+];
+function pickDailyQuote() {
+  // Same quote per calendar day, rotates daily
+  const seed = Number(todayKey().replace(/-/g, ""));
+  return QUOTES[seed % QUOTES.length];
+}
+function showQuoteSplash() {
+  const splash = document.getElementById("quote-splash");
+  const text = document.getElementById("quote-text");
+  if (!splash || !text) return;
+  text.textContent = pickDailyQuote();
+  splash.classList.add("show");
+  // Dismiss after 3.2s, or on tap
+  const dismiss = () => {
+    splash.classList.remove("show");
+    splash.removeEventListener("click", dismiss);
+  };
+  setTimeout(dismiss, 3200);
+  splash.addEventListener("click", dismiss);
+}
+
+// ============ DND CONFIRMATION GATE ============
+// Per-session flag: we ask once per workout session, then trust it.
+let __dndConfirmedSessions = new Set();
+function dndKey(dayId) { return dayId + "@" + todayKey(); }
+function isDndConfirmed(dayId) { return __dndConfirmedSessions.has(dndKey(dayId)); }
+function markDndConfirmed(dayId) { __dndConfirmedSessions.add(dndKey(dayId)); }
+function showDndModal(onConfirm, onCancel) {
+  const m = document.getElementById("dnd-modal");
+  if (!m) { onConfirm && onConfirm(); return; }
+  m.classList.add("show");
+  const confirmBtn = document.getElementById("dnd-confirm");
+  const cancelBtn = document.getElementById("dnd-cancel");
+  const cleanup = () => {
+    m.classList.remove("show");
+    confirmBtn.removeEventListener("click", handleConfirm);
+    cancelBtn.removeEventListener("click", handleCancel);
+  };
+  const handleConfirm = () => { cleanup(); onConfirm && onConfirm(); };
+  const handleCancel = () => { cleanup(); onCancel && onCancel(); };
+  confirmBtn.addEventListener("click", handleConfirm);
+  cancelBtn.addEventListener("click", handleCancel);
+}
+
+// ============ EXERCISE TIPS (during rest) ============
+const EXERCISE_TIPS = {
+  "hip thrust": [
+    "<strong>Drive through your heels</strong>, not your toes. This shifts the load onto your glutes instead of your quads.",
+    "<strong>Tuck your chin</strong> and ribs down at the top — fully extending your spine wastes glute tension and stresses your lower back.",
+    "<strong>Pause for a beat at the top</strong> with a hard glute squeeze. Two seconds of contraction beats a fast rep every time.",
+    "<strong>Keep shins vertical at the top.</strong> If your knees travel forward of your ankles, the bar's drifted and quads are taking over.",
+    "<strong>Don't fully relax at the bottom.</strong> Lower until just before your hips touch, then drive back up — constant tension is what builds the glutes."
+  ],
+  "romanian deadlift": [
+    "<strong>Soft knees, hips back.</strong> The motion is hinging at the hips, not squatting down.",
+    "<strong>Bar travels close to your legs</strong> — it should almost brush your shins on the way down.",
+    "<strong>Lower until you feel your hamstrings stretch hard</strong>, then stop. Going lower just rounds your back.",
+    "<strong>Squeeze your glutes to stand up</strong>, don't yank with your lower back.",
+    "<strong>Keep your spine neutral.</strong> Eyes 1m in front of you on the floor — looking up extends your neck and breaks position."
+  ],
+  "bench press": [
+    "<strong>Pin your shoulder blades back and down.</strong> Create a stable shelf to press off — this protects your shoulders and adds 5–10% to your strength.",
+    "<strong>Feet planted, legs pushing the floor</strong>. Bench press is a full-body lift, not just chest.",
+    "<strong>Bar touches your lower chest</strong>, not your neck. Wrists stack over elbows.",
+    "<strong>Tuck your elbows</strong> to about 45–60° from your sides. Flared elbows wreck your shoulders over time.",
+    "<strong>Push the floor away as you press.</strong> Leg drive transfers force through your hips into the bar."
+  ],
+  "squat": [
+    "<strong>Brace your core like you're about to be punched.</strong> Take a deep breath, hold it through the rep, exhale at the top.",
+    "<strong>Knees track over toes</strong>, not collapsing inward. Push your knees out actively.",
+    "<strong>Depth: hip crease below knee.</strong> Don't half-squat — full ROM builds more muscle and is actually safer.",
+    "<strong>Sit between your heels</strong>, not back onto them. Weight on the mid-foot through the whole rep.",
+    "<strong>Stand up with hips and shoulders rising together.</strong> If your hips shoot up first, the weight is too heavy."
+  ],
+  "deadlift": [
+    "<strong>Bar over mid-foot before you pull.</strong> Set up wrong and the whole rep is compromised.",
+    "<strong>Lats tight, armpits over the bar.</strong> Think \"break the bar in half\" with your hands — it locks your shoulders in.",
+    "<strong>Push the floor away</strong>, don't yank. The bar leaves the floor when your legs straighten, not when your back lifts.",
+    "<strong>Hips and shoulders rise together.</strong> If your hips shoot up first, you've turned a deadlift into a stiff-leg.",
+    "<strong>Stand tall at the top</strong>, then control the way down. Don't drop it — eccentric is where strength is built."
+  ],
+  "overhead press": [
+    "<strong>Squeeze your glutes and brace your core</strong> before pressing. Loose midsection = leak in the chain.",
+    "<strong>Bar path is straight up.</strong> Tuck your chin so the bar can pass your face without arcing forward.",
+    "<strong>Push your head through</strong> at lockout — bar finishes over your ears, not in front of your face.",
+    "<strong>Don't lean back excessively.</strong> Small lean is fine; a full arch turns it into an incline bench.",
+    "<strong>Lower under control to the front delts</strong>, not behind the neck. Stop and reverse at chin level if you're tired."
+  ],
+  "pull-up": [
+    "<strong>Start from a dead hang.</strong> Half-reps don't count — full ROM each time.",
+    "<strong>Drive your elbows down to your ribs</strong>, not just pulling with your arms. This recruits your lats hard.",
+    "<strong>Squeeze your shoulder blades together</strong> at the top. Brief pause with chin over the bar.",
+    "<strong>Lower for 2–3 seconds.</strong> The negative is where 70% of the muscle building happens on this lift.",
+    "<strong>No swinging.</strong> If you're kipping you're cheating yourself out of back development."
+  ],
+  "row": [
+    "<strong>Lead with your elbows</strong>, not your hands. Pull the elbow back past your ribs.",
+    "<strong>Squeeze your shoulder blades together</strong> at the end of each rep. Brief pause for max contraction.",
+    "<strong>Keep your torso fixed.</strong> If you're swaying back and forth, the weight is too heavy.",
+    "<strong>Lower the weight for 2 seconds</strong>, feeling the stretch in your lats at the bottom.",
+    "<strong>Don't shrug at the top.</strong> Keep your shoulders pulled down — the work should stay in your back, not your traps."
+  ],
+  "bicep curl": [
+    "<strong>Elbows pinned to your sides</strong>, never drifting forward. Forward drift means your front delts are taking the load.",
+    "<strong>Lower for 2–3 seconds.</strong> The eccentric is where bicep mass is built.",
+    "<strong>No swinging at the hips.</strong> If you can't lift it with strict form, drop the weight.",
+    "<strong>Squeeze at the top</strong> for a beat instead of just touching and dropping.",
+    "<strong>Keep wrists straight</strong> throughout — bent wrists shift the work to your forearms."
+  ],
+  "preacher curl": [
+    "<strong>Position your upper arms flat against the pad</strong> so your elbows sit slightly below your shoulders. Eliminates cheating from the swing.",
+    "<strong>Lower the weight slowly over 2–3 seconds</strong>, fighting gravity the whole way down. Max tension at the bottom.",
+    "<strong>Pause briefly at the bottom without locking out</strong>, keeping constant tension on the bicep instead of resting.",
+    "<strong>Squeeze hard at the top</strong> and hold for a beat. Focus on the contraction, not just moving the weight up.",
+    "<strong>Keep your wrists straight and neutral</strong> so the work stays in your biceps and off your forearms."
+  ],
+  "tricep extension": [
+    "<strong>Elbows pointed straight up</strong> and pinned. If they flare out, the long head of the tricep loses tension.",
+    "<strong>Stretch deep at the bottom.</strong> Long-head triceps grow most from the lengthened position.",
+    "<strong>Lockout firm at the top</strong> with a brief squeeze. Don't snap your elbows — control the extension.",
+    "<strong>Light weight beats heavy slop here.</strong> Form matters more than load for arm isolation.",
+    "<strong>Eyes forward, not at the weight.</strong> Watching the weight tips your head and changes elbow position."
+  ],
+  "lateral raise": [
+    "<strong>Lead with your elbows</strong>, not your hands. The elbow rises first, hands trail.",
+    "<strong>Stop at shoulder height.</strong> Going higher recruits your traps instead of your delts.",
+    "<strong>Slight bend in the elbow</strong> throughout. Straight arms turn this into a shoulder injury waiting to happen.",
+    "<strong>Lower for 3 seconds.</strong> Delts respond hugely to slow eccentrics.",
+    "<strong>Light weight wins.</strong> If you need momentum to lift it, you're training your hip drive, not your delts."
+  ],
+  "lunge": [
+    "<strong>Front shin stays vertical</strong> at the bottom. Knee drifting past toes loads the kneecap, not the muscles.",
+    "<strong>Drive through the front heel</strong> to stand up — this recruits glutes over quads.",
+    "<strong>Torso upright</strong>, slight forward lean only. Don't hunch over.",
+    "<strong>Step long for glutes</strong>, step short for quads. Adjust based on what you're trying to grow.",
+    "<strong>Touch back knee softly</strong> to the ground — don't smash it."
+  ],
+  "calisthenics": [
+    "<strong>Quality over quantity.</strong> 5 clean reps beats 15 sloppy ones for muscle building.",
+    "<strong>Full range of motion every rep.</strong> Half-reps hide weak ranges.",
+    "<strong>Slow the eccentric (2–3s).</strong> This is the highest-ROI change you can make to bodyweight training.",
+    "<strong>Pause briefly at the hardest part.</strong> Iso holds build strength fast.",
+    "<strong>Breathe out on exertion, in on the way down.</strong> Don't hold your breath unless you're going maximal."
+  ],
+  "weights": [
+    "<strong>Slow the eccentric.</strong> 2–3 seconds lowering builds more muscle than any other tweak.",
+    "<strong>Brace your core every rep</strong> — even on isolation work. Stability lets you express strength.",
+    "<strong>Squeeze the target muscle</strong> through the full rep. Mind-muscle connection isn't woo; it recruits more fibers.",
+    "<strong>Don't bounce out of the bottom.</strong> Brief pause kills momentum and forces real work.",
+    "<strong>If form breaks, the rep doesn't count.</strong> Drop the weight and finish clean."
+  ]
+};
+const GENERIC_TIPS = [
+  "<strong>Brace your core hard before every rep.</strong> A stable midsection lets you push more force.",
+  "<strong>Slow the eccentric (2–3s lowering).</strong> This is where most muscle damage and growth happens.",
+  "<strong>Focus on squeezing the target muscle</strong> through the rep — not just moving the weight.",
+  "<strong>Don't bounce out of the bottom.</strong> Pause briefly to eliminate momentum.",
+  "<strong>Your last rep should be hard but clean.</strong> If form breaks, that rep doesn't count.",
+  "<strong>Breathe out on exertion, in on the way down.</strong> Don't hold your breath unless going maximal.",
+  "<strong>Full range of motion every rep.</strong> Half-reps hide weak ranges and limit growth."
+];
+function pickTipForExercise(name) {
+  const key = (name || "").toLowerCase().trim();
+  if (!key) return GENERIC_TIPS[Math.floor(Math.random() * GENERIC_TIPS.length)];
+  if (EXERCISE_TIPS[key]) {
+    const tips = EXERCISE_TIPS[key];
+    return tips[Math.floor(Math.random() * tips.length)];
+  }
+  // Try partial match: does any known exercise key appear in the name?
+  for (const exKey of Object.keys(EXERCISE_TIPS)) {
+    if (key.includes(exKey)) {
+      const tips = EXERCISE_TIPS[exKey];
+      return tips[Math.floor(Math.random() * tips.length)];
+    }
+  }
+  return GENERIC_TIPS[Math.floor(Math.random() * GENERIC_TIPS.length)];
+}
+
+let __tipTimeouts = [];
+function clearTipTimeouts() {
+  __tipTimeouts.forEach(t => clearTimeout(t));
+  __tipTimeouts = [];
+}
+function showTipOverlay(exerciseName) {
+  const overlay = document.getElementById("tip-overlay");
+  if (!overlay) return;
+  clearTipTimeouts();
+  const tip = pickTipForExercise(exerciseName);
+  document.getElementById("tip-exname").textContent = exerciseName || "Form cue";
+  document.getElementById("tip-content").innerHTML = tip;
+  overlay.classList.remove("hiding");
+  overlay.style.display = "flex";
+  // Force reflow then add .show so 5s fade-in actually animates
+  void overlay.offsetWidth;
+  overlay.classList.add("show");
+  // After 25s total (5s fade in + 20s visible), start the fade out
+  __tipTimeouts.push(setTimeout(() => {
+    overlay.classList.remove("show");
+    overlay.classList.add("hiding");
+  }, 25000));
+  // At 30s total, fully hide
+  __tipTimeouts.push(setTimeout(() => {
+    overlay.style.display = "none";
+    overlay.classList.remove("hiding");
+  }, 30000));
+}
+function hideTipOverlay() {
+  clearTipTimeouts();
+  const overlay = document.getElementById("tip-overlay");
+  if (!overlay) return;
+  overlay.classList.remove("show", "hiding");
+  overlay.style.display = "none";
+}
+
+// ============ RECOVERY TIPS (end of session) ============
+const RECOVERY_TIPS = [
+  "<strong>Eat 30–50g of protein within the next 60 minutes.</strong> Muscle protein synthesis stays elevated for 2–3 hours post-workout — feed it.",
+  "<strong>Sleep 7–9 hours tonight.</strong> Growth hormone peaks in deep sleep. This is when you actually grow.",
+  "<strong>Walk 10–20 minutes later today.</strong> Light movement clears lactate and reduces tomorrow's soreness more than sitting still.",
+  "<strong>Take 5g creatine with your post-workout meal.</strong> Daily intake builds saturation — timing matters less than consistency.",
+  "<strong>Skip the cold shower if hypertrophy is the goal.</strong> Cold reduces the inflammation that's part of building muscle. Use cold on rest days instead.",
+  "<strong>Don't skip tomorrow's meals.</strong> Recovery happens between sessions, not just after them. Under-eating now means underperforming next session.",
+  "<strong>Stretch the muscles you trained tomorrow morning</strong>, not now. Post-workout static stretching can blunt strength gains for up to 24h.",
+  "<strong>Hydrate with electrolytes</strong>, not just water — especially if you sweated through this session. Plain water dilutes sodium and slows recovery."
+];
+function pickRecoveryTip() {
+  return RECOVERY_TIPS[Math.floor(Math.random() * RECOVERY_TIPS.length)];
+}
+
 // ============ REST TIMER (between sets) ============
 const REST_TIMER_DURATION = 90;
 const REST_TIMER_RADIUS = 38;
@@ -1166,7 +1577,7 @@ const REST_TIMER_CIRCUM = 2 * Math.PI * REST_TIMER_RADIUS;
 let __restTimerInterval = null;
 let __restTimerSecondsLeft = 0;
 
-function startRestTimer() {
+function startRestTimer(exerciseName) {
   if (__restTimerInterval) clearInterval(__restTimerInterval);
   __restTimerSecondsLeft = REST_TIMER_DURATION;
   const overlay = document.getElementById("rest-timer-overlay");
@@ -1180,6 +1591,8 @@ function startRestTimer() {
   overlay.querySelector(".timer-ready").classList.remove("show");
   overlay.classList.add("active");
   updateRestTimerDisplay();
+  // Tip overlay during rest (only when there's an exercise context)
+  if (exerciseName) showTipOverlay(exerciseName);
   __restTimerInterval = setInterval(() => {
     __restTimerSecondsLeft--;
     updateRestTimerDisplay();
@@ -1199,6 +1612,7 @@ function stopRestTimer() {
   overlay.querySelector(".timer-ready").classList.remove("show");
   const arc = document.getElementById("timer-arc");
   if (arc) arc.classList.remove("warning");
+  hideTipOverlay();
 }
 
 function updateRestTimerDisplay() {
@@ -1540,11 +1954,26 @@ function renderLiftSession(root, dayId, exIdx) {
       const field = inp.dataset.field;
       const raw = inp.value.trim();
       const v = raw === '' ? 0 : Number(raw);
-      while (sessEx.sets.length <= idx) sessEx.sets.push({ w: 0, r: 0 });
-      sessEx.sets[idx][field] = isNaN(v) ? 0 : v;
-      saveData();
-      // Reps confirmed → kick off 90s rest timer
-      if (field === 'r' && v > 0) startRestTimer();
+
+      // Helper: actually save the value
+      const commit = () => {
+        while (sessEx.sets.length <= idx) sessEx.sets.push({ w: 0, r: 0 });
+        sessEx.sets[idx][field] = isNaN(v) ? 0 : v;
+        saveData();
+        // Reps confirmed → kick off 90s rest timer with the exercise's tip
+        if (field === 'r' && v > 0) startRestTimer(exercise.name);
+      };
+
+      // Gate: before the first reps of this session, force DND confirmation
+      if (field === 'r' && v > 0 && !isDndConfirmed(dayId)) {
+        showDndModal(
+          () => { markDndConfirmed(dayId); commit(); },
+          () => { inp.value = ''; }  // user cancelled — clear the input
+        );
+        return;
+      }
+
+      commit();
     });
   });
   document.getElementById("add-extra-set").addEventListener("click", () => {
@@ -1594,6 +2023,7 @@ function renderLiftComplete(root, dayId) {
     }
   }
 
+  const recoveryTip = pickRecoveryTip();
   root.innerHTML = `
     <div class="complete-card">
       <div class="complete-icon"><i class="ti ti-trophy"></i></div>
@@ -1601,6 +2031,30 @@ function renderLiftComplete(root, dayId) {
       <div class="complete-meta">${escapeHtml(day ? day.name : 'Workout')} · ${totalSets} sets logged</div>
       ${beatCount > 0 ? `<div style="margin-top: 14px; color: var(--accent); font-weight: 700; font-size: 15px;">${beatCount} set${beatCount > 1 ? 's' : ''} beat your last session</div>` : ''}
     </div>
+
+    <div class="card pad" style="margin-bottom: 12px;">
+      <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 10px;">Do this next</div>
+      <div style="display: flex; align-items: flex-start; gap: 12px; padding: 8px 0;">
+        <i class="ti ti-droplet" style="font-size: 22px; color: var(--accent-2); flex-shrink: 0; margin-top: 2px;"></i>
+        <div>
+          <div style="font-weight: 700; font-size: 15px;">Drink 500ml of water</div>
+          <div style="font-size: 13px; color: var(--muted); margin-top: 2px;">Rehydrate before anything else.</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; border-top: 1px solid var(--border);">
+        <i class="ti ti-meat" style="font-size: 22px; color: var(--accent); flex-shrink: 0; margin-top: 2px;"></i>
+        <div>
+          <div style="font-weight: 700; font-size: 15px;">High-protein meal in the next 60 min</div>
+          <div style="font-size: 13px; color: var(--muted); margin-top: 2px;">Aim for 30–50g protein. This window is when muscle protein synthesis is highest.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card pad" style="margin-bottom: 12px;">
+      <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px;">Recovery tip</div>
+      <div style="font-size: 14px; line-height: 1.5;">${recoveryTip}</div>
+    </div>
+
     <button class="submit-big" id="back-to-days">Back to workouts</button>
   `;
   document.getElementById("back-to-days").addEventListener("click", () => {
@@ -1618,6 +2072,7 @@ function renderAll() {
   renderLift();
 }
 renderAll();
+showQuoteSplash(); // brief quote overlay on every app open
 
 // Auto-refresh at midnight so Today empties out and yesterday's ticks
 // fall into the Progress grid without needing to reopen the app.
