@@ -14,6 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <title>AiDHDen</title>
 <style>
   :root {
@@ -235,6 +236,80 @@
   .weigh-input-row { display: flex; gap: 6px; align-items: stretch; }
   .weigh-input { width: 70px; padding: 10px 8px; text-align: center; font-size: 15px; }
   .weigh-input-row .btn { padding: 10px 14px; font-size: 14px; }
+
+  /* Today header — monthly stat next to the gear */
+  .today-month-stat {
+    text-align: right;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .today-month-stat.up { color: var(--danger); }
+  .today-month-stat .tms-cap {
+    display: block;
+    font-size: 8.5px; color: var(--muted); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 1px;
+  }
+  .today-month-stat:empty { display: none; }
+
+  /* Weight tab — clean Apple-style goal card */
+  .mp-clean {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 22px 12px;
+    margin-bottom: 14px;
+  }
+  .mp-clean .mc-cap {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.16em;
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+  .mp-clean .mc-pct {
+    font-size: 60px; font-weight: 800;
+    letter-spacing: -0.04em; line-height: 1;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .mp-clean .mc-pct .sign {
+    font-size: 28px; font-weight: 700; color: var(--muted);
+    margin-left: 4px; vertical-align: 8px;
+  }
+  .mp-clean .mc-pct.done { color: var(--accent); }
+  .mp-clean .mc-sub {
+    font-size: 13px; color: var(--muted);
+    margin: 6px 0 18px;
+    letter-spacing: -0.005em;
+  }
+  .mp-clean .mc-row {
+    display: flex; justify-content: space-between;
+    align-items: baseline;
+    padding: 11px 0;
+    font-size: 14px;
+    border-top: 0.5px solid var(--border);
+  }
+  .mp-clean .mc-row .mc-k { color: var(--muted); }
+  .mp-clean .mc-row .mc-v {
+    font-weight: 700; font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  .mp-clean .mc-row .mc-v.accent { color: var(--accent); }
+  .mp-clean .mc-row .mc-v.danger { color: var(--danger); }
+  .mp-clean .mc-edit {
+    display: block; width: 100%;
+    background: transparent; color: var(--accent-2);
+    border: none; font-size: 13px; font-weight: 600;
+    padding: 14px 0 4px;
+    cursor: pointer; font-family: inherit;
+    border-top: 0.5px solid var(--border);
+    margin-top: 4px;
+    letter-spacing: -0.005em;
+  }
+  .mp-clean .mc-edit:hover { color: var(--accent); }
 
   /* Compact weigh-in strip on Today */
   .weigh-strip {
@@ -513,6 +588,74 @@
     box-sizing: border-box;
   }
   .checkin-card textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+
+  /* Login screen (auth gate) */
+  .login-screen {
+    position: fixed; inset: 0; z-index: 700;
+    background: #ffffff;
+    display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 32px;
+  }
+  .login-screen.show { display: flex; }
+  .login-content { max-width: 320px; width: 100%; text-align: center; }
+  .login-wordmark {
+    font-family: "Poppins", -apple-system, system-ui, sans-serif;
+    font-size: 32px; font-weight: 700;
+    letter-spacing: -0.02em; line-height: 1;
+    margin-bottom: 28px;
+  }
+  .login-wordmark .adhd { color: #1c1c1e; }
+  .login-wordmark .accent { color: #10b981; }
+  .login-screen h2 { font-size: 22px; font-weight: 700; margin: 0 0 6px; }
+  .login-sub {
+    color: var(--muted); font-size: 14px;
+    margin: 0 0 24px; line-height: 1.5;
+  }
+  .login-screen input[type="email"] {
+    width: 100%; padding: 14px; font-size: 15px;
+    background: var(--card-2); border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 10px;
+    text-align: center; box-sizing: border-box;
+  }
+  .login-screen input[type="email"]:focus {
+    outline: 2px solid var(--accent); outline-offset: 0;
+  }
+  .login-screen .btn {
+    width: 100%; padding: 14px;
+    font-size: 15px; font-weight: 700;
+  }
+  #login-status {
+    margin-top: 16px; font-size: 13px;
+    color: var(--muted); min-height: 18px;
+    line-height: 1.4;
+  }
+  #login-status.success { color: var(--accent); font-weight: 600; }
+  #login-status.error { color: var(--danger); }
+  .login-footer {
+    margin-top: 28px;
+    font-size: 11px; color: var(--muted);
+    line-height: 1.6;
+  }
+  .login-footer a { color: var(--accent-2); }
+
+  /* Sync status pill at top of Today */
+  .sync-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; color: var(--muted);
+    background: var(--card-2);
+    padding: 2px 8px; border-radius: 999px;
+    margin-left: 8px; vertical-align: 3px;
+  }
+  .sync-pill.syncing { color: var(--accent-2); }
+  .sync-pill.error { color: var(--danger); }
+  .sync-pill .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+  }
+  .sync-pill.syncing .dot { background: var(--accent-2); animation: pulse 1s infinite; }
+  .sync-pill.error .dot { background: var(--danger); }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
   /* Photo thumbnail in weight history */
   .weight-photo-thumb {
@@ -946,7 +1089,10 @@
       <h1 id="greeting">Today</h1>
       <p class="subtitle" id="today-date"></p>
     </div>
-    <button class="today-gear" id="open-settings" aria-label="Edit habits & settings"><i class="ti ti-settings"></i></button>
+    <div style="display: flex; align-items: center; gap: 10px; margin-top: 12px;">
+      <div class="today-month-stat" id="today-month-stat"></div>
+      <button class="today-gear" id="open-settings" aria-label="Edit habits & settings"><i class="ti ti-settings"></i></button>
+    </div>
   </div>
 
   <!-- TODAY -->
@@ -1016,6 +1162,17 @@
 
   <!-- WEIGHT -->
   <section class="view" id="view-weight">
+    <div class="mp-clean" id="month-progress-lg" style="display: none;">
+      <div class="mc-cap" id="mc-cap">MAY</div>
+      <div class="mc-pct" id="mc-pct">0<span class="sign">%</span></div>
+      <div class="mc-sub" id="mc-sub">of your monthly goal</div>
+      <div class="mc-row"><span class="mc-k">Lost this month</span><span class="mc-v accent" id="mc-lost">—</span></div>
+      <div class="mc-row"><span class="mc-k">Remaining</span><span class="mc-v" id="mc-togo">—</span></div>
+      <div class="mc-row"><span class="mc-k">Start of month</span><span class="mc-v" id="mc-start">—</span></div>
+      <div class="mc-row"><span class="mc-k">Goal</span><span class="mc-v" id="mc-goal">—</span></div>
+      <button class="mc-edit" id="mp-lg-edit">Edit goal</button>
+    </div>
+
     <h2>Last 30 days</h2>
     <div class="card pad">
       <div id="weight-chart"></div>
@@ -1045,6 +1202,24 @@
     <!-- Populated by renderLift() -->
   </section>
 
+
+  <!-- Login screen (sits on top of everything else when signed out) -->
+  <div id="login-screen" class="login-screen" role="dialog" aria-label="Sign in">
+    <div class="login-content">
+      <div class="login-wordmark">
+        <span class="adhd">A</span><span class="accent">i</span><span class="adhd">DHD</span><span class="accent">en</span>
+      </div>
+      <h2>Welcome</h2>
+      <p class="login-sub">Sign in to sync your data across devices. No password — we'll email you a magic link.</p>
+      <input type="email" id="login-email" placeholder="your@email.com" autocomplete="email" />
+      <button class="btn" id="login-btn">Send magic link</button>
+      <div id="login-status"></div>
+      <div class="login-footer">
+        Your data lives in your private Supabase project.<br/>
+        Each family member gets their own account.
+      </div>
+    </div>
+  </div>
 
   <!-- Splash on app open: quote takes center stage, small logo at bottom -->
   <div id="quote-splash" class="quote-splash" role="dialog" aria-label="App splash">
@@ -1087,6 +1262,20 @@
 
   <!-- Lightbox for tapping photos in history -->
   <div id="photo-lightbox" class="photo-lightbox" role="dialog"><img id="photo-lightbox-img" alt=""></div>
+
+  <!-- Monthly goal modal (asks on first weigh-in of the month) -->
+  <div id="goal-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="mc-icon"><i class="ti ti-target"></i></div>
+      <h3 id="goal-modal-title">Monthly goal</h3>
+      <p id="goal-modal-sub">What's your target weight by the end of the month?</p>
+      <input id="goal-input" type="number" step="0.1" inputmode="decimal" placeholder="kg" style="width: 100%; padding: 12px; font-size: 16px; text-align: center; background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; margin-bottom: 14px;" />
+      <div class="mc-btns">
+        <button id="goal-skip" class="mc-cancel">Skip</button>
+        <button id="goal-save" class="mc-confirm">Set goal</button>
+      </div>
+    </div>
+  </div>
 
   <!-- DND confirmation modal (before first set) -->
   <div id="dnd-modal" class="modal-overlay" role="dialog" aria-modal="true">
@@ -1400,14 +1589,168 @@ function renderProgress() {
   document.getElementById("best-streak").textContent = best;
 }
 
+// ============ MONTHLY GOAL TRACKING ============
+function getCurrentMonthKey() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+}
+function getMonthName(monthKey) {
+  const [y, m] = monthKey.split("-").map(Number);
+  return new Date(y, m - 1, 1).toLocaleDateString(undefined, { month: "long" });
+}
+function getMonthlyProgress() {
+  const monthKey = getCurrentMonthKey();
+  const goal = (data.monthlyGoals || {})[monthKey] || null;
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1); startOfMonth.setHours(0, 0, 0, 0);
+  // data.weights is newest-first
+  const thisMonth = (data.weights || []).filter(w => new Date(w.when) >= startOfMonth);
+  if (thisMonth.length === 0) return { hasData: false, hasGoal: !!goal, goal, monthKey };
+  const current = Number(thisMonth[0].kg);
+  const startWeight = Number(thisMonth[thisMonth.length - 1].kg);
+  const moved = startWeight - current; // positive = lost
+  if (!goal) {
+    return { hasData: true, hasGoal: false, monthKey, startWeight, current, moved };
+  }
+  const targetMove = startWeight - goal; // positive if cutting (goal < start)
+  const isCut = targetMove > 0;
+  const isBulk = targetMove < 0;
+  const toGoRaw = current - goal;
+  let percent = 0;
+  if (Math.abs(targetMove) > 0.01) percent = (moved / targetMove) * 100;
+  percent = Math.max(0, Math.min(100, percent));
+  const achieved = (isCut && current <= goal) || (isBulk && current >= goal);
+  return {
+    hasData: true, hasGoal: true, monthKey, goal, startWeight, current,
+    moved, toGo: Math.abs(toGoRaw), percent, achieved,
+    direction: isCut ? "cut" : (isBulk ? "bulk" : "flat")
+  };
+}
+function isFirstWeightOfMonth() {
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1); startOfMonth.setHours(0, 0, 0, 0);
+  const thisMonth = (data.weights || []).filter(w => new Date(w.when) >= startOfMonth);
+  return thisMonth.length === 1;
+}
+function showGoalModal(monthKey, onDone) {
+  const m = document.getElementById("goal-modal");
+  if (!m) { if (onDone) onDone(); return; }
+  const monthName = getMonthName(monthKey);
+  document.getElementById("goal-modal-title").textContent = monthName + " goal";
+  document.getElementById("goal-modal-sub").textContent =
+    `What's your target weight by the end of ${monthName}? Leave blank if you don't have one.`;
+  const input = document.getElementById("goal-input");
+  input.value = "";
+  m.classList.add("show");
+  const save = document.getElementById("goal-save");
+  const skip = document.getElementById("goal-skip");
+  const cleanup = () => {
+    m.classList.remove("show");
+    save.removeEventListener("click", onSave);
+    skip.removeEventListener("click", onSkip);
+  };
+  const onSave = () => {
+    const v = Number(input.value);
+    if (!v || v <= 0) { input.focus(); return; }
+    if (!data.monthlyGoals) data.monthlyGoals = {};
+    data.monthlyGoals[monthKey] = v;
+    saveData(); cleanup(); renderAll();
+    if (onDone) onDone();
+  };
+  const onSkip = () => { cleanup(); if (onDone) onDone(); };
+  save.addEventListener("click", onSave);
+  skip.addEventListener("click", onSkip);
+  setTimeout(() => input.focus(), 100);
+}
+function renderMonthProgress() {
+  const p = getMonthlyProgress();
+
+  // ----- Today: inline stat next to gear -----
+  const stat = document.getElementById("today-month-stat");
+  if (stat) {
+    if (!p.hasData) {
+      stat.innerHTML = "";
+      stat.classList.remove("up");
+    } else if (p.moved > 0) {
+      stat.innerHTML = `<span class="tms-cap">this month</span>↓ ${p.moved.toFixed(1)} kg`;
+      stat.classList.remove("up");
+    } else if (p.moved < 0) {
+      stat.innerHTML = `<span class="tms-cap">this month</span>↑ ${Math.abs(p.moved).toFixed(1)} kg`;
+      stat.classList.add("up");
+    } else {
+      stat.innerHTML = `<span class="tms-cap">this month</span>0.0 kg`;
+      stat.classList.remove("up");
+    }
+  }
+
+  // ----- Weight tab: clean card -----
+  const cardLg = document.getElementById("month-progress-lg");
+  if (cardLg) {
+    if (!p.hasData && !p.hasGoal) {
+      cardLg.style.display = "none";
+      return;
+    }
+    cardLg.style.display = "block";
+    document.getElementById("mc-cap").textContent = getMonthName(p.monthKey).toUpperCase();
+
+    const pctEl = document.getElementById("mc-pct");
+    const subEl = document.getElementById("mc-sub");
+    if (p.hasGoal && p.hasData) {
+      pctEl.innerHTML = `${Math.round(p.percent)}<span class="sign">%</span>`;
+      pctEl.classList.toggle("done", !!p.achieved);
+      subEl.textContent = p.achieved ? "goal achieved" : "of your monthly goal";
+    } else if (p.hasGoal) {
+      pctEl.innerHTML = `0<span class="sign">%</span>`;
+      pctEl.classList.remove("done");
+      subEl.textContent = "log a weight to start tracking";
+    } else {
+      pctEl.innerHTML = `—`;
+      pctEl.classList.remove("done");
+      subEl.textContent = "tap edit to set this month's goal";
+    }
+
+    const lostEl = document.getElementById("mc-lost");
+    if (p.hasData) {
+      if (p.moved >= 0) { lostEl.textContent = `−${p.moved.toFixed(1)} kg`; lostEl.className = "mc-v accent"; }
+      else { lostEl.textContent = `+${Math.abs(p.moved).toFixed(1)} kg`; lostEl.className = "mc-v danger"; }
+    } else { lostEl.textContent = "—"; lostEl.className = "mc-v"; }
+
+    document.getElementById("mc-togo").textContent =
+      p.hasGoal && p.hasData ? (p.achieved ? "0.0 kg" : `${p.toGo.toFixed(1)} kg`) : "—";
+    document.getElementById("mc-start").textContent = p.hasData ? `${p.startWeight} kg` : "—";
+    document.getElementById("mc-goal").textContent = p.hasGoal ? `${p.goal} kg` : "Not set";
+  }
+}
+
+// Wire the "Edit goal" button on the Weight tab
+(function wireEditGoal() {
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("#mp-lg-edit")) {
+      showGoalModal(getCurrentMonthKey());
+    }
+  });
+})();
+
 // ============ WEIGHT + WEEKLY CHECK-IN ============
 function logWeight(v) {
   if (!v || v <= 0) { alert("Enter a valid weight"); return false; }
   const entry = { id: Date.now(), kg: v, when: new Date().toISOString() };
   data.weights.unshift(entry);
   saveData();
-  // Prompt for weekly check-in if 7+ days since last
-  if (shouldPromptCheckin()) {
+
+  // Determine what to prompt
+  const monthKey = getCurrentMonthKey();
+  const needGoal = isFirstWeightOfMonth() && !((data.monthlyGoals || {})[monthKey]);
+  const needCheckin = shouldPromptCheckin();
+
+  // Chain modals if both are needed; goal first, then weekly check-in
+  if (needGoal && needCheckin) {
+    setTimeout(() => showGoalModal(monthKey, () => {
+      setTimeout(() => showCheckinModal(entry), 250);
+    }), 250);
+  } else if (needGoal) {
+    setTimeout(() => showGoalModal(monthKey), 250);
+  } else if (needCheckin) {
     setTimeout(() => showCheckinModal(entry), 250);
   }
   return true;
@@ -1432,7 +1775,11 @@ function resizeAndEncodePhoto(file, callback) {
       const canvas = document.createElement("canvas");
       canvas.width = w; canvas.height = h;
       canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-      callback(canvas.toDataURL("image/jpeg", 0.7));
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+      // Also produce a Blob for upload to Storage
+      canvas.toBlob((blob) => {
+        callback({ dataUrl, blob });
+      }, "image/jpeg", 0.7);
     };
     img.onerror = () => callback(null);
     img.src = e.target.result;
@@ -1461,11 +1808,11 @@ function showCheckinModal(weightEntry) {
   photoInput.addEventListener("change", () => {
     const f = photoInput.files && photoInput.files[0];
     if (!f) return;
-    resizeAndEncodePhoto(f, (dataUrl) => {
-      if (!dataUrl) { alert("Couldn't read that image."); return; }
-      __pendingPhoto = dataUrl;
+    resizeAndEncodePhoto(f, (result) => {
+      if (!result || !result.dataUrl) { alert("Couldn't read that image."); return; }
+      __pendingPhoto = result; // { dataUrl, blob }
       wrap.innerHTML = `
-        <img src="${dataUrl}" class="ci-photo-preview" alt="Progress photo">
+        <img src="${result.dataUrl}" class="ci-photo-preview" alt="Progress photo">
         <button class="ci-photo-clear" id="ci-photo-clear" type="button" aria-label="Remove photo"><i class="ti ti-x"></i></button>
       `;
       document.getElementById("ci-photo-clear").addEventListener("click", () => {
@@ -1482,9 +1829,20 @@ function showCheckinModal(weightEntry) {
     save.removeEventListener("click", onSave);
     skip.removeEventListener("click", onSkip);
   };
-  const onSave = () => {
+  const onSave = async () => {
     const comment = document.getElementById("ci-comment").value.trim();
-    if (__pendingPhoto) weightEntry.photo = __pendingPhoto;
+    if (__pendingPhoto && __pendingPhoto.dataUrl) {
+      weightEntry.photo = __pendingPhoto.dataUrl; // local cache for instant display
+      // Fire-and-forget upload to Supabase Storage so other devices can fetch it
+      if (__pendingPhoto.blob && __authedUserId) {
+        uploadPhotoToCloud(weightEntry.id, __pendingPhoto.blob).then(path => {
+          if (path) {
+            weightEntry.photoPath = path;
+            saveData(); // triggers cloud sync of the metadata
+          }
+        });
+      }
+    }
     if (comment) weightEntry.comment = comment;
     data.lastCheckin = new Date().toISOString();
     try { saveData(); } catch (e) { alert("Photo too large — try a smaller one."); }
@@ -1651,10 +2009,12 @@ function renderWeight() {
     ul.innerHTML = `<li class="muted" style="justify-content:center;">No weight entries yet.</li>`;
     return;
   }
-  ul.innerHTML = data.weights.slice(0, 30).map(w => `
+  ul.innerHTML = data.weights.slice(0, 30).map(w => {
+    const photoSrc = w.photo || w.photoSignedUrl || null;
+    return `
     <li>
       <div class="weight-row" style="flex: 1; min-width: 0;">
-        ${w.photo ? `<img src="${w.photo}" class="weight-photo-thumb" alt="Progress photo">` : ''}
+        ${photoSrc ? `<img src="${photoSrc}" class="weight-photo-thumb" alt="Progress photo">` : ''}
         <div style="flex: 1; min-width: 0;">
           <div style="font-weight: 600;">${w.kg} kg</div>
           <div class="muted" style="font-size: 12px;">${fmtDateTime(w.when)}</div>
@@ -1663,7 +2023,8 @@ function renderWeight() {
       </div>
       <button class="btn danger" data-id="${w.id}">Delete</button>
     </li>
-  `).join("");
+  `;
+  }).join("");
   ul.querySelectorAll(".btn.danger").forEach(b => {
     b.addEventListener("click", () => {
       const id = Number(b.dataset.id);
@@ -3151,6 +3512,7 @@ function buildBigChart(sessions) {
 function renderAll() {
   renderToday();
   renderWeighCard();
+  renderMonthProgress();
   renderProgress();
   renderProgressView();
   renderWeight();
@@ -3159,6 +3521,200 @@ function renderAll() {
 }
 renderAll();
 showQuoteSplash(); // brief quote overlay on every app open
+
+// ============ SUPABASE CLOUD SYNC ============
+const SB_URL = "https://kdmoognapnkwhanusxkl.supabase.co";
+const SB_KEY = "sb_publishable_0YwcoaI-6AK8PKNc2hY7tA_UWjnXJ2W";
+const SB = (typeof supabase !== "undefined")
+  ? supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } })
+  : null;
+let __authedUserId = null;
+let __cloudPushTimer = null;
+
+// Wrap saveData so every change also schedules a cloud push (debounced)
+const __origSaveData = saveData;
+saveData = function () {
+  __origSaveData();
+  if (__authedUserId) {
+    if (__cloudPushTimer) clearTimeout(__cloudPushTimer);
+    __cloudPushTimer = setTimeout(pushToCloud, 1500);
+    setSyncStatus("syncing");
+  }
+};
+
+function setSyncStatus(state) {
+  // Optional: update a sync pill if it exists in the DOM
+  const pill = document.getElementById("sync-pill");
+  if (!pill) return;
+  pill.classList.remove("syncing", "error");
+  if (state === "syncing") pill.classList.add("syncing");
+  else if (state === "error") pill.classList.add("error");
+}
+
+function showLoginScreen() {
+  document.getElementById("login-screen").classList.add("show");
+}
+function hideLoginScreen() {
+  document.getElementById("login-screen").classList.remove("show");
+}
+
+async function pushToCloud() {
+  if (!SB || !__authedUserId) return;
+  try {
+    // Strip out heavy photo base64 — those live in Storage by path
+    const syncData = JSON.parse(JSON.stringify(data));
+    if (syncData.weights) {
+      syncData.weights = syncData.weights.map(w => {
+        const { photo, photoSignedUrl, ...rest } = w;
+        return rest;
+      });
+    }
+    const { error } = await SB.from("profiles").upsert({
+      user_id: __authedUserId,
+      data: syncData,
+      last_checkin_at: data.lastCheckin || null,
+      shown_edu_tips: data.shownEduTips || {}
+    });
+    if (error) throw error;
+    setSyncStatus("ok");
+  } catch (e) {
+    console.warn("Cloud push failed:", e);
+    setSyncStatus("error");
+  }
+}
+
+async function pullFromCloud() {
+  if (!SB || !__authedUserId) return;
+  try {
+    const { data: rows, error } = await SB.from("profiles")
+      .select("data, last_checkin_at, shown_edu_tips")
+      .eq("user_id", __authedUserId)
+      .maybeSingle();
+    if (error) throw error;
+    if (rows && rows.data && Object.keys(rows.data).length > 0) {
+      // Cloud has data — merge it into local
+      const cloudData = rows.data;
+      // Preserve any local photo base64 that we have for entries that match
+      const localPhotos = {};
+      (data.weights || []).forEach(w => { if (w.photo) localPhotos[w.id] = w.photo; });
+      Object.assign(data, cloudData);
+      // Re-attach local photo base64 where available (instant display)
+      (data.weights || []).forEach(w => {
+        if (localPhotos[w.id]) w.photo = localPhotos[w.id];
+      });
+      if (rows.last_checkin_at) data.lastCheckin = rows.last_checkin_at;
+      if (rows.shown_edu_tips) data.shownEduTips = rows.shown_edu_tips;
+      __origSaveData(); // save to localStorage without re-triggering push
+      renderAll();
+    } else {
+      // First time signing in on this account — push existing local data up
+      await pushToCloud();
+    }
+  } catch (e) {
+    console.warn("Cloud pull failed:", e);
+  }
+}
+
+// Photo upload to Supabase Storage
+async function uploadPhotoToCloud(weightId, blob) {
+  if (!SB || !__authedUserId) return null;
+  try {
+    const path = `${__authedUserId}/${weightId}.jpg`;
+    const { error } = await SB.storage.from("photos").upload(path, blob, {
+      contentType: "image/jpeg",
+      upsert: true
+    });
+    if (error) throw error;
+    return path;
+  } catch (e) {
+    console.warn("Photo upload failed:", e);
+    return null;
+  }
+}
+
+async function getSignedPhotoUrl(path) {
+  if (!SB || !path) return null;
+  try {
+    const { data: signed, error } = await SB.storage.from("photos")
+      .createSignedUrl(path, 3600);
+    if (error) throw error;
+    return signed.signedUrl;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Hydrate signed URLs for weights that have photoPath but no local photo
+async function hydratePhotoUrls() {
+  if (!SB || !__authedUserId) return;
+  let changed = false;
+  for (const w of (data.weights || [])) {
+    if (w.photoPath && !w.photo && !w.photoSignedUrl) {
+      w.photoSignedUrl = await getSignedPhotoUrl(w.photoPath);
+      changed = true;
+    }
+  }
+  if (changed) renderWeight();
+}
+
+// ============ AUTH WIRING ============
+async function initAuth() {
+  if (!SB) {
+    console.warn("Supabase library not loaded — running in local-only mode.");
+    return;
+  }
+  const { data: { session } } = await SB.auth.getSession();
+  if (session && session.user) {
+    __authedUserId = session.user.id;
+    hideLoginScreen();
+    await pullFromCloud();
+    await hydratePhotoUrls();
+  } else {
+    showLoginScreen();
+  }
+  SB.auth.onAuthStateChange(async (event, session) => {
+    if (event === "SIGNED_IN" && session && session.user) {
+      __authedUserId = session.user.id;
+      hideLoginScreen();
+      await pullFromCloud();
+      await hydratePhotoUrls();
+    } else if (event === "SIGNED_OUT") {
+      __authedUserId = null;
+      showLoginScreen();
+    }
+  });
+}
+
+// Wire login button
+document.getElementById("login-btn").addEventListener("click", async () => {
+  const email = document.getElementById("login-email").value.trim();
+  const status = document.getElementById("login-status");
+  status.className = "";
+  if (!email || !email.includes("@")) {
+    status.textContent = "Enter a valid email.";
+    status.className = "error";
+    return;
+  }
+  status.textContent = "Sending…";
+  if (!SB) {
+    status.textContent = "Supabase failed to load. Check your connection.";
+    status.className = "error";
+    return;
+  }
+  const { error } = await SB.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.origin + window.location.pathname }
+  });
+  if (error) {
+    status.textContent = "Error: " + error.message;
+    status.className = "error";
+  } else {
+    status.textContent = "✓ Check your email for the magic link.";
+    status.className = "success";
+  }
+});
+
+initAuth();
 
 // Auto-refresh at midnight so Today empties out and yesterday's ticks
 // fall into the Progress grid without needing to reopen the app.
