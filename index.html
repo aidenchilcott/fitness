@@ -5,12 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="Fitness" />
-<meta name="theme-color" content="#ffffff" />
+<meta name="apple-mobile-web-app-title" content="AiDHDen" />
+<meta name="theme-color" content="#0b0b0f" />
 <link rel="manifest" href="/manifest.webmanifest" />
 <link rel="apple-touch-icon" href="/icon-180.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
-<title>Fitness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800&display=swap">
+<title>AiDHDen</title>
 <style>
   :root {
     --bg: #ffffff;
@@ -168,15 +172,14 @@
   }
   .progress-axis .ticks { display: flex; justify-content: space-between; padding: 0 2px; }
 
-  /* Landscape rotation: full-screen Progress view */
+  /* Landscape rotation: full-screen Settings (Progress + Habits) view */
   @media (orientation: landscape) {
     body { padding-bottom: 16px; }
     .tabs { display: none; }
     h1, #today-date { display: none; }
     .view { display: none !important; }
-    #view-progress { display: block !important; }
-    #view-progress h2 { font-size: 16px; margin: 8px 0; }
-    #view-progress .subtitle { margin-bottom: 8px; }
+    #view-settings { display: block !important; }
+    #view-settings h2, #view-settings h3 { font-size: 16px; margin: 8px 0; }
     .progress-axis { grid-template-columns: 180px 1fr; font-size: 12px; }
     .progress-row { grid-template-columns: 180px 1fr; }
     .progress-label { font-size: 14px; }
@@ -364,7 +367,7 @@
     font-family: inherit;
   }
 
-  /* Quote splash on app open */
+  /* Splash on app open: white bg, ADHD black, ien green */
   .quote-splash {
     position: fixed; inset: 0;
     background: #ffffff;
@@ -373,25 +376,34 @@
     align-items: center; justify-content: center;
     padding: 32px;
     text-align: center;
-    transition: opacity 0.6s ease;
+    transition: opacity 0.5s ease;
     opacity: 0;
     pointer-events: none;
   }
   .quote-splash.show { opacity: 1; pointer-events: auto; }
+  .quote-splash .wordmark {
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 42px; font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 40px;
+  }
+  .quote-splash .wordmark .adhd { color: #1c1c1e; }   /* ADHD letters → black */
+  .quote-splash .wordmark .accent { color: #10b981; } /* i, e, n → green */
   .quote-splash .qmark {
-    font-size: 56px; color: var(--accent); line-height: 1;
-    margin-bottom: 18px;
+    font-size: 28px; color: #10b981; line-height: 1;
+    margin-bottom: 12px;
   }
   .quote-splash .qtext {
-    font-family: var(--font-serif, Georgia, "Times New Roman", serif);
-    font-size: 22px; font-weight: 500;
-    line-height: 1.35; letter-spacing: -0.01em;
-    color: var(--text); max-width: 320px;
+    font-family: "Poppins", -apple-system, system-ui, sans-serif;
+    font-size: 18px; font-weight: 500;
+    line-height: 1.45; letter-spacing: -0.01em;
+    color: #1c1c1e; max-width: 320px;
   }
   .quote-splash .qsub {
-    font-size: 12px; color: var(--muted);
+    font-size: 10px; color: #8a8a8e;
     margin-top: 24px;
-    text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.18em; font-weight: 600;
   }
 
   /* DND confirmation modal */
@@ -470,15 +482,10 @@
     max-width: 340px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
     opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 5s ease, transform 5s ease;
+    transform: translateY(6px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
   }
-  .tip-overlay.show .tip-card { opacity: 1; transform: translateY(0); }
-  .tip-overlay.hiding .tip-card {
-    opacity: 0;
-    transform: translateY(-4px);
-    transition: opacity 5s ease, transform 5s ease;
-  }
+  .tip-overlay .tip-card.tip-in { opacity: 1; transform: translateY(0); }
   .tip-overlay .tip-cap {
     font-size: 10px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.12em;
@@ -736,41 +743,47 @@
     <div id="habit-list"></div>
   </section>
 
-  <!-- PROGRESS / OVERVIEW -->
-  <section class="view" id="view-progress">
-    <h2>Last 30 days</h2>
+  <!-- SETTINGS (combines Progress + Habits editor) -->
+  <section class="view" id="view-settings">
+    <h2 style="margin-top: 4px;">Settings</h2>
+
+    <h3 style="font-size: 16px; margin: 18px 0 6px;">Progress · last 30 days</h3>
     <p class="subtitle">Each square is one day. Today is the last column. Tap any square to backfill a missed tick.</p>
     <p class="rotate-hint"><i class="ti ti-rotate-rectangle"></i> Rotate your phone for a bigger view (easier to tap)</p>
-
     <div class="card">
       <div class="progress-axis">
         <div></div>
-        <div class="ticks">
-          <span>30d ago</span>
-          <span>15d</span>
-          <span>Today</span>
-        </div>
+        <div class="ticks"><span>30d ago</span><span>15d</span><span>Today</span></div>
       </div>
-      <div class="progress-wrap">
-        <div class="progress-grid" id="progress-grid"></div>
+      <div class="progress-wrap"><div class="progress-grid" id="progress-grid"></div></div>
+    </div>
+    <div class="card pad">
+      <div class="grid-3">
+        <div><div class="stat-big" id="best-streak">0</div><div class="stat-label">longest streak (any habit)</div></div>
+        <div><div class="stat-big" id="total-ticks">0</div><div class="stat-label">total ticks</div></div>
+        <div><div class="stat-big" id="perfect-days">0</div><div class="stat-label">perfect days</div></div>
       </div>
     </div>
 
+    <h3 style="font-size: 16px; margin: 26px 0 6px;">Edit habits</h3>
+    <p class="subtitle">Tap to rename or change icon. Add new ones below.</p>
+    <div id="habit-edit-list"></div>
+    <h3 style="font-size: 14px; margin: 16px 0 6px;">Add a habit</h3>
     <div class="card pad">
-      <div class="grid-3">
-        <div>
-          <div class="stat-big" id="best-streak">0</div>
-          <div class="stat-label">longest streak (any habit)</div>
-        </div>
-        <div>
-          <div class="stat-big" id="total-ticks">0</div>
-          <div class="stat-label">total ticks</div>
-        </div>
-        <div>
-          <div class="stat-big" id="perfect-days">0</div>
-          <div class="stat-label">perfect days</div>
-        </div>
+      <div class="habit-edit-fields">
+        <input id="new-habit-icon" class="icon-input" placeholder="ti-star" />
+        <input id="new-habit-name" placeholder="e.g. Meditate 10min" />
       </div>
+      <select id="new-habit-cat" style="margin-top: 8px;">
+        <option value="Nutrition">Nutrition</option>
+        <option value="Fitness">Fitness</option>
+        <option value="Wellness" selected>Wellness</option>
+      </select>
+      <p class="muted" style="font-size: 12px; margin: 8px 4px 0;">
+        Icon: any Tabler icon name (e.g. <code>ti-coffee</code>, <code>ti-yoga</code>, <code>ti-flame</code>).
+        See <a href="https://tabler.io/icons" target="_blank" style="color: var(--accent-2);">tabler.io/icons</a>.
+      </p>
+      <button class="btn wide" id="add-habit" style="margin-top: 10px;">Add habit</button>
     </div>
   </section>
 
@@ -805,36 +818,14 @@
     <!-- Populated by renderLift() -->
   </section>
 
-  <!-- HABITS (edit) -->
-  <section class="view" id="view-habits">
-    <h2>Your habits</h2>
-    <p class="subtitle">Edit the name or icon, change category, or delete. Add new ones below.</p>
-    <div id="habit-edit-list"></div>
 
-    <h2>Add a habit</h2>
-    <div class="card pad">
-      <div class="habit-edit-fields">
-        <input id="new-habit-icon" class="icon-input" placeholder="ti-star" />
-        <input id="new-habit-name" placeholder="e.g. Meditate 10min" />
-      </div>
-      <select id="new-habit-cat" style="margin-top: 8px;">
-        <option value="Nutrition">Nutrition</option>
-        <option value="Fitness">Fitness</option>
-        <option value="Wellness" selected>Wellness</option>
-      </select>
-      <p class="muted" style="font-size: 12px; margin: 8px 4px 0;">
-        Icon: any Tabler icon name (e.g. <code>ti-coffee</code>, <code>ti-yoga</code>, <code>ti-flame</code>).
-        See <a href="https://tabler.io/icons" target="_blank" style="color: var(--accent-2);">tabler.io/icons</a>.
-      </p>
-      <button class="btn wide" id="add-habit" style="margin-top: 10px;">Add habit</button>
+  <!-- Splash on app open: white bg, ADHD letters black, ien green -->
+  <div id="quote-splash" class="quote-splash" role="dialog" aria-label="App splash">
+    <div class="wordmark">
+      <span class="adhd">A</span><span class="accent">i</span><span class="adhd">DHD</span><span class="accent">en</span>
     </div>
-  </section>
-
-  <!-- Quote splash (appears on app open) -->
-  <div id="quote-splash" class="quote-splash" role="dialog" aria-label="Daily quote">
     <div class="qmark"><i class="ti ti-quote"></i></div>
     <div class="qtext" id="quote-text"></div>
-    <div class="qsub">Aiden's playbook</div>
   </div>
 
   <!-- DND confirmation modal (before first set) -->
@@ -879,39 +870,81 @@
   <!-- TABS -->
   <nav class="tabs">
     <div class="tab active" data-view="today"><i class="ti ti-checks ticon" aria-hidden="true"></i>Today</div>
-    <div class="tab" data-view="progress"><i class="ti ti-chart-bar ticon" aria-hidden="true"></i>Progress</div>
     <div class="tab" data-view="lift"><i class="ti ti-barbell ticon" aria-hidden="true"></i>Lift</div>
     <div class="tab" data-view="weight"><i class="ti ti-scale ticon" aria-hidden="true"></i>Weight</div>
-    <div class="tab" data-view="habits"><i class="ti ti-settings ticon" aria-hidden="true"></i>Habits</div>
+    <div class="tab" data-view="settings"><i class="ti ti-settings ticon" aria-hidden="true"></i>Settings</div>
   </nav>
 
 <script>
 // ============ STORAGE ============
-const KEY = "fitness_v8";
+const KEY = "fitness_v9";
 
 const CATEGORIES = ["Nutrition", "Fitness", "Wellness"];
 
+// Array order = render order within each category
 const DEFAULT_HABITS = [
   // Nutrition
-  { id: 1,  icon: "ti-meat",        name: "High-protein meal 1",        cat: "Nutrition" },
-  { id: 2,  icon: "ti-meat",        name: "High-protein meal 2",        cat: "Nutrition" },
-  { id: 3,  icon: "ti-meat",        name: "High-protein meal 3",        cat: "Nutrition" },
-  { id: 4,  icon: "ti-meat",        name: "High-protein meal 4",        cat: "Nutrition" },
-  { id: 5,  icon: "ti-pill",        name: "Creatine",                   cat: "Nutrition" },
-  { id: 6,  icon: "ti-bottle-off",  name: "No alcohol",                 cat: "Nutrition" },
-  { id: 7,  icon: "ti-coffee",      name: "≤ 2 coffees",                cat: "Nutrition" },
-  { id: 8,  icon: "ti-hourglass",   name: "12+ hrs fasting",            cat: "Nutrition" },
+  { id: 1,  icon: "ti-meat",        name: "High-protein meal 1", cat: "Nutrition" },
+  { id: 2,  icon: "ti-meat",        name: "High-protein meal 2", cat: "Nutrition" },
+  { id: 3,  icon: "ti-meat",        name: "High-protein meal 3", cat: "Nutrition" },
+  { id: 4,  icon: "ti-meat",        name: "High-protein meal 4", cat: "Nutrition" },
+  { id: 5,  icon: "ti-pill",        name: "Creatine",            cat: "Nutrition" },
   // Fitness
-  { id: 9,  icon: "ti-walk",        name: "10,000 steps",               cat: "Fitness" },
-  { id: 10, icon: "ti-run",         name: "Run",                        cat: "Fitness" },
-  { id: 11, icon: "ti-stretching",  name: "15kg dumbells calisthenics", cat: "Fitness" },
-  { id: 12, icon: "ti-barbell",     name: "45min weights",              cat: "Fitness" },
-  // Wellness
-  { id: 13, icon: "ti-bed",         name: "8h sleep",                   cat: "Wellness" },
-  { id: 14, icon: "ti-droplet",     name: "Water 2L+",                  cat: "Wellness" },
-  { id: 15, icon: "ti-book",        name: "Reading before bed",         cat: "Wellness" },
-  { id: 16, icon: "ti-snowflake",   name: "Cold shower",                cat: "Wellness" }
+  { id: 9,  icon: "ti-walk",        name: "10,000 steps",        cat: "Fitness" },
+  { id: 10, icon: "ti-run",         name: "Run",                 cat: "Fitness" },
+  { id: 11, icon: "ti-stretching",  name: "Calisthenics",        cat: "Fitness" },
+  { id: 12, icon: "ti-barbell",     name: "Weights",             cat: "Fitness" },
+  // Wellness (Cold shower first)
+  { id: 16, icon: "ti-snowflake",   name: "Cold shower",         cat: "Wellness" },
+  { id: 13, icon: "ti-bed",         name: "8h sleep",            cat: "Wellness" },
+  { id: 14, icon: "ti-droplet",     name: "2L Water",            cat: "Wellness" },
+  { id: 15, icon: "ti-book",        name: "Reading before bed",  cat: "Wellness" },
+  { id: 8,  icon: "ti-hourglass",   name: "12h Fast",            cat: "Wellness" },
+  { id: 6,  icon: "ti-bottle-off",  name: "No alcohol",          cat: "Wellness" },
+  { id: 7,  icon: "ti-coffee",      name: "≤ 2 coffees",         cat: "Wellness" }
 ];
+
+// Default lift days + exercises seeded on first run
+const DEFAULT_WORKOUTS = {
+  days: [
+    { id: 1, name: "Push A",    exerciseIds: [101, 102, 103, 104] },
+    { id: 2, name: "Pull A",    exerciseIds: [105, 106, 107, 108] },
+    { id: 3, name: "Shoulders", exerciseIds: [109, 110, 111, 112] },
+    { id: 4, name: "Push B",    exerciseIds: [113, 114, 115, 116] },
+    { id: 5, name: "Pull B",    exerciseIds: [117, 118, 119, 120] },
+    { id: 6, name: "Legs",      exerciseIds: [121, 122, 123, 124] }
+  ],
+  exercises: [
+    { id: 101, name: "Barbell bench press" },
+    { id: 102, name: "Seated dumbbell shoulder press" },
+    { id: 103, name: "Incline dumbbell press" },
+    { id: 104, name: "Cable tricep pushdown" },
+    { id: 105, name: "Barbell row" },
+    { id: 106, name: "Lat pulldown" },
+    { id: 107, name: "Seated cable row" },
+    { id: 108, name: "Barbell bicep curl" },
+    { id: 109, name: "Seated barbell overhead press" },
+    { id: 110, name: "Seated dumbbell lateral raise" },
+    { id: 111, name: "Cable rope face pull" },
+    { id: 112, name: "Standing single-arm cable lateral raise" },
+    { id: 113, name: "Incline dumbbell press" },
+    { id: 114, name: "Seated Arnold press" },
+    { id: 115, name: "Cable chest fly" },
+    { id: 116, name: "Overhead tricep extension" },
+    { id: 117, name: "Wide-grip lat pulldown" },
+    { id: 118, name: "Chest-supported row" },
+    { id: 119, name: "Reverse pec deck" },
+    { id: 120, name: "Hammer curl" },
+    { id: 121, name: "Barbell back squat" },
+    { id: 122, name: "Romanian deadlift" },
+    { id: 123, name: "Barbell hip thrust" },
+    { id: 124, name: "Standing calf raise" }
+  ],
+  sessions: [],
+  nextDayId: 7,
+  nextExerciseId: 200,
+  nextSessionId: 1
+};
 
 function loadData() {
   try {
@@ -920,19 +953,15 @@ function loadData() {
   } catch (e) {}
   return { habits: DEFAULT_HABITS.slice(), log: {}, weights: [], nextId: 17 };
 }
+function defaultWorkouts() {
+  return JSON.parse(JSON.stringify(DEFAULT_WORKOUTS));
+}
 function saveData() { localStorage.setItem(KEY, JSON.stringify(data)); }
 let data = loadData();
 
-// Migration: ensure workouts structure exists
+// Migration: ensure workouts structure exists (seeded with default 6-day split)
 if (!data.workouts) {
-  data.workouts = {
-    days: [],
-    exercises: [],
-    sessions: [],
-    nextDayId: 1,
-    nextExerciseId: 1,
-    nextSessionId: 1
-  };
+  data.workouts = defaultWorkouts();
   saveData();
 }
 
@@ -962,7 +991,7 @@ document.querySelectorAll(".tab").forEach(t => {
     document.querySelectorAll(".view").forEach(x => x.classList.remove("active"));
     t.classList.add("active");
     document.getElementById("view-" + t.dataset.view).classList.add("active");
-    const titles = { progress: "Progress", lift: "Lift", weight: "Weight", habits: "Habits" };
+    const titles = { lift: "Lift", weight: "Weight", settings: "Settings" };
     if (t.dataset.view !== "today") {
       // For non-today tabs, set greeting plainly. renderToday() handles the count for Today.
       document.getElementById("greeting").textContent = titles[t.dataset.view];
@@ -1342,16 +1371,15 @@ const QUOTES = [
   "Strong is harder than skinny. Worth it though.",
   "Eat for the body you want, not the body you have."
 ];
-function pickDailyQuote() {
-  // Same quote per calendar day, rotates daily
-  const seed = Number(todayKey().replace(/-/g, ""));
-  return QUOTES[seed % QUOTES.length];
+function pickRandomQuote() {
+  // Fresh random quote on every app open
+  return QUOTES[Math.floor(Math.random() * QUOTES.length)];
 }
 function showQuoteSplash() {
   const splash = document.getElementById("quote-splash");
   const text = document.getElementById("quote-text");
   if (!splash || !text) return;
-  text.textContent = pickDailyQuote();
+  text.textContent = pickRandomQuote();
   splash.classList.add("show");
   // Dismiss after 3.2s, or on tap
   const dismiss = () => {
@@ -1491,6 +1519,69 @@ const EXERCISE_TIPS = {
     "<strong>Squeeze the target muscle</strong> through the full rep. Mind-muscle connection isn't woo; it recruits more fibers.",
     "<strong>Don't bounce out of the bottom.</strong> Brief pause kills momentum and forces real work.",
     "<strong>If form breaks, the rep doesn't count.</strong> Drop the weight and finish clean."
+  ],
+  "lat pulldown": [
+    "<strong>Pull with your elbows, not your hands.</strong> Drive your elbows down and back, hands are just hooks.",
+    "<strong>Bar to your upper chest</strong>, not your chin or behind your neck. Slight backward lean is fine.",
+    "<strong>Stop shrugging.</strong> Pull your shoulder blades down and back before you start pulling.",
+    "<strong>Squeeze for a beat at the bottom.</strong> Then a slow 3-second release on the way up.",
+    "<strong>Full stretch at the top.</strong> Let your shoulder blades fully elevate before the next rep — that's where lat growth comes from."
+  ],
+  "face pull": [
+    "<strong>Cable at forehead height</strong>, not chest. The angle is what targets rear delts and rotator cuff.",
+    "<strong>Elbows high</strong> through the whole pull. Imagine pulling a bow back at the same height as your nose.",
+    "<strong>External rotation at the end</strong> — knuckles end up pointing at the ceiling. This is the rotator cuff work that protects your shoulders.",
+    "<strong>Light weight, high reps.</strong> 15–20 reps with strict form beats 8 with momentum every time.",
+    "<strong>Hold for 1 second at the contraction.</strong> The full benefit is in the squeeze, not the pull."
+  ],
+  "arnold press": [
+    "<strong>Start with palms facing you</strong> at chin height, finish overhead with palms forward. The rotation is the whole point.",
+    "<strong>Don't rush the rotation.</strong> Move smoothly through the arc — that's where the full deltoid range gets hit.",
+    "<strong>Sit upright</strong> on a 90° bench. Reclining turns it into an incline press.",
+    "<strong>Squeeze your glutes and brace your core</strong> before pressing — no lower-back arch.",
+    "<strong>Lower under control.</strong> Reverse the rotation on the way down, don't just drop."
+  ],
+  "chest fly": [
+    "<strong>Slight elbow bend, locked the whole rep.</strong> Don't straighten and bend — that turns it into a press.",
+    "<strong>Stretch deep at the bottom.</strong> Feel the stretch across your chest before reversing.",
+    "<strong>Squeeze your hands together at the top</strong> for a beat — chest fully contracted.",
+    "<strong>Don't go too heavy.</strong> Flies are a stretch movement, not a power movement.",
+    "<strong>Wrists stack over elbows</strong> the whole way. If they collapse you'll wreck your shoulders over time."
+  ],
+  "reverse pec deck": [
+    "<strong>Chest pressed against the pad</strong>, no leaning back. The work has to come from your rear delts, not momentum.",
+    "<strong>Lead with your elbows</strong>, pull them back as far as your shoulder mobility allows.",
+    "<strong>Squeeze your shoulder blades together</strong> at the back — 1-second hold.",
+    "<strong>Lower for 2–3 seconds.</strong> Slow eccentric is where rear delt growth lives.",
+    "<strong>Light weight beats heavy slop</strong> on this one. If you're using momentum, you're training your back, not your rear delts."
+  ],
+  "hammer curl": [
+    "<strong>Neutral grip the entire rep</strong> — palms face each other, never rotate.",
+    "<strong>Elbows pinned to your sides.</strong> If they drift forward, the front delts steal the work.",
+    "<strong>Brachialis emphasis</strong> — this lift adds thickness to the side of your arm, not just bicep peak.",
+    "<strong>Lower for 2 seconds.</strong> Slow eccentric drives the most growth in elbow flexors.",
+    "<strong>No swinging.</strong> If you need momentum, drop the weight."
+  ],
+  "calf raise": [
+    "<strong>Full stretch at the bottom.</strong> Heels drop below the platform — this is the entire reason for calf growth.",
+    "<strong>Pause at the top for 1 second.</strong> Calves recover fast; the contraction time matters more than reps.",
+    "<strong>Slow eccentric (3 seconds down).</strong> Calves are built for endurance — slow them down to make them grow.",
+    "<strong>Knees straight</strong> for gastrocnemius, knees bent for soleus. Both matter.",
+    "<strong>Don't bounce.</strong> Each rep is a controlled stretch and squeeze, not a hop."
+  ],
+  "skullcrusher": [
+    "<strong>Elbows pointed at the ceiling</strong>, pinned in place. They shouldn't flare or move forward.",
+    "<strong>Lower to the forehead or just past it.</strong> Stop and reverse — don't bonk your skull.",
+    "<strong>Long-head triceps grow from the stretch.</strong> Don't shortcut the eccentric.",
+    "<strong>Light weight beats heavy</strong> here. Triceps respond to tension, not load.",
+    "<strong>Keep upper arms vertical.</strong> If they angle back, you're turning it into a tricep extension — different movement."
+  ],
+  "bulgarian split squat": [
+    "<strong>Most of your weight on the front leg.</strong> The back leg is for balance only.",
+    "<strong>Front shin stays vertical</strong> at the bottom — knee shouldn't drift past your toes.",
+    "<strong>Torso upright</strong> for quad focus, slight forward lean for glute focus. Pick one and stay consistent.",
+    "<strong>Slow descent (2–3 seconds).</strong> Then drive up through your front heel.",
+    "<strong>Bench height matters.</strong> Too high overstretches your hip flexor. Knee-height bench is the sweet spot."
   ]
 };
 const GENERIC_TIPS = [
@@ -1502,21 +1593,15 @@ const GENERIC_TIPS = [
   "<strong>Breathe out on exertion, in on the way down.</strong> Don't hold your breath unless going maximal.",
   "<strong>Full range of motion every rep.</strong> Half-reps hide weak ranges and limit growth."
 ];
-function pickTipForExercise(name) {
+function getTipsForExercise(name) {
   const key = (name || "").toLowerCase().trim();
-  if (!key) return GENERIC_TIPS[Math.floor(Math.random() * GENERIC_TIPS.length)];
-  if (EXERCISE_TIPS[key]) {
-    const tips = EXERCISE_TIPS[key];
-    return tips[Math.floor(Math.random() * tips.length)];
-  }
-  // Try partial match: does any known exercise key appear in the name?
+  if (!key) return GENERIC_TIPS.slice();
+  if (EXERCISE_TIPS[key]) return EXERCISE_TIPS[key].slice();
+  // Partial match — find a known key that appears in the exercise name
   for (const exKey of Object.keys(EXERCISE_TIPS)) {
-    if (key.includes(exKey)) {
-      const tips = EXERCISE_TIPS[exKey];
-      return tips[Math.floor(Math.random() * tips.length)];
-    }
+    if (key.includes(exKey)) return EXERCISE_TIPS[exKey].slice();
   }
-  return GENERIC_TIPS[Math.floor(Math.random() * GENERIC_TIPS.length)];
+  return GENERIC_TIPS.slice();
 }
 
 let __tipTimeouts = [];
@@ -1528,31 +1613,73 @@ function showTipOverlay(exerciseName) {
   const overlay = document.getElementById("tip-overlay");
   if (!overlay) return;
   clearTipTimeouts();
-  const tip = pickTipForExercise(exerciseName);
+  // Shuffle the tip pool so the same lift doesn't repeat tip 1 every session
+  const tips = getTipsForExercise(exerciseName);
+  for (let i = tips.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [tips[i], tips[j]] = [tips[j], tips[i]];
+  }
   document.getElementById("tip-exname").textContent = exerciseName || "Form cue";
-  document.getElementById("tip-content").innerHTML = tip;
+  // Backdrop fades in
   overlay.classList.remove("hiding");
   overlay.style.display = "flex";
-  // Force reflow then add .show so 5s fade-in actually animates
   void overlay.offsetWidth;
   overlay.classList.add("show");
-  // After 25s total (5s fade in + 20s visible), start the fade out
-  __tipTimeouts.push(setTimeout(() => {
-    overlay.classList.remove("show");
-    overlay.classList.add("hiding");
-  }, 25000));
-  // At 30s total, fully hide
-  __tipTimeouts.push(setTimeout(() => {
-    overlay.style.display = "none";
-    overlay.classList.remove("hiding");
-  }, 30000));
+
+  const card = overlay.querySelector(".tip-card");
+  let idx = 0;
+
+  const showOne = () => {
+    document.getElementById("tip-content").innerHTML = tips[idx % tips.length];
+    card.classList.add("tip-in");
+    // Hide this tip after 8.5s (leaves 1.5s for fade out before next one shows)
+    __tipTimeouts.push(setTimeout(() => {
+      card.classList.remove("tip-in");
+    }, 8500));
+    idx++;
+    // Schedule next tip in 10s — up to 9 rotations max for a 90s rest
+    if (idx < 9) {
+      __tipTimeouts.push(setTimeout(showOne, 10000));
+    }
+  };
+  showOne();
 }
 function hideTipOverlay() {
   clearTipTimeouts();
   const overlay = document.getElementById("tip-overlay");
   if (!overlay) return;
+  const card = overlay.querySelector(".tip-card");
+  if (card) card.classList.remove("tip-in");
   overlay.classList.remove("show", "hiding");
   overlay.style.display = "none";
+}
+
+// ============ BEEP (alarm at 10s remaining) ============
+let __audioCtx = null;
+function playBeep() {
+  try {
+    if (!__audioCtx) {
+      __audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    const ctx = __audioCtx;
+    if (ctx.state === "suspended") ctx.resume();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = 880; // A5 — alarm-style pitch
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    const t0 = ctx.currentTime;
+    gain.gain.setValueAtTime(0, t0);
+    gain.gain.linearRampToValueAtTime(0.25, t0 + 0.04);
+    gain.gain.setValueAtTime(0.25, t0 + 0.92);
+    gain.gain.linearRampToValueAtTime(0, t0 + 1.0);
+    osc.start(t0);
+    osc.stop(t0 + 1.0);
+  } catch (e) {
+    // Fallback: vibrate if audio blocked
+    try { navigator.vibrate && navigator.vibrate([200, 80, 200]); } catch (e2) {}
+  }
 }
 
 // ============ RECOVERY TIPS (end of session) ============
@@ -1625,6 +1752,8 @@ function updateRestTimerDisplay() {
   text.textContent = left;
   if (left <= 10) arc.classList.add("warning");
   else arc.classList.remove("warning");
+  // 1-second alarm beep at exactly 10s remaining
+  if (left === 10) playBeep();
   // "Get ready" appears at 10s and stays for 3 seconds (10 → 8)
   const ready = document.querySelector("#rest-timer-overlay .timer-ready");
   if (ready) {
