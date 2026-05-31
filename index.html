@@ -736,6 +736,79 @@
   }
   .prog-exercise.empty .prog-current,
   .prog-exercise.empty .prog-change { display: none; }
+  .prog-exercise:active { transform: scale(0.99); }
+
+  /* Detail view (after tapping into an exercise) */
+  .prog-detail-head {
+    display: flex; align-items: center; gap: 8px;
+    margin: 4px 0 12px;
+  }
+  .prog-detail-back {
+    background: var(--card-2); border: 1px solid var(--border);
+    border-radius: 10px;
+    width: 36px; height: 36px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text); font-size: 20px; cursor: pointer;
+  }
+  .prog-detail-title { flex: 1; min-width: 0; }
+  .prog-detail-name {
+    font-size: 20px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1;
+  }
+  .prog-detail-day {
+    font-size: 12px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;
+    margin-top: 3px;
+  }
+  .prog-summary {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px; margin-bottom: 12px;
+  }
+  .prog-summary-tile {
+    background: var(--card-2); border-radius: 10px; padding: 10px;
+    text-align: center;
+  }
+  .prog-summary-tile .v {
+    font-size: 18px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums;
+  }
+  .prog-summary-tile .v .unit { font-size: 11px; color: var(--muted); font-weight: 500; margin-left: 1px; }
+  .prog-summary-tile .v.up { color: var(--accent); }
+  .prog-summary-tile .v.down { color: var(--danger); }
+  .prog-summary-tile .l {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
+    margin-top: 4px;
+  }
+  .prog-big-chart {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px;
+    margin-bottom: 12px;
+  }
+  .prog-history {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 8px 12px;
+  }
+  .prog-history-row {
+    display: grid; grid-template-columns: 80px 70px 1fr;
+    gap: 10px; align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .prog-history-row:last-child { border-bottom: none; }
+  .prog-history-date {
+    font-size: 12px; font-weight: 600; color: var(--text);
+  }
+  .prog-history-date .rel {
+    display: block; font-size: 10px; color: var(--muted); font-weight: 500; margin-top: 1px;
+  }
+  .prog-history-max {
+    font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums;
+  }
+  .prog-history-max .unit { font-size: 10px; color: var(--muted); font-weight: 500; margin-left: 1px; }
+  .prog-history-sets {
+    font-size: 11px; color: var(--muted);
+    font-variant-numeric: tabular-nums; line-height: 1.4;
+    text-align: right;
+  }
 
   /* Gear icon header on Today */
   .today-head {
@@ -2286,9 +2359,17 @@ function sparkPath(points, W, H) {
   </svg>`;
 }
 
+// State: which exercise (if any) is being inspected on the Progress tab
+let progressDetailExId = null;
+
 function renderProgressView() {
   const wrap = document.getElementById("prog-list");
   if (!wrap) return;
+  // Show the detail view if user has tapped into an exercise
+  if (progressDetailExId !== null) {
+    renderProgressDetail(wrap, progressDetailExId);
+    return;
+  }
   const days = data.workouts.days || [];
 
   let html = "";
@@ -2339,7 +2420,7 @@ function renderProgressView() {
       const changeText = series.length === 1 ? 'first session' : `${sign}${change} kg`;
 
       html += `
-        <div class="prog-exercise">
+        <div class="prog-exercise" data-ex-id="${exId}" role="button" tabindex="0">
           <div class="prog-name">${escapeHtml(ex.name)}</div>
           <div class="prog-spark">${sparkPath(series, 82, 24)}</div>
           <div class="prog-stats">
@@ -2362,6 +2443,173 @@ function renderProgressView() {
   }
 
   wrap.innerHTML = html;
+
+  // Wire row taps → open detail
+  wrap.querySelectorAll(".prog-exercise[data-ex-id]").forEach(row => {
+    row.addEventListener("click", () => {
+      progressDetailExId = Number(row.dataset.exId);
+      renderProgressView();
+      window.scrollTo({ top: 0 });
+    });
+  });
+}
+
+// Detail view: full chart + per-session breakdown
+function renderProgressDetail(wrap, exId) {
+  const ex = data.workouts.exercises.find(e => e.id === exId);
+  if (!ex) { progressDetailExId = null; renderProgressView(); return; }
+
+  // Find the day that contains this exercise
+  const day = data.workouts.days.find(d => d.exerciseIds.includes(exId));
+  const dayName = day ? day.name : "";
+
+  // Gather all sessions that contain this exercise, with max weight per session
+  const sessions = data.workouts.sessions
+    .filter(s => (s.exercises || []).some(e => e.exerciseId === exId))
+    .map(s => {
+      const sEx = s.exercises.find(e => e.exerciseId === exId);
+      const setsCopy = (sEx.sets || []).map(set => ({ w: Number(set.w) || 0, r: Number(set.r) || 0 }));
+      const maxW = setsCopy.length ? Math.max(...setsCopy.map(set => set.w)) : 0;
+      return { date: s.date, sets: setsCopy, maxW };
+    })
+    .filter(s => s.maxW > 0)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  if (sessions.length === 0) {
+    wrap.innerHTML = `
+      <div class="prog-detail-head">
+        <button class="prog-detail-back" id="prog-back" aria-label="Back"><i class="ti ti-chevron-left"></i></button>
+        <div class="prog-detail-title">
+          <div class="prog-detail-name">${escapeHtml(ex.name)}</div>
+          ${dayName ? `<div class="prog-detail-day">${escapeHtml(dayName)}</div>` : ''}
+        </div>
+      </div>
+      <div class="empty-state">No sessions logged yet for this exercise.</div>
+    `;
+    document.getElementById("prog-back").addEventListener("click", () => {
+      progressDetailExId = null; renderProgressView();
+    });
+    return;
+  }
+
+  const current = sessions[sessions.length - 1].maxW;
+  const first = sessions[0].maxW;
+  const change = current - first;
+  const max = Math.max(...sessions.map(s => s.maxW));
+  const changeSign = change > 0 ? '+' : '';
+  const changeCls = change > 0 ? 'up' : (change < 0 ? 'down' : '');
+
+  // Big chart (320x180) with axis labels
+  const chart = buildBigChart(sessions);
+
+  // Build session rows (newest first for the list)
+  const rows = sessions.slice().reverse().map(s => `
+    <div class="prog-history-row">
+      <div class="prog-history-date">
+        ${formatShortDate(s.date)}
+        <span class="rel">${formatRelativeDate(s.date)}</span>
+      </div>
+      <div class="prog-history-max">${s.maxW}<span class="unit">kg</span></div>
+      <div class="prog-history-sets">${s.sets.map(set => `${set.w}×${set.r}`).join(' · ')}</div>
+    </div>
+  `).join("");
+
+  wrap.innerHTML = `
+    <div class="prog-detail-head">
+      <button class="prog-detail-back" id="prog-back" aria-label="Back"><i class="ti ti-chevron-left"></i></button>
+      <div class="prog-detail-title">
+        <div class="prog-detail-name">${escapeHtml(ex.name)}</div>
+        ${dayName ? `<div class="prog-detail-day">${escapeHtml(dayName)}</div>` : ''}
+      </div>
+    </div>
+
+    <div class="prog-summary">
+      <div class="prog-summary-tile"><div class="v">${current}<span class="unit">kg</span></div><div class="l">Current</div></div>
+      <div class="prog-summary-tile"><div class="v ${changeCls}">${changeSign}${change}<span class="unit">kg</span></div><div class="l">Total change</div></div>
+      <div class="prog-summary-tile"><div class="v">${max}<span class="unit">kg</span></div><div class="l">PR</div></div>
+    </div>
+
+    <div class="prog-big-chart">${chart}</div>
+
+    <div class="prog-history">${rows}</div>
+  `;
+
+  document.getElementById("prog-back").addEventListener("click", () => {
+    progressDetailExId = null; renderProgressView();
+  });
+}
+
+function formatShortDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+function buildBigChart(sessions) {
+  const W = 320, H = 180, padL = 30, padR = 12, padT = 14, padB = 28;
+  const ws = sessions.map(s => s.maxW);
+  const minW = Math.min(...ws), maxW = Math.max(...ws);
+  const pad = Math.max((maxW - minW) * 0.18, 1.5);
+  const yMin = Math.floor(minW - pad);
+  const yMax = Math.ceil(maxW + pad);
+
+  // X-axis maps session index to x position
+  const stepX = sessions.length > 1 ? (W - padL - padR) / (sessions.length - 1) : 0;
+  const xFor = i => padL + i * stepX;
+  const yFor = w => H - padB - ((w - yMin) / Math.max(yMax - yMin, 0.001)) * (H - padT - padB);
+
+  const pts = sessions.map((s, i) => ({ x: xFor(i), y: yFor(s.maxW), kg: s.maxW, date: s.date }));
+
+  // Smooth path
+  function smoothPath(p) {
+    if (p.length === 1) return `M ${p[0].x.toFixed(1)} ${p[0].y.toFixed(1)}`;
+    let d = `M ${p[0].x.toFixed(1)} ${p[0].y.toFixed(1)}`;
+    for (let i = 0; i < p.length - 1; i++) {
+      const p0 = p[i - 1] || p[i];
+      const p1 = p[i];
+      const p2 = p[i + 1];
+      const p3 = p[i + 2] || p2;
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+    }
+    return d;
+  }
+
+  const path = smoothPath(pts);
+  const dots = pts.map(p =>
+    `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="var(--accent)"/>
+     <text x="${p.x.toFixed(1)}" y="${(p.y - 8).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="700" fill="var(--text)">${p.kg}</text>`
+  ).join("");
+
+  // Y-axis labels (just min and max)
+  const yLabels = `
+    <text x="${padL - 6}" y="${yFor(yMax).toFixed(1) + 3}" text-anchor="end" font-size="9" fill="var(--muted)">${yMax}</text>
+    <text x="${padL - 6}" y="${yFor(yMin).toFixed(1) + 3}" text-anchor="end" font-size="9" fill="var(--muted)">${yMin}</text>
+  `;
+
+  // X-axis labels: first, middle (if ≥3 points), last
+  const xLabels = [];
+  xLabels.push(`<text x="${pts[0].x.toFixed(1)}" y="${H - 8}" text-anchor="start" font-size="9" fill="var(--muted)">${formatShortDate(pts[0].date)}</text>`);
+  if (pts.length >= 3) {
+    const mid = Math.floor(pts.length / 2);
+    xLabels.push(`<text x="${pts[mid].x.toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="9" fill="var(--muted)">${formatShortDate(pts[mid].date)}</text>`);
+  }
+  if (pts.length > 1) {
+    xLabels.push(`<text x="${pts[pts.length - 1].x.toFixed(1)}" y="${H - 8}" text-anchor="end" font-size="9" fill="var(--muted)">${formatShortDate(pts[pts.length - 1].date)}</text>`);
+  }
+
+  return `
+    <svg viewBox="0 0 ${W} ${H}" style="width: 100%; height: auto; display: block;" preserveAspectRatio="none">
+      <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="var(--border)" stroke-width="1"/>
+      <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H - padB}" stroke="var(--border)" stroke-width="1"/>
+      <path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      ${dots}
+      ${yLabels}
+      ${xLabels.join("")}
+    </svg>
+  `;
 }
 
 // Gear icon on Today opens the (hidden) Settings view
