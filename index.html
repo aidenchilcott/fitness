@@ -258,12 +258,11 @@
 
   /* Single-column compact habits list */
   .group-heading-compact {
-    font-size: 9.5px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.12em;
-    color: var(--muted);
-    margin: 6px 2px 3px;
+    font-size: 12px; font-weight: 600;
+    color: var(--text);
+    margin: 14px 2px 6px;
   }
-  .group-heading-compact:first-child { margin-top: 4px; }
+  .group-heading-compact:first-child { margin-top: 6px; }
   .habits-grid {
     display: flex; flex-direction: column;
     gap: 3px;
@@ -451,6 +450,81 @@
   }
   .modal-card .mc-confirm {
     background: var(--accent); color: white;
+  }
+
+  /* Weekly check-in modal (photo + comment) */
+  .checkin-card { max-width: 360px; text-align: left; }
+  .checkin-card h3 { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+  .checkin-card .ci-sub { font-size: 13px; color: var(--muted); margin: 0 0 16px; }
+  .checkin-card .ci-label {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 12px 0 6px;
+  }
+  .checkin-card .ci-photo-btn {
+    width: 100%;
+    background: var(--card-2); border: 1.5px dashed var(--border);
+    border-radius: 12px;
+    padding: 18px; font-size: 14px; font-weight: 600;
+    color: var(--text); cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .checkin-card .ci-photo-btn .ti { font-size: 20px; color: var(--accent); }
+  .checkin-card .ci-photo-preview {
+    width: 100%; max-height: 200px;
+    object-fit: cover; border-radius: 12px;
+    display: block; margin-top: 4px;
+  }
+  .checkin-card .ci-photo-wrap {
+    position: relative;
+  }
+  .checkin-card .ci-photo-clear {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(0,0,0,0.6); color: white;
+    border: none; border-radius: 50%;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; cursor: pointer;
+  }
+  .checkin-card textarea {
+    width: 100%; padding: 10px 12px;
+    font-size: 14px; font-family: inherit;
+    background: var(--card-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 10px;
+    resize: none; line-height: 1.4;
+    box-sizing: border-box;
+  }
+  .checkin-card textarea:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+
+  /* Photo thumbnail in weight history */
+  .weight-photo-thumb {
+    width: 44px; height: 44px;
+    object-fit: cover; border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .weight-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .weight-comment {
+    font-size: 12px; color: var(--muted);
+    font-style: italic; margin-top: 4px;
+    line-height: 1.4;
+  }
+  .photo-lightbox {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 600;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .photo-lightbox.show { display: flex; }
+  .photo-lightbox img {
+    max-width: 100%; max-height: 100%;
+    border-radius: 12px;
   }
 
   /* Tip overlay during rest */
@@ -964,6 +1038,33 @@
     <div class="qtext" id="quote-text"></div>
   </div>
 
+  <!-- Weekly check-in modal: progress photo + comment -->
+  <div id="checkin-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card checkin-card">
+      <h3>Weekly check-in</h3>
+      <p class="ci-sub">Add a progress photo and how this week felt. Both optional.</p>
+
+      <div class="ci-label">Progress photo</div>
+      <div class="ci-photo-wrap" id="ci-photo-wrap">
+        <button class="ci-photo-btn" id="ci-photo-btn" type="button">
+          <i class="ti ti-camera"></i> Take or upload photo
+        </button>
+        <input type="file" id="ci-photo-input" accept="image/*" capture="environment" hidden>
+      </div>
+
+      <div class="ci-label">How did this week feel?</div>
+      <textarea id="ci-comment" rows="3" placeholder="Energy, soreness, mood, anything…"></textarea>
+
+      <div class="mc-btns" style="margin-top: 16px;">
+        <button id="ci-skip" class="mc-cancel">Skip</button>
+        <button id="ci-save" class="mc-confirm">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox for tapping photos in history -->
+  <div id="photo-lightbox" class="photo-lightbox" role="dialog"><img id="photo-lightbox-img" alt=""></div>
+
   <!-- DND confirmation modal (before first set) -->
   <div id="dnd-modal" class="modal-overlay" role="dialog" aria-modal="true">
     <div class="modal-card">
@@ -1013,11 +1114,11 @@
 
 <script>
 // ============ STORAGE ============
-const KEY = "fitness_v9";
+const KEY = "fitness_v10";
 
 const CATEGORIES = ["Nutrition", "Fitness", "Wellness"];
 
-// Array order = render order within each category
+// Array order = render order within each category. All names sentence case for consistency.
 const DEFAULT_HABITS = [
   // Nutrition
   { id: 1,  icon: "ti-meat",        name: "High-protein meal 1", cat: "Nutrition" },
@@ -1033,11 +1134,11 @@ const DEFAULT_HABITS = [
   // Wellness (Cold shower first)
   { id: 16, icon: "ti-snowflake",   name: "Cold shower",         cat: "Wellness" },
   { id: 13, icon: "ti-bed",         name: "8h sleep",            cat: "Wellness" },
-  { id: 14, icon: "ti-droplet",     name: "2L Water",            cat: "Wellness" },
+  { id: 14, icon: "ti-droplet",     name: "2L water",            cat: "Wellness" },
   { id: 15, icon: "ti-book",        name: "Reading before bed",  cat: "Wellness" },
-  { id: 8,  icon: "ti-hourglass",   name: "12h Fast",            cat: "Wellness" },
+  { id: 8,  icon: "ti-hourglass",   name: "12h fast",            cat: "Wellness" },
   { id: 6,  icon: "ti-bottle-off",  name: "No alcohol",          cat: "Wellness" },
-  { id: 7,  icon: "ti-coffee",      name: "≤ 2 coffees",         cat: "Wellness" }
+  { id: 7,  icon: "ti-coffee",      name: "Max 2 coffees",       cat: "Wellness" }
 ];
 
 // Default lift days + exercises seeded on first run
@@ -1276,13 +1377,122 @@ function renderProgress() {
   document.getElementById("best-streak").textContent = best;
 }
 
-// ============ WEIGHT ============
+// ============ WEIGHT + WEEKLY CHECK-IN ============
 function logWeight(v) {
   if (!v || v <= 0) { alert("Enter a valid weight"); return false; }
-  data.weights.unshift({ id: Date.now(), kg: v, when: new Date().toISOString() });
+  const entry = { id: Date.now(), kg: v, when: new Date().toISOString() };
+  data.weights.unshift(entry);
   saveData();
+  // Prompt for weekly check-in if 7+ days since last
+  if (shouldPromptCheckin()) {
+    setTimeout(() => showCheckinModal(entry), 250);
+  }
   return true;
 }
+
+function shouldPromptCheckin() {
+  const last = data.lastCheckin;
+  if (!last) return true;
+  const sevenDaysMs = 7 * 24 * 3600 * 1000;
+  return Date.now() - new Date(last).getTime() >= sevenDaysMs;
+}
+
+function resizeAndEncodePhoto(file, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const maxSize = 500;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
+      else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL("image/jpeg", 0.7));
+    };
+    img.onerror = () => callback(null);
+    img.src = e.target.result;
+  };
+  reader.onerror = () => callback(null);
+  reader.readAsDataURL(file);
+}
+
+let __pendingPhoto = null;
+function showCheckinModal(weightEntry) {
+  const m = document.getElementById("checkin-modal");
+  if (!m) return;
+  __pendingPhoto = null;
+  document.getElementById("ci-comment").value = "";
+  // Reset photo area to button state
+  const wrap = document.getElementById("ci-photo-wrap");
+  wrap.innerHTML = `
+    <button class="ci-photo-btn" id="ci-photo-btn" type="button"><i class="ti ti-camera"></i> Take or upload photo</button>
+    <input type="file" id="ci-photo-input" accept="image/*" capture="environment" hidden>
+  `;
+  m.classList.add("show");
+
+  const photoBtn = document.getElementById("ci-photo-btn");
+  const photoInput = document.getElementById("ci-photo-input");
+  photoBtn.addEventListener("click", () => photoInput.click());
+  photoInput.addEventListener("change", () => {
+    const f = photoInput.files && photoInput.files[0];
+    if (!f) return;
+    resizeAndEncodePhoto(f, (dataUrl) => {
+      if (!dataUrl) { alert("Couldn't read that image."); return; }
+      __pendingPhoto = dataUrl;
+      wrap.innerHTML = `
+        <img src="${dataUrl}" class="ci-photo-preview" alt="Progress photo">
+        <button class="ci-photo-clear" id="ci-photo-clear" type="button" aria-label="Remove photo"><i class="ti ti-x"></i></button>
+      `;
+      document.getElementById("ci-photo-clear").addEventListener("click", () => {
+        __pendingPhoto = null;
+        showCheckinModal(weightEntry); // re-open with reset state
+      });
+    });
+  });
+
+  const save = document.getElementById("ci-save");
+  const skip = document.getElementById("ci-skip");
+  const cleanup = () => {
+    m.classList.remove("show");
+    save.removeEventListener("click", onSave);
+    skip.removeEventListener("click", onSkip);
+  };
+  const onSave = () => {
+    const comment = document.getElementById("ci-comment").value.trim();
+    if (__pendingPhoto) weightEntry.photo = __pendingPhoto;
+    if (comment) weightEntry.comment = comment;
+    data.lastCheckin = new Date().toISOString();
+    try { saveData(); } catch (e) { alert("Photo too large — try a smaller one."); }
+    cleanup();
+    renderAll();
+  };
+  const onSkip = () => {
+    // Still mark the week complete so we don't pester again immediately
+    data.lastCheckin = new Date().toISOString();
+    saveData();
+    cleanup();
+  };
+  save.addEventListener("click", onSave);
+  skip.addEventListener("click", onSkip);
+}
+
+// Photo lightbox
+(function wireLightbox() {
+  document.addEventListener("click", (e) => {
+    const thumb = e.target.closest(".weight-photo-thumb");
+    if (thumb) {
+      const lb = document.getElementById("photo-lightbox");
+      document.getElementById("photo-lightbox-img").src = thumb.src;
+      lb.classList.add("show");
+      return;
+    }
+    if (e.target.closest("#photo-lightbox")) {
+      document.getElementById("photo-lightbox").classList.remove("show");
+    }
+  });
+})();
 
 document.getElementById("save-weight").addEventListener("click", () => {
   const v = Number(document.getElementById("weight-input").value);
@@ -1420,9 +1630,13 @@ function renderWeight() {
   }
   ul.innerHTML = data.weights.slice(0, 30).map(w => `
     <li>
-      <div>
-        <div style="font-weight: 600;">${w.kg} kg</div>
-        <div class="muted" style="font-size: 12px;">${fmtDateTime(w.when)}</div>
+      <div class="weight-row" style="flex: 1; min-width: 0;">
+        ${w.photo ? `<img src="${w.photo}" class="weight-photo-thumb" alt="Progress photo">` : ''}
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-weight: 600;">${w.kg} kg</div>
+          <div class="muted" style="font-size: 12px;">${fmtDateTime(w.when)}</div>
+          ${w.comment ? `<div class="weight-comment">"${escapeHtml(w.comment)}"</div>` : ''}
+        </div>
       </div>
       <button class="btn danger" data-id="${w.id}">Delete</button>
     </li>
@@ -1973,8 +2187,7 @@ function renderLift() {
 function renderLiftList(root) {
   const days = data.workouts.days;
   let html = `
-    <div style="display: flex; justify-content: space-between; align-items: center; margin: 4px 0 12px;">
-      <h2 style="margin: 0;">Lift</h2>
+    <div style="display: flex; justify-content: flex-end; align-items: center; margin: 4px 0 2px;">
       <button class="icon-btn" id="lift-edit-btn" aria-label="Edit workouts"><i class="ti ti-settings"></i></button>
     </div>
   `;
@@ -2373,15 +2586,13 @@ function renderProgressView() {
   const days = data.workouts.days || [];
 
   let html = "";
-  let anyData = false;
 
   for (const day of days) {
     const sessions = data.workouts.sessions
       .filter(s => s.dayId === day.id)
       .sort((a, b) => a.date.localeCompare(b.date));
-    if (sessions.length === 0) continue;
 
-    // Per-exercise series
+    // Per-exercise series (max weight per session)
     const seriesById = new Map();
     for (const exId of day.exerciseIds) seriesById.set(exId, []);
     for (const s of sessions) {
@@ -2392,15 +2603,15 @@ function renderProgressView() {
       }
     }
 
-    // Only render the day if at least one exercise has data
-    const exercisesWithData = day.exerciseIds.filter(id => (seriesById.get(id) || []).length > 0);
-    if (exercisesWithData.length === 0) continue;
-    anyData = true;
+    // Always render the day — even if no sessions yet — so the user sees their whole plan
+    const sessionsLabel = sessions.length === 0
+      ? "not started"
+      : `${sessions.length} session${sessions.length === 1 ? '' : 's'}`;
 
     html += `
       <div class="prog-day-head">
         <span class="prog-day-name">${escapeHtml(day.name)}</span>
-        <span class="prog-day-meta">${sessions.length} session${sessions.length === 1 ? '' : 's'}</span>
+        <span class="prog-day-meta">${sessionsLabel}</span>
       </div>
     `;
 
@@ -2409,7 +2620,12 @@ function renderProgressView() {
       if (!ex) continue;
       const series = seriesById.get(exId) || [];
       if (series.length === 0) {
-        html += `<div class="prog-exercise empty"><div class="prog-name">${escapeHtml(ex.name)}</div><div>—</div></div>`;
+        html += `
+          <div class="prog-exercise empty" data-ex-id="${exId}" role="button" tabindex="0">
+            <div class="prog-name">${escapeHtml(ex.name)}</div>
+            <div style="color: var(--muted); font-size: 11px;">no data yet</div>
+          </div>
+        `;
         continue;
       }
       const current = series[series.length - 1].w;
@@ -2432,12 +2648,12 @@ function renderProgressView() {
     }
   }
 
-  if (!anyData) {
+  if (days.length === 0) {
     html = `
       <div class="empty-state" style="padding: 40px 20px; margin-top: 12px;">
         <i class="ti ti-chart-line" style="font-size: 40px; color: var(--muted); margin-bottom: 8px; display: block;"></i>
-        No lift sessions logged yet.<br/>
-        Open the Lift tab and log a session — your progress will show up here.
+        No workout days set up yet.<br/>
+        Open the Lift tab, tap the gear, and add your routine.
       </div>
     `;
   }
