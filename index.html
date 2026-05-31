@@ -632,6 +632,22 @@
   }
   #login-status.success { color: var(--accent); font-weight: 600; }
   #login-status.error { color: var(--danger); }
+  .login-link {
+    display: block; width: 100%;
+    background: transparent; color: var(--accent-2);
+    border: none; font-size: 13px; font-weight: 600;
+    padding: 14px 0 0;
+    cursor: pointer; font-family: inherit;
+    text-align: center;
+  }
+  #login-code {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.4em;
+    padding: 14px;
+    font-variant-numeric: tabular-nums;
+  }
   .login-footer {
     margin-top: 28px;
     font-size: 11px; color: var(--muted);
@@ -1206,10 +1222,22 @@
       <div class="login-wordmark">
         <span class="adhd">A</span><span class="accent">i</span><span class="adhd">DHD</span><span class="accent">en</span>
       </div>
-      <h2>Welcome</h2>
-      <p class="login-sub">Sign in to sync your data across devices. No password — we'll email you a magic link.</p>
-      <input type="email" id="login-email" placeholder="your@email.com" autocomplete="email" />
-      <button class="btn" id="login-btn">Send magic link</button>
+      <h2 id="login-title">Welcome</h2>
+      <p class="login-sub" id="login-sub">Sign in to sync your data. We'll email you a 6-digit code.</p>
+
+      <!-- Step 1: enter email -->
+      <div id="login-step-email">
+        <input type="email" id="login-email" placeholder="your@email.com" autocomplete="email" />
+        <button class="btn" id="login-btn">Send code</button>
+      </div>
+
+      <!-- Step 2: enter 6-digit code -->
+      <div id="login-step-code" style="display: none;">
+        <input type="text" id="login-code" placeholder="123456" inputmode="numeric" maxlength="6" autocomplete="one-time-code" pattern="[0-9]*" />
+        <button class="btn" id="login-verify-btn">Verify code</button>
+        <button class="login-link" id="login-back-btn">← Use a different email</button>
+      </div>
+
       <div id="login-status"></div>
       <div class="login-footer">
         Your data lives in your private Supabase project.<br/>
@@ -3682,33 +3710,81 @@ async function initAuth() {
   });
 }
 
-// Wire login button
+// ----- Two-step OTP login flow (works in PWA, no Safari redirect needed) -----
+let __pendingEmail = null;
+
+function setLoginStatus(text, kind) {
+  const s = document.getElementById("login-status");
+  s.textContent = text || "";
+  s.className = kind || "";
+}
+function showLoginStep(step) {
+  document.getElementById("login-step-email").style.display = step === "email" ? "block" : "none";
+  document.getElementById("login-step-code").style.display  = step === "code"  ? "block" : "none";
+}
+
+// Step 1: send the 6-digit code
 document.getElementById("login-btn").addEventListener("click", async () => {
   const email = document.getElementById("login-email").value.trim();
-  const status = document.getElementById("login-status");
-  status.className = "";
-  if (!email || !email.includes("@")) {
-    status.textContent = "Enter a valid email.";
-    status.className = "error";
-    return;
-  }
-  status.textContent = "Sending…";
-  if (!SB) {
-    status.textContent = "Supabase failed to load. Check your connection.";
-    status.className = "error";
-    return;
-  }
+  setLoginStatus("");
+  if (!email || !email.includes("@")) { setLoginStatus("Enter a valid email.", "error"); return; }
+  if (!SB) { setLoginStatus("Supabase failed to load. Check your connection.", "error"); return; }
+  setLoginStatus("Sending…");
+  // shouldCreateUser: true → creates account if first time
   const { error } = await SB.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: window.location.origin + window.location.pathname }
+    options: { shouldCreateUser: true }
   });
   if (error) {
-    status.textContent = "Error: " + error.message;
-    status.className = "error";
-  } else {
-    status.textContent = "✓ Check your email for the magic link.";
-    status.className = "success";
+    setLoginStatus("Error: " + error.message, "error");
+    return;
   }
+  __pendingEmail = email;
+  document.getElementById("login-title").textContent = "Check your email";
+  document.getElementById("login-sub").textContent = `We sent a 6-digit code to ${email}. It might take 30 seconds.`;
+  showLoginStep("code");
+  setLoginStatus("");
+  setTimeout(() => document.getElementById("login-code").focus(), 100);
+});
+
+// Step 2: verify the 6-digit code
+document.getElementById("login-verify-btn").addEventListener("click", async () => {
+  const tokenRaw = document.getElementById("login-code").value.trim();
+  const token = tokenRaw.replace(/\s+/g, "");
+  setLoginStatus("");
+  if (!token || token.length < 6) { setLoginStatus("Enter the 6-digit code from your email.", "error"); return; }
+  if (!__pendingEmail) { setLoginStatus("Please request a new code.", "error"); showLoginStep("email"); return; }
+  if (!SB) { setLoginStatus("Supabase failed to load.", "error"); return; }
+  setLoginStatus("Verifying…");
+  const { error } = await SB.auth.verifyOtp({
+    email: __pendingEmail,
+    token,
+    type: "email"
+  });
+  if (error) {
+    setLoginStatus("Code didn't match — double-check the email.", "error");
+    return;
+  }
+  // onAuthStateChange will fire SIGNED_IN and pull data + hide screen
+  setLoginStatus("✓ Signed in", "success");
+});
+
+// "Use a different email" — back to step 1
+document.getElementById("login-back-btn").addEventListener("click", () => {
+  __pendingEmail = null;
+  document.getElementById("login-code").value = "";
+  document.getElementById("login-title").textContent = "Welcome";
+  document.getElementById("login-sub").textContent = "Sign in to sync your data. We'll email you a 6-digit code.";
+  showLoginStep("email");
+  setLoginStatus("");
+});
+
+// Enter key submits the active step
+document.getElementById("login-email").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("login-btn").click();
+});
+document.getElementById("login-code").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("login-verify-btn").click();
 });
 
 initAuth();
