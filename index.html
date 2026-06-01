@@ -642,9 +642,9 @@
   }
   #login-code {
     text-align: center;
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 700;
-    letter-spacing: 0.4em;
+    letter-spacing: 0.25em;
     padding: 14px;
     font-variant-numeric: tabular-nums;
   }
@@ -1223,7 +1223,7 @@
         <span class="adhd">A</span><span class="accent">i</span><span class="adhd">DHD</span><span class="accent">en</span>
       </div>
       <h2 id="login-title">Welcome</h2>
-      <p class="login-sub" id="login-sub">Sign in to sync your data. We'll email you a 6-digit code.</p>
+      <p class="login-sub" id="login-sub">Sign in to sync your data. We'll email you a sign-in code.</p>
 
       <!-- Step 1: enter email -->
       <div id="login-step-email">
@@ -1231,9 +1231,9 @@
         <button class="btn" id="login-btn">Send code</button>
       </div>
 
-      <!-- Step 2: enter 6-digit code -->
+      <!-- Step 2: enter sign-in code from email (6–8 digits) -->
       <div id="login-step-code" style="display: none;">
-        <input type="text" id="login-code" placeholder="123456" inputmode="numeric" maxlength="6" autocomplete="one-time-code" pattern="[0-9]*" />
+        <input type="text" id="login-code" placeholder="Code from email" inputmode="numeric" maxlength="10" autocomplete="one-time-code" pattern="[0-9]*" />
         <button class="btn" id="login-verify-btn">Verify code</button>
         <button class="login-link" id="login-back-btn">← Use a different email</button>
       </div>
@@ -3741,7 +3741,7 @@ document.getElementById("login-btn").addEventListener("click", async () => {
   }
   __pendingEmail = email;
   document.getElementById("login-title").textContent = "Check your email";
-  document.getElementById("login-sub").textContent = `We sent a 6-digit code to ${email}. It might take 30 seconds.`;
+  document.getElementById("login-sub").textContent = `We sent a sign-in code to ${email}. It might take 30 seconds.`;
   showLoginStep("code");
   setLoginStatus("");
   setTimeout(() => document.getElementById("login-code").focus(), 100);
@@ -3752,7 +3752,7 @@ document.getElementById("login-verify-btn").addEventListener("click", async () =
   const tokenRaw = document.getElementById("login-code").value.trim();
   const token = tokenRaw.replace(/\s+/g, "");
   setLoginStatus("");
-  if (!token || token.length < 6) { setLoginStatus("Enter the 6-digit code from your email.", "error"); return; }
+  if (!token || token.length < 6) { setLoginStatus("Enter the code from your email.", "error"); return; }
   if (!__pendingEmail) { setLoginStatus("Please request a new code.", "error"); showLoginStep("email"); return; }
   if (!SB) { setLoginStatus("Supabase failed to load.", "error"); return; }
   setLoginStatus("Verifying…");
@@ -3774,7 +3774,7 @@ document.getElementById("login-back-btn").addEventListener("click", () => {
   __pendingEmail = null;
   document.getElementById("login-code").value = "";
   document.getElementById("login-title").textContent = "Welcome";
-  document.getElementById("login-sub").textContent = "Sign in to sync your data. We'll email you a 6-digit code.";
+  document.getElementById("login-sub").textContent = "Sign in to sync your data. We'll email you a sign-in code.";
   showLoginStep("email");
   setLoginStatus("");
 });
