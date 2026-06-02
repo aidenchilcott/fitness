@@ -383,65 +383,163 @@
     font-size: 12px; font-weight: 400;
   }
 
-  /* Rest timer overlay (floating during a lift session) */
-  .rest-timer-overlay {
-    position: fixed;
-    bottom: calc(var(--safe-bottom) + 84px);
-    left: 50%;
-    transform: translateX(-50%) translateY(160%);
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 12px 16px 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  /* Landscape: lay all habits out in 3 columns so the whole list fits at a glance */
+  @media (orientation: landscape) and (max-height: 600px) {
+    .group-heading-compact { margin: 6px 2px 2px; font-size: 9px; }
+    .habits-grid {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .habits-grid .habit-tile {
+      flex: 1 1 calc(33.333% - 4px);
+      min-width: 0;
+      padding: 4px 8px;
+      min-height: 26px;
+      border-radius: 8px;
+    }
+    .habits-grid .habit-tile .habit-name { font-size: 11px; }
+    .habits-grid .habit-tile .habit-icon { font-size: 14px; width: 16px; }
+    .habits-grid .habit-tile .mini-check { width: 14px; height: 14px; border-width: 1.5px; }
+    .habits-grid .habit-tile.done .mini-check::after { font-size: 9px; }
+    /* tighten card padding when in landscape so all 16 habits fit */
+    h1 { font-size: 20px; margin: 4px 0 2px; }
+    .group-heading-compact:first-child { margin-top: 4px; }
+    .scroll { padding-top: 4px; }
+    .weigh-strip { padding: 6px 12px; margin-bottom: 6px; }
+  }
+
+  /* Unified rest screen */
+  .rest-overlay {
+    position: fixed; inset: 0;
     z-index: 200;
+    display: none;
+    flex-direction: column;
+  }
+  .rest-overlay.active { display: flex; }
+  .rest-overlay .rest-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(20, 20, 22, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .rest-overlay .rest-content {
+    position: relative; z-index: 2;
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: calc(env(safe-area-inset-top, 0px) + 24px) 18px 24px;
+  }
+  .rest-overlay .rest-exname {
+    color: rgba(255, 255, 255, 0.62);
     text-align: center;
-    width: 180px;
-    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease;
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.18em;
+    margin-bottom: 12px;
+  }
+  .rest-overlay .rest-gif-card {
+    background: #1f1f24;
+    border-radius: 18px;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    margin-bottom: 22px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .rest-overlay .rest-gif {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .rest-overlay .rest-gif-fallback {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px;
+    color: rgba(255, 255, 255, 0.45);
+  }
+  .rest-overlay .rest-gif-fallback i { font-size: 48px; }
+  .rest-overlay .rest-gif-label {
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.15em;
+  }
+  .rest-overlay .rest-section { margin-bottom: 18px; }
+  .rest-overlay .rest-section-title {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.15em;
+    margin: 0 0 10px;
+  }
+  .rest-overlay .rest-cues {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .rest-overlay .rest-cue {
+    background: white;
+    color: var(--text);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.4;
     opacity: 0;
-    pointer-events: none;
+    transform: translateY(8px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
   }
-  .rest-timer-overlay.active {
-    transform: translateX(-50%) translateY(0);
+  .rest-overlay .rest-cue.in {
     opacity: 1;
-    pointer-events: auto;
+    transform: translateY(0);
   }
-  .rest-timer-overlay .timer-ready {
-    font-size: 13px; font-weight: 700;
+  .rest-overlay .rest-bottom {
+    position: relative; z-index: 2;
+    padding: 14px 18px calc(env(safe-area-inset-bottom, 0px) + 16px);
+    background: rgba(15, 15, 17, 0.92);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .rest-overlay .rest-ready {
+    text-align: center;
     color: var(--accent);
-    height: 0; overflow: hidden;
-    transition: height 0.2s ease, margin 0.2s ease;
-    margin: 0;
+    font-size: 14px; font-weight: 700;
+    height: 0; overflow: hidden; margin: 0;
+    transition: height 0.25s ease, margin 0.25s ease;
   }
-  .rest-timer-overlay .timer-ready.show {
+  .rest-overlay .rest-ready.show {
     height: 18px;
-    margin: 0 0 6px;
+    margin: 0 0 10px;
   }
-  .rest-timer-overlay .timer-svg {
-    width: 110px; height: 110px;
-    display: block; margin: 0 auto;
+  .rest-overlay .rest-timer-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
   }
-  .rest-timer-overlay #timer-arc {
-    stroke: var(--accent);
-    transition: stroke-dashoffset 0.95s linear, stroke 0.3s ease;
+  .rest-overlay .rest-time-num {
+    color: white;
+    font-size: 26px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
   }
-  .rest-timer-overlay #timer-arc.warning { stroke: var(--danger); }
-  .rest-timer-overlay #timer-text { fill: var(--text); }
-  .rest-timer-overlay .timer-label {
-    font-size: 10px; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.12em;
-    margin: 4px 0 10px;
-    font-weight: 700;
-  }
-  .rest-timer-overlay .timer-skip-btn {
-    background: var(--card-2); color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 6px 16px;
+  .rest-overlay .rest-skip {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    padding: 8px 18px;
     font-size: 13px; font-weight: 600;
     cursor: pointer;
     font-family: inherit;
   }
+  .rest-overlay .rest-progress-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .rest-overlay .rest-progress-fill {
+    height: 100%;
+    width: 100%;
+    background: var(--accent);
+    transform-origin: left center;
+    transform: scaleX(1);
+    will-change: transform;
+  }
+  .rest-overlay .rest-progress-fill.warning { background: var(--danger); }
 
   /* Splash on app open: quote dominates, small logo at the bottom */
   .quote-splash {
@@ -705,78 +803,7 @@
     border-radius: 12px;
   }
 
-  /* Tip overlay during rest — stack of cards that pile up, never fade out */
-  .tip-overlay {
-    position: fixed; inset: 0;
-    z-index: 180;
-    display: none;
-    pointer-events: none;
-  }
-  .tip-overlay.show, .tip-overlay.hiding { display: block; }
-  .tip-overlay .tip-backdrop {
-    position: absolute; inset: 0;
-    background: rgba(28, 28, 30, 0.72);
-    opacity: 0;
-    transition: opacity 2s ease;
-  }
-  .tip-overlay.show .tip-backdrop { opacity: 1; }
-  .tip-overlay.hiding .tip-backdrop { opacity: 0; transition: opacity 1.5s ease; }
-  .tip-overlay .tip-stack-wrap {
-    position: absolute;
-    top: calc(env(safe-area-inset-top, 0px) + 32px);
-    left: 16px; right: 16px;
-    bottom: 200px;
-    overflow-y: auto;
-    pointer-events: auto;
-    display: flex; flex-direction: column;
-    -webkit-overflow-scrolling: touch;
-  }
-  .tip-overlay .tip-stack-header {
-    text-align: center;
-    color: white;
-    margin-bottom: 16px;
-    flex-shrink: 0;
-  }
-  .tip-overlay .tip-cap {
-    font-size: 10px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.14em;
-    color: rgba(255, 255, 255, 0.62);
-  }
-  .tip-overlay .tip-exname {
-    font-size: 19px; font-weight: 700;
-    letter-spacing: -0.01em;
-    color: white;
-    margin-top: 4px;
-  }
-  .tip-overlay .tip-stack {
-    display: flex; flex-direction: column;
-    gap: 10px;
-    padding-bottom: 8px;
-  }
-  .tip-overlay .tip-item {
-    background: white;
-    border-radius: 14px;
-    padding: 13px 15px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-    font-size: 13px;
-    line-height: 1.5;
-    color: var(--text);
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 1.2s ease, transform 1.2s ease;
-  }
-  .tip-overlay .tip-item.in {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .tip-overlay .tip-item strong { font-weight: 700; }
-  .tip-overlay .tip-item .tip-num {
-    display: inline-block;
-    font-size: 9px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.1em;
-    color: var(--accent);
-    margin-bottom: 6px;
-  }
+  /* (Old tip-overlay was here — now unified into .rest-overlay above.) */
 
   /* Words tab — Spanish word of the day log */
   .word-row {
@@ -1503,32 +1530,41 @@
     </div>
   </div>
 
-  <!-- Tip overlay (during rest timer): tips stack one after another -->
-  <div id="tip-overlay" class="tip-overlay" aria-hidden="true">
-    <div class="tip-backdrop"></div>
-    <div class="tip-stack-wrap">
-      <div class="tip-stack-header">
-        <div class="tip-cap">Form cues</div>
-        <div class="tip-exname" id="tip-exname"></div>
-      </div>
-      <div class="tip-stack" id="tip-stack"></div>
-    </div>
-  </div>
+  <!-- Unified rest screen: GIF + cues + bottom progress line -->
+  <div id="rest-overlay" class="rest-overlay" role="status" aria-live="polite" aria-hidden="true">
+    <div class="rest-backdrop"></div>
+    <div class="rest-content">
+      <div class="rest-exname" id="rest-exname"></div>
 
-  <!-- Rest timer overlay (floats during lift sessions) -->
-  <div id="rest-timer-overlay" class="rest-timer-overlay" role="status" aria-live="polite">
-    <div class="timer-ready">Get ready for your next set</div>
-    <svg viewBox="0 0 100 100" class="timer-svg">
-      <circle cx="50" cy="50" r="38" fill="none" stroke="#e5e5ea" stroke-width="6"/>
-      <g transform="rotate(-90 50 50) scale(-1 1) translate(-100 0)">
-        <circle cx="50" cy="50" r="38" fill="none" stroke-width="6"
-                stroke-linecap="round" id="timer-arc"
-                stroke-dasharray="238.76" stroke-dashoffset="0"/>
-      </g>
-      <text x="50" y="58" text-anchor="middle" font-size="22" font-weight="700" id="timer-text">90</text>
-    </svg>
-    <div class="timer-label">Rest</div>
-    <button id="timer-skip" class="timer-skip-btn">Skip</button>
+      <div class="rest-gif-card" id="rest-gif-card">
+        <img class="rest-gif" id="rest-gif" alt="" style="display:none;" />
+        <div class="rest-gif-fallback" id="rest-gif-fallback">
+          <i class="ti ti-barbell"></i>
+          <div class="rest-gif-label">Form reference</div>
+        </div>
+      </div>
+
+      <div class="rest-section">
+        <div class="rest-section-title">Before you start</div>
+        <div class="rest-cues" id="rest-cues-before"></div>
+      </div>
+
+      <div class="rest-section">
+        <div class="rest-section-title">During lift</div>
+        <div class="rest-cues" id="rest-cues-during"></div>
+      </div>
+    </div>
+
+    <div class="rest-bottom">
+      <div class="rest-ready" id="rest-ready">Get ready.</div>
+      <div class="rest-timer-row">
+        <div class="rest-time-num" id="rest-time-num">90</div>
+        <button id="rest-skip" class="rest-skip">Skip</button>
+      </div>
+      <div class="rest-progress-track">
+        <div class="rest-progress-fill" id="rest-progress-fill"></div>
+      </div>
+    </div>
   </div>
 
   <!-- TABS -->
@@ -1586,7 +1622,7 @@ const DEFAULT_WORKOUTS = {
     { id: 103, name: "Incline dumbbell press" },
     { id: 104, name: "Cable tricep pushdown" },
     { id: 105, name: "Barbell row" },
-    { id: 106, name: "Lat pulldown" },
+    { id: 106, name: "Cable lat pulldown" },
     { id: 107, name: "Seated cable row" },
     { id: 108, name: "Barbell bicep curl" },
     { id: 109, name: "Seated barbell overhead press" },
@@ -1597,7 +1633,7 @@ const DEFAULT_WORKOUTS = {
     { id: 114, name: "Seated Arnold press" },
     { id: 115, name: "Cable chest fly" },
     { id: 116, name: "Overhead tricep extension" },
-    { id: 117, name: "Wide-grip lat pulldown" },
+    { id: 117, name: "Cable wide-grip lat pulldown" },
     { id: 118, name: "Chest-supported row" },
     { id: 119, name: "Reverse pec deck" },
     { id: 120, name: "Hammer curl" },
@@ -2121,26 +2157,70 @@ function showCheckinModal(weightEntry) {
   });
 })();
 
-document.getElementById("save-weight").addEventListener("click", () => {
-  const v = Number(document.getElementById("weight-input").value);
-  if (logWeight(v)) {
-    document.getElementById("weight-input").value = "";
-    renderAll();
-    // (no rest timer here — that's lift-only)
+// ============ WEIGHT AUTO-SAVE ============
+// Saves automatically 600ms after the user stops typing, so the entry can't get
+// lost by closing the modal or backgrounding the app halfway through.
+// Also keeps the explicit Save button for the muscle-memory tap.
+function showSavedToast(msg) {
+  let t = document.getElementById("__saved_toast__");
+  if (!t) {
+    t = document.createElement("div");
+    t.id = "__saved_toast__";
+    t.style.cssText = "position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 96px);background:#0b0b0f;color:#fff;font-size:13px;font-weight:600;padding:9px 16px;border-radius:999px;z-index:1000;opacity:0;transition:opacity .2s ease;pointer-events:none;";
+    document.body.appendChild(t);
   }
-});
+  t.textContent = msg;
+  t.style.opacity = "1";
+  clearTimeout(t.__h);
+  t.__h = setTimeout(() => { t.style.opacity = "0"; }, 1400);
+}
 
-document.getElementById("quick-save-weight").addEventListener("click", () => {
-  const v = Number(document.getElementById("quick-weight").value);
-  if (logWeight(v)) {
-    document.getElementById("quick-weight").value = "";
+function wireWeightInput(inputId, btnId) {
+  const input = document.getElementById(inputId);
+  const btn = document.getElementById(btnId);
+  if (!input) return;
+
+  let debounce = null;
+  const trySave = (silent) => {
+    if (debounce) { clearTimeout(debounce); debounce = null; }
+    const v = Number(input.value);
+    if (!v || v <= 0) return false;
+    // Use addWeightSilently so the alert doesn't fire mid-typing
+    const entry = { id: Date.now(), kg: v, when: new Date().toISOString() };
+    data.weights.unshift(entry);
+    saveData();
+    input.value = "";
     renderAll();
-    // (no rest timer here — that's lift-only)
-  }
-});
-document.getElementById("quick-weight").addEventListener("keydown", e => {
-  if (e.key === "Enter") document.getElementById("quick-save-weight").click();
-});
+    if (!silent) showSavedToast("Saved");
+    // Now trigger any post-save prompts (goal, weekly check-in)
+    const monthKey = getCurrentMonthKey();
+    const needGoal = isFirstWeightOfMonth() && !((data.monthlyGoals || {})[monthKey]);
+    const needCheckin = shouldPromptCheckin();
+    if (needGoal && needCheckin) {
+      setTimeout(() => showGoalModal(monthKey, () => setTimeout(() => showCheckinModal(entry), 250)), 250);
+    } else if (needGoal) {
+      setTimeout(() => showGoalModal(monthKey), 250);
+    } else if (needCheckin) {
+      setTimeout(() => showCheckinModal(entry), 250);
+    }
+    return true;
+  };
+
+  // Auto-save 600ms after the user stops typing
+  input.addEventListener("input", () => {
+    if (debounce) clearTimeout(debounce);
+    debounce = setTimeout(() => trySave(false), 600);
+  });
+  // Save immediately on blur/Enter so leaving the field doesn't lose anything
+  input.addEventListener("blur", () => trySave(false));
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") { e.preventDefault(); trySave(false); input.blur(); }
+  });
+  // Explicit save button still works
+  if (btn) btn.addEventListener("click", () => trySave(false));
+}
+wireWeightInput("weight-input", "save-weight");
+wireWeightInput("quick-weight", "quick-save-weight");
 
 function renderWeighCard() {
   const cur = document.getElementById("weigh-latest");
@@ -2868,59 +2948,42 @@ function getTipsForExercise(name) {
   return lift.concat(fallback);
 }
 
-let __tipTimeouts = [];
-function clearTipTimeouts() {
-  __tipTimeouts.forEach(t => clearTimeout(t));
-  __tipTimeouts = [];
-}
-function showTipOverlay(exerciseName) {
-  const overlay = document.getElementById("tip-overlay");
-  const stack = document.getElementById("tip-stack");
-  if (!overlay || !stack) return;
-  clearTipTimeouts();
+// ============ UNIVERSAL FORM CUES ============
+// Shown on every rest screen, in the order the user needs to remember them.
+const CUES_BEFORE_LIFT = [
+  "Feet on the floor and tense core.",
+  "Remember to squeeze at the top.",
+];
+const CUES_DURING_LIFT = [
+  "Exhale on the breath out.",
+  "Fully extend arms.",
+];
 
-  // Always exactly 4 tips per rest — pre-shuffled + deduped from getTipsForExercise
-  const tips = getTipsForExercise(exerciseName).slice(0, 4);
-  if (tips.length === 0) return;
-
-  document.getElementById("tip-exname").textContent = exerciseName || "Form cues";
-  stack.innerHTML = "";
-
-  overlay.classList.remove("hiding");
-  overlay.style.display = "block";
-  void overlay.offsetWidth;
-  overlay.classList.add("show");
-
-  // Tip 1 appears immediately, then one every 15s. Max 4 — after which the stack stays put.
-  tips.forEach((tipHtml, i) => {
-    __tipTimeouts.push(setTimeout(() => {
-      const item = document.createElement("div");
-      item.className = "tip-item";
-      item.innerHTML = `<div class="tip-num">Cue ${i + 1}</div>${tipHtml}`;
-      stack.appendChild(item);
-      void item.offsetWidth;
-      item.classList.add("in");
-      // Auto-scroll so the newest tip is visible if the stack overflows
-      const wrap = stack.parentElement;
-      if (wrap && wrap.scrollHeight > wrap.clientHeight) {
-        wrap.scrollTo({ top: wrap.scrollHeight, behavior: "smooth" });
-      }
-    }, i * 15000));
-  });
-}
-function hideTipOverlay() {
-  clearTipTimeouts();
-  const overlay = document.getElementById("tip-overlay");
-  if (!overlay) return;
-  overlay.classList.remove("show");
-  overlay.classList.add("hiding");
-  // Let the backdrop fade out, then fully hide and clear the stack
-  setTimeout(() => {
-    overlay.classList.remove("hiding");
-    overlay.style.display = "none";
-    const stack = document.getElementById("tip-stack");
-    if (stack) stack.innerHTML = "";
-  }, 1600);
+// ============ EXERCISE FORM GIFS ============
+// Drop in side-profile / front-profile GIF URLs as you find good ones.
+// Lookup is substring-based, so "bench press" matches "Barbell bench press".
+// Falls back to a clean barbell-icon card if no URL matches or the image fails.
+const EXERCISE_GIFS = {
+  // Example slots — fill in with real URLs when ready:
+  // "bench press":       "https://example.com/bench.gif",
+  // "squat":             "https://example.com/squat.gif",
+  // "deadlift":          "https://example.com/deadlift.gif",
+  // "cable lat pulldown":"https://example.com/lat-pulldown.gif",
+  // "barbell row":       "https://example.com/row.gif",
+  // "shoulder press":    "https://example.com/ohp.gif",
+  // "tricep pushdown":   "https://example.com/pushdown.gif",
+  // "hammer curl":       "https://example.com/hammer-curl.gif",
+  // "hip thrust":        "https://example.com/hip-thrust.gif",
+  // "calf raise":        "https://example.com/calf-raise.gif",
+};
+function getGifForExercise(name) {
+  if (!name) return null;
+  const key = String(name).toLowerCase().trim();
+  if (EXERCISE_GIFS[key]) return EXERCISE_GIFS[key];
+  for (const k of Object.keys(EXERCISE_GIFS)) {
+    if (key.includes(k)) return EXERCISE_GIFS[k];
+  }
+  return null;
 }
 
 // ============ BEEP (alarm at 10s remaining) ============
@@ -2966,75 +3029,199 @@ function pickRecoveryTip() {
   return RECOVERY_TIPS[Math.floor(Math.random() * RECOVERY_TIPS.length)];
 }
 
-// ============ REST TIMER (between sets) ============
+// ============ REST SCREEN (unified: GIF + cues + bottom timer line) ============
+// Wall-clock based, so backgrounding the app or switching tabs doesn't pause it.
+// The rest state is persisted to localStorage and recomputed on every frame,
+// so even a refresh mid-rest resumes the countdown correctly.
 const REST_TIMER_DURATION = 90;
-const REST_TIMER_RADIUS = 38;
-const REST_TIMER_CIRCUM = 2 * Math.PI * REST_TIMER_RADIUS;
-let __restTimerInterval = null;
-let __restTimerSecondsLeft = 0;
+const REST_STATE_KEY = "fitness_rest_v1";
+let __restRafId = null;
+let __restCueTimeouts = [];
+let __restBeepPlayed = false;
+
+function loadRestState() {
+  try {
+    const raw = localStorage.getItem(REST_STATE_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (!s || !s.startedAt || !s.duration) return null;
+    return s;
+  } catch (e) { return null; }
+}
+function saveRestState(s) {
+  try { localStorage.setItem(REST_STATE_KEY, JSON.stringify(s)); } catch (e) {}
+}
+function clearRestState() {
+  try { localStorage.removeItem(REST_STATE_KEY); } catch (e) {}
+}
 
 function startRestTimer(exerciseName) {
-  if (__restTimerInterval) clearInterval(__restTimerInterval);
-  __restTimerSecondsLeft = REST_TIMER_DURATION;
-  const overlay = document.getElementById("rest-timer-overlay");
+  // Always restart fresh — clear any pending timeouts/raf/state
+  cancelRestRaf();
+  clearRestCueTimeouts();
+  __restBeepPlayed = false;
+
+  const state = {
+    startedAt: Date.now(),
+    duration: REST_TIMER_DURATION,
+    exerciseName: exerciseName || "",
+  };
+  saveRestState(state);
+  showRestOverlay(state);
+}
+
+function resumeRestTimerIfActive() {
+  // Called on app load — if there's an in-progress rest, pop the overlay back up.
+  const s = loadRestState();
+  if (!s) return;
+  const remaining = Math.max(0, s.duration - (Date.now() - s.startedAt) / 1000);
+  if (remaining <= 0) { clearRestState(); return; }
+  showRestOverlay(s);
+}
+
+function showRestOverlay(state) {
+  const overlay = document.getElementById("rest-overlay");
   if (!overlay) return;
-  // Reset visual state
-  const arc = document.getElementById("timer-arc");
-  if (arc) {
-    arc.classList.remove("warning");
-    arc.style.strokeDashoffset = "0";
-  }
-  overlay.querySelector(".timer-ready").classList.remove("show");
   overlay.classList.add("active");
-  updateRestTimerDisplay();
-  // Tip overlay during rest (only when there's an exercise context)
-  if (exerciseName) showTipOverlay(exerciseName);
-  __restTimerInterval = setInterval(() => {
-    __restTimerSecondsLeft--;
-    updateRestTimerDisplay();
-    if (__restTimerSecondsLeft <= 0) {
-      try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (e) {}
-      setTimeout(stopRestTimer, 600);
+  overlay.setAttribute("aria-hidden", "false");
+
+  // Header + GIF
+  document.getElementById("rest-exname").textContent = state.exerciseName || "Rest";
+  setRestGif(state.exerciseName);
+
+  // Reset cue cards (empty, will populate on schedule)
+  const beforeEl = document.getElementById("rest-cues-before");
+  const duringEl = document.getElementById("rest-cues-during");
+  beforeEl.innerHTML = "";
+  duringEl.innerHTML = "";
+  // Pre-render all 4 cues but hidden; reveal on schedule based on elapsed time
+  const cues = [
+    { text: CUES_BEFORE_LIFT[0], at: 0,  container: beforeEl },
+    { text: CUES_BEFORE_LIFT[1], at: 5,  container: beforeEl },
+    { text: CUES_DURING_LIFT[0], at: 30, container: duringEl },
+    { text: CUES_DURING_LIFT[1], at: 35, container: duringEl },
+  ];
+  cues.forEach(c => {
+    const el = document.createElement("div");
+    el.className = "rest-cue";
+    el.textContent = c.text;
+    c.container.appendChild(el);
+    c.el = el;
+  });
+  // Schedule reveals based on elapsed
+  const elapsedNow = (Date.now() - state.startedAt) / 1000;
+  cues.forEach(c => {
+    const delay = Math.max(0, c.at - elapsedNow) * 1000;
+    if (delay === 0) {
+      // already past — reveal immediately
+      requestAnimationFrame(() => c.el.classList.add("in"));
+    } else {
+      __restCueTimeouts.push(setTimeout(() => c.el.classList.add("in"), delay));
     }
-  }, 1000);
+  });
+
+  // Bottom row reset
+  document.getElementById("rest-ready").classList.remove("show");
+  document.getElementById("rest-progress-fill").classList.remove("warning");
+
+  startRestRaf();
+}
+
+function setRestGif(exerciseName) {
+  const img = document.getElementById("rest-gif");
+  const fb = document.getElementById("rest-gif-fallback");
+  const url = getGifForExercise(exerciseName);
+  if (url) {
+    img.onload = () => { img.style.display = "block"; fb.style.display = "none"; };
+    img.onerror = () => { img.style.display = "none"; fb.style.display = "flex"; img.src = ""; };
+    img.src = url;
+  } else {
+    img.style.display = "none";
+    img.src = "";
+    fb.style.display = "flex";
+  }
+}
+
+function startRestRaf() {
+  cancelRestRaf();
+  const fill = document.getElementById("rest-progress-fill");
+  const numEl = document.getElementById("rest-time-num");
+  const readyEl = document.getElementById("rest-ready");
+
+  const tick = () => {
+    const s = loadRestState();
+    if (!s) { stopRestTimer(); return; }
+    const elapsed = (Date.now() - s.startedAt) / 1000;
+    const remaining = Math.max(0, s.duration - elapsed);
+    const frac = Math.max(0, Math.min(1, remaining / s.duration));
+
+    // Progress line: scale from full (1) → empty (0). Smooth at ~60fps.
+    fill.style.transform = `scaleX(${frac})`;
+    numEl.textContent = Math.ceil(remaining);
+
+    // 10s warning
+    const warn = remaining <= 10;
+    fill.classList.toggle("warning", warn);
+    if (remaining <= 10 && remaining >= 7) readyEl.classList.add("show");
+    else readyEl.classList.remove("show");
+
+    // Beep once at the 10s mark
+    if (!__restBeepPlayed && remaining <= 10 && remaining > 9) {
+      __restBeepPlayed = true;
+      playBeep();
+    }
+
+    if (remaining <= 0) {
+      try { navigator.vibrate && navigator.vibrate([120, 60, 120]); } catch (e) {}
+      setTimeout(stopRestTimer, 400);
+      return;
+    }
+    __restRafId = requestAnimationFrame(tick);
+  };
+  __restRafId = requestAnimationFrame(tick);
+}
+
+function cancelRestRaf() {
+  if (__restRafId !== null) {
+    cancelAnimationFrame(__restRafId);
+    __restRafId = null;
+  }
+}
+function clearRestCueTimeouts() {
+  __restCueTimeouts.forEach(t => clearTimeout(t));
+  __restCueTimeouts = [];
 }
 
 function stopRestTimer() {
-  if (__restTimerInterval) clearInterval(__restTimerInterval);
-  __restTimerInterval = null;
-  const overlay = document.getElementById("rest-timer-overlay");
+  cancelRestRaf();
+  clearRestCueTimeouts();
+  __restBeepPlayed = false;
+  clearRestState();
+  const overlay = document.getElementById("rest-overlay");
   if (!overlay) return;
   overlay.classList.remove("active");
-  overlay.querySelector(".timer-ready").classList.remove("show");
-  const arc = document.getElementById("timer-arc");
-  if (arc) arc.classList.remove("warning");
-  hideTipOverlay();
+  overlay.setAttribute("aria-hidden", "true");
+  document.getElementById("rest-ready").classList.remove("show");
 }
 
-function updateRestTimerDisplay() {
-  const left = Math.max(0, __restTimerSecondsLeft);
-  const arc = document.getElementById("timer-arc");
-  const text = document.getElementById("timer-text");
-  if (!arc || !text) return;
-  // Arc drains: offset grows as time falls
-  arc.style.strokeDashoffset = String(REST_TIMER_CIRCUM * (1 - left / REST_TIMER_DURATION));
-  text.textContent = left;
-  if (left <= 10) arc.classList.add("warning");
-  else arc.classList.remove("warning");
-  // 1-second alarm beep at exactly 10s remaining
-  if (left === 10) playBeep();
-  // "Get ready" appears at 10s and stays for 3 seconds (10 → 8)
-  const ready = document.querySelector("#rest-timer-overlay .timer-ready");
-  if (ready) {
-    if (left <= 10 && left >= 8) ready.classList.add("show");
-    else ready.classList.remove("show");
-  }
-}
-
-// Wire skip button once on load
-(function wireTimer() {
-  const skip = document.getElementById("timer-skip");
+// Wire skip button + resume on tab-return + boot resume
+(function wireRest() {
+  const skip = document.getElementById("rest-skip");
   if (skip) skip.addEventListener("click", stopRestTimer);
+
+  // When the tab comes back to focus, re-sync the timer from wall-clock state
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return;
+    const s = loadRestState();
+    if (!s) return;
+    const remaining = Math.max(0, s.duration - (Date.now() - s.startedAt) / 1000);
+    if (remaining <= 0) { stopRestTimer(); return; }
+    // overlay may have been closed — re-render & restart raf
+    showRestOverlay(s);
+  });
+
+  // Resume on app open if a rest is already in progress
+  resumeRestTimerIfActive();
 })();
 
 // ============ LIFT (progressive overload) ============
