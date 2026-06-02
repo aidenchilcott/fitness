@@ -8,7 +8,9 @@
 <meta name="apple-mobile-web-app-title" content="AiDHDen" />
 <meta name="theme-color" content="#0b0b0f" />
 <link rel="manifest" href="/manifest.webmanifest" />
-<link rel="apple-touch-icon" href="/icon-180.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png" />
+<link rel="apple-touch-icon-precomposed" sizes="180x180" href="/icon-180.png" />
+<link rel="icon" type="image/png" sizes="180x180" href="/icon-180.png" />
 <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -703,58 +705,77 @@
     border-radius: 12px;
   }
 
-  /* Tip overlay during rest */
+  /* Tip overlay during rest — stack of cards that pile up, never fade out */
   .tip-overlay {
     position: fixed; inset: 0;
     z-index: 180;
     display: none;
-    align-items: center; justify-content: center;
-    padding: 24px;
     pointer-events: none;
   }
-  .tip-overlay.show, .tip-overlay.hiding { display: flex; }
+  .tip-overlay.show, .tip-overlay.hiding { display: block; }
   .tip-overlay .tip-backdrop {
     position: absolute; inset: 0;
-    background: rgba(28, 28, 30, 0.7);
+    background: rgba(28, 28, 30, 0.72);
     opacity: 0;
-    transition: opacity 5s ease;
+    transition: opacity 2s ease;
   }
   .tip-overlay.show .tip-backdrop { opacity: 1; }
-  .tip-overlay.hiding .tip-backdrop {
-    opacity: 0;
-    transition: opacity 5s ease;
+  .tip-overlay.hiding .tip-backdrop { opacity: 0; transition: opacity 1.5s ease; }
+  .tip-overlay .tip-stack-wrap {
+    position: absolute;
+    top: calc(env(safe-area-inset-top, 0px) + 32px);
+    left: 16px; right: 16px;
+    bottom: 200px;
+    overflow-y: auto;
+    pointer-events: auto;
+    display: flex; flex-direction: column;
+    -webkit-overflow-scrolling: touch;
   }
-  .tip-overlay .tip-card {
-    position: relative;
-    background: white;
-    border-radius: 18px;
-    padding: 22px 20px 22px;
-    max-width: 340px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-    opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+  .tip-overlay .tip-stack-header {
+    text-align: center;
+    color: white;
+    margin-bottom: 16px;
+    flex-shrink: 0;
   }
-  .tip-overlay .tip-card.tip-in { opacity: 1; transform: translateY(0); }
   .tip-overlay .tip-cap {
     font-size: 10px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.12em;
-    color: var(--accent);
-    margin: 0 0 4px;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: rgba(255, 255, 255, 0.62);
   }
   .tip-overlay .tip-exname {
-    font-size: 18px; font-weight: 700;
+    font-size: 19px; font-weight: 700;
     letter-spacing: -0.01em;
-    margin: 0 0 12px;
-    color: var(--text);
+    color: white;
+    margin-top: 4px;
   }
-  .tip-overlay .tip-content {
-    font-size: 14px;
+  .tip-overlay .tip-stack {
+    display: flex; flex-direction: column;
+    gap: 10px;
+    padding-bottom: 8px;
+  }
+  .tip-overlay .tip-item {
+    background: white;
+    border-radius: 14px;
+    padding: 13px 15px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    font-size: 13px;
     line-height: 1.5;
     color: var(--text);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 1.2s ease, transform 1.2s ease;
   }
-  .tip-overlay .tip-content strong {
-    font-weight: 700;
+  .tip-overlay .tip-item.in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .tip-overlay .tip-item strong { font-weight: 700; }
+  .tip-overlay .tip-item .tip-num {
+    display: inline-block;
+    font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 6px;
   }
 
   /* Lift section */
@@ -1315,13 +1336,15 @@
     </div>
   </div>
 
-  <!-- Tip overlay (during rest timer) -->
+  <!-- Tip overlay (during rest timer): tips stack one after another -->
   <div id="tip-overlay" class="tip-overlay" aria-hidden="true">
     <div class="tip-backdrop"></div>
-    <div class="tip-card">
-      <div class="tip-cap">Form cue</div>
-      <div class="tip-exname" id="tip-exname"></div>
-      <div class="tip-content" id="tip-content"></div>
+    <div class="tip-stack-wrap">
+      <div class="tip-stack-header">
+        <div class="tip-cap">Form cues</div>
+        <div class="tip-exname" id="tip-exname"></div>
+      </div>
+      <div class="tip-stack" id="tip-stack"></div>
     </div>
   </div>
 
@@ -1439,14 +1462,22 @@ if (!data.workouts) {
   saveData();
 }
 
-function todayKey() { return new Date().toISOString().slice(0, 10); }
+// Local-time YYYY-MM-DD — using UTC would roll the day at the wrong time in Melbourne
+function localDateKey(d) {
+  d = d || new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+function todayKey() { return localDateKey(); }
 function fmtDateTime(iso) {
   const d = new Date(iso);
   return d.toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 function dateNDaysAgo(n) {
   const d = new Date(); d.setDate(d.getDate() - n);
-  return d.toISOString().slice(0, 10);
+  return localDateKey(d);
 }
 function habitsByCat() {
   const out = {};
@@ -1905,7 +1936,7 @@ document.getElementById("save-weight").addEventListener("click", () => {
   if (logWeight(v)) {
     document.getElementById("weight-input").value = "";
     renderAll();
-    startRestTimer(); // 90s timer post-weigh-in
+    // (no rest timer here — that's lift-only)
   }
 });
 
@@ -1914,7 +1945,7 @@ document.getElementById("quick-save-weight").addEventListener("click", () => {
   if (logWeight(v)) {
     document.getElementById("quick-weight").value = "";
     renderAll();
-    startRestTimer(); // 90s timer post-weigh-in
+    // (no rest timer here — that's lift-only)
   }
 });
 document.getElementById("quick-weight").addEventListener("keydown", e => {
@@ -2654,45 +2685,52 @@ function clearTipTimeouts() {
 }
 function showTipOverlay(exerciseName) {
   const overlay = document.getElementById("tip-overlay");
-  if (!overlay) return;
+  const stack = document.getElementById("tip-stack");
+  if (!overlay || !stack) return;
   clearTipTimeouts();
-  // Already shuffled + deduped inside getTipsForExercise
-  const tips = getTipsForExercise(exerciseName);
+
+  // Always exactly 4 tips per rest — pre-shuffled + deduped from getTipsForExercise
+  const tips = getTipsForExercise(exerciseName).slice(0, 4);
   if (tips.length === 0) return;
-  document.getElementById("tip-exname").textContent = exerciseName || "Form cue";
-  // Backdrop fades in
+
+  document.getElementById("tip-exname").textContent = exerciseName || "Form cues";
+  stack.innerHTML = "";
+
   overlay.classList.remove("hiding");
-  overlay.style.display = "flex";
+  overlay.style.display = "block";
   void overlay.offsetWidth;
   overlay.classList.add("show");
 
-  const card = overlay.querySelector(".tip-card");
-  let idx = 0;
-  // Max 9 slots in a 90s rest, but never more than the unique tips we have
-  const slots = Math.min(9, tips.length);
-
-  const showOne = () => {
-    document.getElementById("tip-content").innerHTML = tips[idx];
-    card.classList.add("tip-in");
-    // Hide this tip after 8.5s (leaves 1.5s for fade out before next one shows)
+  // Tip 1 appears immediately, then one every 15s. Max 4 — after which the stack stays put.
+  tips.forEach((tipHtml, i) => {
     __tipTimeouts.push(setTimeout(() => {
-      card.classList.remove("tip-in");
-    }, 8500));
-    idx++;
-    if (idx < slots) {
-      __tipTimeouts.push(setTimeout(showOne, 10000));
-    }
-  };
-  showOne();
+      const item = document.createElement("div");
+      item.className = "tip-item";
+      item.innerHTML = `<div class="tip-num">Cue ${i + 1}</div>${tipHtml}`;
+      stack.appendChild(item);
+      void item.offsetWidth;
+      item.classList.add("in");
+      // Auto-scroll so the newest tip is visible if the stack overflows
+      const wrap = stack.parentElement;
+      if (wrap && wrap.scrollHeight > wrap.clientHeight) {
+        wrap.scrollTo({ top: wrap.scrollHeight, behavior: "smooth" });
+      }
+    }, i * 15000));
+  });
 }
 function hideTipOverlay() {
   clearTipTimeouts();
   const overlay = document.getElementById("tip-overlay");
   if (!overlay) return;
-  const card = overlay.querySelector(".tip-card");
-  if (card) card.classList.remove("tip-in");
-  overlay.classList.remove("show", "hiding");
-  overlay.style.display = "none";
+  overlay.classList.remove("show");
+  overlay.classList.add("hiding");
+  // Let the backdrop fade out, then fully hide and clear the stack
+  setTimeout(() => {
+    overlay.classList.remove("hiding");
+    overlay.style.display = "none";
+    const stack = document.getElementById("tip-stack");
+    if (stack) stack.innerHTML = "";
+  }, 1600);
 }
 
 // ============ BEEP (alarm at 10s remaining) ============
@@ -3130,7 +3168,9 @@ function renderLiftSession(root, dayId, exIdx) {
         sessEx.sets[idx][field] = isNaN(v) ? 0 : v;
         saveData();
         // Reps confirmed → kick off 90s rest timer with the exercise's tip
-        if (field === 'r' && v > 0) startRestTimer(exercise.name);
+        // BUT skip the timer on the last set — no need to rest before moving to the next exercise
+        const isLastSet = idx === blockCount - 1;
+        if (field === 'r' && v > 0 && !isLastSet) startRestTimer(exercise.name);
       };
 
       // Gate: before the first reps of this session, force DND confirmation
