@@ -409,7 +409,7 @@
     .weigh-strip { padding: 6px 12px; margin-bottom: 6px; }
   }
 
-  /* Unified rest screen */
+  /* Unified rest screen — light theme to match the rest of the app */
   .rest-overlay {
     position: fixed; inset: 0;
     z-index: 200;
@@ -419,9 +419,7 @@
   .rest-overlay.active { display: flex; }
   .rest-overlay .rest-backdrop {
     position: absolute; inset: 0;
-    background: rgba(20, 20, 22, 0.92);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: var(--bg);
   }
   .rest-overlay .rest-content {
     position: relative; z-index: 2;
@@ -431,14 +429,14 @@
     padding: calc(env(safe-area-inset-top, 0px) + 24px) 18px 24px;
   }
   .rest-overlay .rest-exname {
-    color: rgba(255, 255, 255, 0.62);
+    color: var(--muted);
     text-align: center;
     font-size: 10px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.18em;
     margin-bottom: 12px;
   }
   .rest-overlay .rest-gif-card {
-    background: #1f1f24;
+    background: var(--card-2);
     border-radius: 18px;
     overflow: hidden;
     aspect-ratio: 4 / 3;
@@ -454,27 +452,63 @@
   .rest-overlay .rest-gif-fallback {
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    gap: 10px;
-    color: rgba(255, 255, 255, 0.45);
+    gap: 4px;
+    width: 100%; height: 100%;
+    color: var(--text);
+    padding: 8px;
   }
-  .rest-overlay .rest-gif-fallback i { font-size: 48px; }
+  .rest-overlay .rest-gif-fallback .form-svg {
+    width: 86%; max-width: 280px; height: auto;
+    display: block;
+  }
+  .rest-overlay .rest-gif-fallback i { font-size: 48px; color: var(--muted); }
   .rest-overlay .rest-gif-label {
     font-size: 10px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.15em;
+    color: var(--muted);
   }
+  /* Subtle bench-press / squat / pulldown loops — arms/body pulse with the rep */
+  @keyframes formArmsUp   { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+  @keyframes formArmsDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(12px); } }
+  @keyframes formBodyDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(14px); } }
+  @keyframes formBodyHinge{ 0%, 100% { transform: rotate(0); }   50% { transform: rotate(14deg); transform-origin: 100px 50px; } }
+  .form-svg .bp-arms,
+  .form-svg .dp-arms,
+  .form-svg .sp-arms,
+  .form-svg .lp-arms,
+  .form-svg .tp-arms { animation: formArmsUp 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .form-svg .hc-arms,
+  .form-svg .bc-arms,
+  .form-svg .gen-arms { animation: formArmsDown 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .form-svg .sq-body { animation: formBodyDown 2.4s ease-in-out infinite; }
+  .form-svg .dl-body,
+  .form-svg .rdl-body { animation: formBodyHinge 2.4s ease-in-out infinite; }
+  .form-svg .row-arms { animation: formArmsDown 2.0s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .form-svg .ht-body  { animation: formArmsUp 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .form-svg .cl-legs  { animation: formBodyDown 2.0s ease-in-out infinite; transform-origin: 100px 100px; }
+
   .rest-overlay .rest-section { margin-bottom: 18px; }
   .rest-overlay .rest-section-title {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--muted);
     font-size: 11px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.15em;
     margin: 0 0 10px;
+  }
+  /* "During lift" section is hidden until the first during-cue is scheduled to appear */
+  .rest-overlay .rest-during-section {
+    opacity: 0; max-height: 0; overflow: hidden; margin-bottom: 0;
+    transition: opacity 0.5s ease, max-height 0.5s ease, margin-bottom 0.5s ease;
+  }
+  .rest-overlay .rest-during-section.revealed {
+    opacity: 1; max-height: 360px; margin-bottom: 18px;
   }
   .rest-overlay .rest-cues {
     display: flex; flex-direction: column; gap: 8px;
   }
   .rest-overlay .rest-cue {
-    background: white;
+    background: var(--card);
     color: var(--text);
+    border: 1px solid var(--border);
     border-radius: 12px;
     padding: 12px 14px;
     font-size: 14px;
@@ -490,8 +524,8 @@
   .rest-overlay .rest-bottom {
     position: relative; z-index: 2;
     padding: 14px 18px calc(env(safe-area-inset-bottom, 0px) + 16px);
-    background: rgba(15, 15, 17, 0.92);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--bg);
+    border-top: 1px solid var(--border);
   }
   .rest-overlay .rest-ready {
     text-align: center;
@@ -509,15 +543,15 @@
     margin-bottom: 10px;
   }
   .rest-overlay .rest-time-num {
-    color: white;
+    color: var(--text);
     font-size: 26px; font-weight: 800;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
   }
   .rest-overlay .rest-skip {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: var(--card-2);
+    color: var(--text);
+    border: 1px solid var(--border);
     border-radius: 999px;
     padding: 8px 18px;
     font-size: 13px; font-weight: 600;
@@ -527,7 +561,7 @@
   .rest-overlay .rest-progress-track {
     width: 100%;
     height: 4px;
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--border);
     border-radius: 2px;
     overflow: hidden;
   }
@@ -1549,7 +1583,7 @@
         <div class="rest-cues" id="rest-cues-before"></div>
       </div>
 
-      <div class="rest-section">
+      <div class="rest-section rest-during-section" id="rest-during-section">
         <div class="rest-section-title">During lift</div>
         <div class="rest-cues" id="rest-cues-during"></div>
       </div>
@@ -2181,43 +2215,82 @@ function wireWeightInput(inputId, btnId) {
   if (!input) return;
 
   let debounce = null;
-  const trySave = (silent) => {
+  let activeEntryId = null; // updated by auto-saves so we don't create duplicates
+
+  // final=true:  explicit save — clears input, shows "Saved" toast, fires post-save prompts
+  // final=false: silent auto-save — keeps input value so user can keep typing (e.g. add a decimal)
+  const trySave = (final) => {
     if (debounce) { clearTimeout(debounce); debounce = null; }
-    const v = Number(input.value);
-    if (!v || v <= 0) return false;
-    // Use addWeightSilently so the alert doesn't fire mid-typing
-    const entry = { id: Date.now(), kg: v, when: new Date().toISOString() };
-    data.weights.unshift(entry);
+    const raw = String(input.value).trim();
+    // While the user is mid-typing, "88." parses fine (88) but we shouldn't commit yet.
+    if (!final && /[.]$/.test(raw)) return false;
+    const v = Number(raw);
+    if (!v || v <= 0) {
+      if (final) { activeEntryId = null; input.value = ""; }
+      return false;
+    }
+
+    if (activeEntryId !== null) {
+      // Update the entry we created earlier in this typing session
+      const idx = data.weights.findIndex(e => e.id === activeEntryId);
+      if (idx >= 0) {
+        data.weights[idx].kg = v;
+        data.weights[idx].when = new Date().toISOString();
+      } else {
+        activeEntryId = Date.now();
+        data.weights.unshift({ id: activeEntryId, kg: v, when: new Date().toISOString() });
+      }
+    } else {
+      activeEntryId = Date.now();
+      data.weights.unshift({ id: activeEntryId, kg: v, when: new Date().toISOString() });
+    }
     saveData();
-    input.value = "";
     renderAll();
-    if (!silent) showSavedToast("Saved");
-    // Now trigger any post-save prompts (goal, weekly check-in)
-    const monthKey = getCurrentMonthKey();
-    const needGoal = isFirstWeightOfMonth() && !((data.monthlyGoals || {})[monthKey]);
-    const needCheckin = shouldPromptCheckin();
-    if (needGoal && needCheckin) {
-      setTimeout(() => showGoalModal(monthKey, () => setTimeout(() => showCheckinModal(entry), 250)), 250);
-    } else if (needGoal) {
-      setTimeout(() => showGoalModal(monthKey), 250);
-    } else if (needCheckin) {
-      setTimeout(() => showCheckinModal(entry), 250);
+
+    if (final) {
+      input.value = "";
+      showSavedToast(`Saved ${v} kg`);
+      const finishedId = activeEntryId;
+      activeEntryId = null;
+      // Post-save prompts (goal, weekly check-in) — only on explicit save
+      const monthKey = getCurrentMonthKey();
+      const needGoal = isFirstWeightOfMonth() && !((data.monthlyGoals || {})[monthKey]);
+      const needCheckin = shouldPromptCheckin();
+      const entry = data.weights.find(e => e.id === finishedId);
+      if (needGoal && needCheckin && entry) {
+        setTimeout(() => showGoalModal(monthKey, () => setTimeout(() => showCheckinModal(entry), 250)), 250);
+      } else if (needGoal) {
+        setTimeout(() => showGoalModal(monthKey), 250);
+      } else if (needCheckin && entry) {
+        setTimeout(() => showCheckinModal(entry), 250);
+      }
     }
     return true;
   };
 
-  // Auto-save 600ms after the user stops typing
+  // Auto-save 1500ms after typing stops — long enough to add a decimal without
+  // the input getting cleared out from under you.
   input.addEventListener("input", () => {
     if (debounce) clearTimeout(debounce);
-    debounce = setTimeout(() => trySave(false), 600);
+    debounce = setTimeout(() => trySave(false), 1500);
   });
-  // Save immediately on blur/Enter so leaving the field doesn't lose anything
-  input.addEventListener("blur", () => trySave(false));
+  // Explicit triggers — these finalize the entry and clear the input.
+  input.addEventListener("blur", () => trySave(true));
   input.addEventListener("keydown", e => {
-    if (e.key === "Enter") { e.preventDefault(); trySave(false); input.blur(); }
+    if (e.key === "Enter") { e.preventDefault(); trySave(true); input.blur(); }
   });
-  // Explicit save button still works
-  if (btn) btn.addEventListener("click", () => trySave(false));
+  if (btn) btn.addEventListener("click", () => trySave(true));
+
+  // Flush pending edits when the tab goes to background — iOS sometimes kills
+  // the page on home-button press, and we don't want to lose a half-typed decimal.
+  const flushOnBackground = () => {
+    if (document.visibilityState === "hidden" && input.value && /^\d+(\.\d+)?$/.test(String(input.value).trim())) {
+      if (debounce) clearTimeout(debounce);
+      trySave(false);
+    }
+  };
+  document.addEventListener("visibilitychange", flushOnBackground);
+  window.addEventListener("pagehide", flushOnBackground);
 }
 wireWeightInput("weight-input", "save-weight");
 wireWeightInput("quick-weight", "quick-save-weight");
@@ -2948,34 +3021,532 @@ function getTipsForExercise(name) {
   return lift.concat(fallback);
 }
 
-// ============ UNIVERSAL FORM CUES ============
-// Shown on every rest screen, in the order the user needs to remember them.
-const CUES_BEFORE_LIFT = [
-  "Feet on the floor and tense core.",
-  "Remember to squeeze at the top.",
-];
-const CUES_DURING_LIFT = [
-  "Exhale on the breath out.",
-  "Fully extend arms.",
-];
-
-// ============ EXERCISE FORM GIFS ============
-// Drop in side-profile / front-profile GIF URLs as you find good ones.
-// Lookup is substring-based, so "bench press" matches "Barbell bench press".
-// Falls back to a clean barbell-icon card if no URL matches or the image fails.
-const EXERCISE_GIFS = {
-  // Example slots — fill in with real URLs when ready:
-  // "bench press":       "https://example.com/bench.gif",
-  // "squat":             "https://example.com/squat.gif",
-  // "deadlift":          "https://example.com/deadlift.gif",
-  // "cable lat pulldown":"https://example.com/lat-pulldown.gif",
-  // "barbell row":       "https://example.com/row.gif",
-  // "shoulder press":    "https://example.com/ohp.gif",
-  // "tricep pushdown":   "https://example.com/pushdown.gif",
-  // "hammer curl":       "https://example.com/hammer-curl.gif",
-  // "hip thrust":        "https://example.com/hip-thrust.gif",
-  // "calf raise":        "https://example.com/calf-raise.gif",
+// ============ EXERCISE-SPECIFIC FORM CUES ============
+// Each entry has 2 cues for setup (Before) and 2 for execution (During).
+// Lookup is substring-based on lowercased exercise name, so "Barbell bench press"
+// matches the "bench press" entry below.
+const EXERCISE_CUES = {
+  "bench press": {
+    before: [
+      "Feet flat, glutes squeezed, shoulder blades pinched back.",
+      "Wrists stacked over elbows, grip just outside shoulder width."
+    ],
+    during: [
+      "Bar lowers to lower chest — no bouncing.",
+      "Drive feet into the floor as you press, exhale on the way up."
+    ]
+  },
+  "incline dumbbell press": {
+    before: [
+      "Bench at 30°, dumbbells at chest level, palms forward.",
+      "Pinch shoulder blades back into the bench."
+    ],
+    during: [
+      "Press up and slightly in, dumbbells nearly touch at the top.",
+      "Slow 3-second lower, stop just shy of full stretch."
+    ]
+  },
+  "incline barbell press": {
+    before: [
+      "Bench at 30°, feet planted, scapulae retracted.",
+      "Grip just wider than shoulder width."
+    ],
+    during: [
+      "Bar to upper chest, full control on the descent.",
+      "Drive through the heels, exhale as you press."
+    ]
+  },
+  "shoulder press": {
+    before: [
+      "Core braced, glutes tight, neutral spine.",
+      "Elbows just below shoulder height to start."
+    ],
+    during: [
+      "Press straight up, biceps end near your ears.",
+      "Don't flare ribs — squeeze glutes to keep neutral."
+    ]
+  },
+  "arnold press": {
+    before: [
+      "Sit tall on a 90° bench, palms facing you at chin height.",
+      "Brace core, squeeze glutes."
+    ],
+    during: [
+      "Rotate smoothly through the arc — palms forward overhead.",
+      "Reverse the rotation slowly on the way down."
+    ]
+  },
+  "tricep pushdown": {
+    before: [
+      "Elbows pinned to your sides, slight forward lean.",
+      "Wrists straight, grip relaxed."
+    ],
+    during: [
+      "Only your forearms move — elbows stay locked.",
+      "Squeeze the triceps hard at the bottom for 1 second."
+    ]
+  },
+  "tricep extension": {
+    before: [
+      "Elbows pointed up, upper arms still next to your head.",
+      "Slight chest-up posture, core braced."
+    ],
+    during: [
+      "Lower behind your head with control — elbows don't flare.",
+      "Press up, pause, squeeze the long head at the top."
+    ]
+  },
+  "skullcrusher": {
+    before: [
+      "Elbows pointed at the ceiling, pinned in place.",
+      "Wrists neutral, grip just inside shoulder width."
+    ],
+    during: [
+      "Lower to forehead or just past — elbows don't flare.",
+      "Drive up to lockout, squeeze the triceps."
+    ]
+  },
+  "barbell row": {
+    before: [
+      "Hinge at hips, bar over mid-foot, neutral spine.",
+      "Brace core, squeeze shoulder blades together."
+    ],
+    during: [
+      "Pull the bar to your lower chest, elbows back.",
+      "Slow 2-second lower, don't lose the hinge."
+    ]
+  },
+  "chest-supported row": {
+    before: [
+      "Chest pressed firmly into the pad the whole set.",
+      "Shoulders down and back to start."
+    ],
+    during: [
+      "Pull with your elbows, not your hands.",
+      "Squeeze your shoulder blades together at the top."
+    ]
+  },
+  "cable lat pulldown": {
+    before: [
+      "Sit tall, knees locked under the pad, slight backward lean.",
+      "Pull shoulder blades down and back before the rep starts."
+    ],
+    during: [
+      "Drive elbows down and back — bar to upper chest.",
+      "Full stretch at the top, let your scapulae elevate."
+    ]
+  },
+  "lat pulldown": {
+    before: [
+      "Sit tall, knees locked under the pad, slight backward lean.",
+      "Pull shoulder blades down and back before the rep starts."
+    ],
+    during: [
+      "Drive elbows down and back — bar to upper chest.",
+      "Full stretch at the top, let your scapulae elevate."
+    ]
+  },
+  "face pull": {
+    before: [
+      "Cable at forehead height, double-rope, palms facing in.",
+      "Brace core, slight forward lean."
+    ],
+    during: [
+      "Elbows high, rotate knuckles toward the ceiling.",
+      "1-second squeeze on the rear delts at the end."
+    ]
+  },
+  "reverse pec deck": {
+    before: [
+      "Chest pressed into the pad, feet flat.",
+      "Slight elbow bend, locked the whole rep."
+    ],
+    during: [
+      "Lead with the elbows, pull them back as far as mobility allows.",
+      "Slow 2–3 second return, no momentum."
+    ]
+  },
+  "hammer curl": {
+    before: [
+      "Neutral grip, palms facing each other, elbows pinned to sides.",
+      "Stand tall, shoulders back."
+    ],
+    during: [
+      "Only the forearms move — elbows don't drift forward.",
+      "Slow 2-second lower, no swinging."
+    ]
+  },
+  "bicep curl": {
+    before: [
+      "Elbows pinned to your sides, palms forward.",
+      "Stand tall, brace your core."
+    ],
+    during: [
+      "Curl with the biceps only — no shoulder swing.",
+      "Slow descent, full stretch at the bottom."
+    ]
+  },
+  "lateral raise": {
+    before: [
+      "Slight forward lean, elbows softly bent.",
+      "Dumbbells start just in front of your thighs."
+    ],
+    during: [
+      "Lead with the elbows, raise to shoulder height.",
+      "Pause at the top, slow 2-second lower."
+    ]
+  },
+  "chest fly": {
+    before: [
+      "Slight elbow bend — locked for the whole set.",
+      "Shoulder blades pinned back, feet flat."
+    ],
+    during: [
+      "Deep stretch at the bottom, then squeeze hands together at the top.",
+      "Slow 2-second return, don't turn it into a press."
+    ]
+  },
+  "squat": {
+    before: [
+      "Bar racked high, feet shoulder width, toes slightly out.",
+      "Brace core, big breath in, eyes forward."
+    ],
+    during: [
+      "Knees track over toes, sit down between your hips.",
+      "Drive the floor away — chest stays up the whole way."
+    ]
+  },
+  "deadlift": {
+    before: [
+      "Bar over mid-foot, hips back, neutral spine.",
+      "Brace hard before you pull — air in, lock the ribs down."
+    ],
+    during: [
+      "Push the floor away, bar drags up the legs.",
+      "Lock out hips and knees together at the top."
+    ]
+  },
+  "romanian deadlift": {
+    before: [
+      "Soft knees, bar at your hips, shoulders back.",
+      "Brace core, hinge from the hips."
+    ],
+    during: [
+      "Push hips back, bar slides down the thighs.",
+      "Stop when you feel a deep hamstring stretch — then drive hips forward."
+    ]
+  },
+  "hip thrust": {
+    before: [
+      "Upper back on bench, bar over hip crease, knees at 90°.",
+      "Chin tucked, ribs down, brace your core."
+    ],
+    during: [
+      "Drive through your heels, squeeze glutes hard at the top.",
+      "Hold the lockout for 1 second before lowering with control."
+    ]
+  },
+  "calf raise": {
+    before: [
+      "Balls of feet on the platform, heels free to drop.",
+      "Stand tall, brace your core."
+    ],
+    during: [
+      "Full stretch at the bottom, drive up onto your toes.",
+      "Pause for 1 second at the top, slow 3-second lower."
+    ]
+  },
+  "bulgarian split squat": {
+    before: [
+      "Most weight on the front leg, back foot on bench.",
+      "Front shin will stay vertical."
+    ],
+    during: [
+      "Slow descent (2–3s), torso slightly forward.",
+      "Drive up through the front heel — knee doesn't drift past toes."
+    ]
+  },
 };
+const GENERIC_CUES = {
+  before: [
+    "Set your feet, brace your core, lock in your grip.",
+    "One deep breath in before the first rep."
+  ],
+  during: [
+    "Slow eccentric (2–3 seconds lowering).",
+    "Exhale on the hard part, full range of motion."
+  ]
+};
+function getCuesForExercise(name) {
+  if (!name) return GENERIC_CUES;
+  const key = String(name).toLowerCase().trim();
+  if (EXERCISE_CUES[key]) return EXERCISE_CUES[key];
+  for (const k of Object.keys(EXERCISE_CUES)) {
+    if (key.includes(k)) return EXERCISE_CUES[k];
+  }
+  return GENERIC_CUES;
+}
+
+// ============ EXERCISE FORM VISUALS ============
+// Inline animated SVGs — light theme, side-profile stick figures showing the
+// rep pattern. Always render (no external dependencies). To use a real GIF
+// instead, drop a URL into EXERCISE_GIFS — it takes priority over the SVG.
+// Real exercise GIFs sourced from JahelCuadrado/ExerciseGymGifsDB on GitHub,
+// served via jsDelivr CDN. Lookup is substring-based so "Barbell bench press"
+// (default workout name) matches the "bench press" key below.
+// Broken URLs fall back to the inline SVG animation via onerror.
+const GIF_BASE = "https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0";
+const EXERCISE_GIFS = {
+  // CHEST
+  "bench press":                 GIF_BASE + "/pectorals/barbell-bench-press.gif",
+  "incline dumbbell press":      GIF_BASE + "/pectorals/dumbbell-incline-bench-press.gif",
+  "incline press":               GIF_BASE + "/pectorals/dumbbell-incline-bench-press.gif",
+  "chest fly":                   GIF_BASE + "/pectorals/dumbbell-fly.gif",
+  "cable chest fly":             GIF_BASE + "/pectorals/cable-standing-fly.gif",
+
+  // BACK / LATS
+  "cable lat pulldown":          GIF_BASE + "/lats/cable-pulldown.gif",
+  "lat pulldown":                GIF_BASE + "/lats/cable-pulldown.gif",
+  "cable wide-grip lat pulldown":GIF_BASE + "/lats/twin-handle-parallel-grip-lat-pulldown.gif",
+  "wide-grip lat pulldown":      GIF_BASE + "/lats/twin-handle-parallel-grip-lat-pulldown.gif",
+  "barbell row":                 GIF_BASE + "/upper-back/barbell-bent-over-row.gif",
+  "chest-supported row":         GIF_BASE + "/upper-back/barbell-incline-row.gif",
+
+  // SHOULDERS
+  "shoulder press":              GIF_BASE + "/delts/dumbbell-seated-shoulder-press.gif",
+  "seated dumbbell shoulder press": GIF_BASE + "/delts/dumbbell-seated-shoulder-press.gif",
+  "arnold press":                GIF_BASE + "/delts/dumbbell-arnold-press.gif",
+  "lateral raise":               GIF_BASE + "/delts/dumbbell-lateral-raise.gif",
+  "cable lateral raise":         GIF_BASE + "/delts/cable-lateral-raise.gif",
+  "reverse pec deck":            GIF_BASE + "/delts/dumbbell-reverse-fly.gif",
+  "face pull":                   GIF_BASE + "/delts/cable-rear-delt-row-with-rope.gif",
+
+  // ARMS
+  "hammer curl":                 GIF_BASE + "/biceps/dumbbell-hammer-curl.gif",
+  "bicep curl":                  GIF_BASE + "/biceps/barbell-curl.gif",
+  "tricep pushdown":             GIF_BASE + "/triceps/cable-pushdown.gif",
+  "cable tricep pushdown":       GIF_BASE + "/triceps/cable-pushdown.gif",
+  "tricep extension":            GIF_BASE + "/triceps/dumbbell-overhead-triceps-extension.gif",
+  "overhead tricep extension":   GIF_BASE + "/triceps/dumbbell-overhead-triceps-extension.gif",
+  "skullcrusher":                GIF_BASE + "/triceps/barbell-skullcrusher.gif",
+
+  // LEGS
+  "squat":                       GIF_BASE + "/quads/barbell-squat.gif",
+  "barbell back squat":          GIF_BASE + "/quads/barbell-squat.gif",
+  "bulgarian split squat":       GIF_BASE + "/quads/dumbbell-bulgarian-split-squat.gif",
+  "deadlift":                    GIF_BASE + "/hamstrings/barbell-deadlift.gif",
+  "romanian deadlift":           GIF_BASE + "/hamstrings/barbell-romanian-deadlift.gif",
+  "hip thrust":                  GIF_BASE + "/glutes/barbell-hip-thrust.gif",
+  "barbell hip thrust":          GIF_BASE + "/glutes/barbell-hip-thrust.gif",
+  "calf raise":                  GIF_BASE + "/calves/lever-standing-calf-raise.gif",
+  "standing calf raise":         GIF_BASE + "/calves/lever-standing-calf-raise.gif",
+};
+const EXERCISE_ANIMATIONS = {
+  "bench press": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <rect x="40" y="92" width="120" height="6" rx="2" fill="#1c1c1e"/>
+      <rect x="96" y="98" width="8" height="22" fill="#1c1c1e"/>
+      <ellipse cx="60" cy="78" rx="14" ry="9" fill="#1c1c1e"/>
+      <rect x="74" y="74" width="58" height="9" rx="3" fill="#1c1c1e"/>
+      <g class="bp-arms">
+        <line x1="92" y1="80" x2="100" y2="60" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <line x1="110" y1="80" x2="118" y2="60" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <rect x="86" y="54" width="46" height="4" rx="2" fill="#10b981"/>
+      </g>
+    </svg>
+  `,
+  "incline dumbbell press": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <line x1="50" y1="120" x2="150" y2="60" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+      <line x1="60" y1="120" x2="60" y2="130" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="150" cy="55" rx="10" ry="8" fill="#1c1c1e"/>
+      <g class="dp-arms">
+        <line x1="138" y1="68" x2="148" y2="40" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="148" cy="36" r="6" fill="#10b981"/>
+      </g>
+    </svg>
+  `,
+  "shoulder press": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <ellipse cx="100" cy="48" rx="11" ry="10" fill="#1c1c1e"/>
+      <rect x="93" y="58" width="14" height="42" rx="4" fill="#1c1c1e"/>
+      <line x1="93" y1="100" x2="86" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+      <line x1="107" y1="100" x2="114" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+      <g class="sp-arms">
+        <line x1="93" y1="62" x2="80" y2="46" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <line x1="107" y1="62" x2="120" y2="46" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <rect x="70" y="40" width="60" height="5" rx="2" fill="#10b981"/>
+      </g>
+    </svg>
+  `,
+  "squat": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <g class="sq-body">
+        <ellipse cx="100" cy="40" rx="11" ry="10" fill="#1c1c1e"/>
+        <rect x="93" y="50" width="14" height="38" rx="4" fill="#1c1c1e"/>
+        <line x1="93" y1="88" x2="84" y2="120" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
+        <line x1="107" y1="88" x2="116" y2="120" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
+        <line x1="84" y1="120" x2="76" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+        <line x1="116" y1="120" x2="124" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+        <rect x="70" y="32" width="60" height="5" rx="2" fill="#10b981"/>
+      </g>
+    </svg>
+  `,
+  "deadlift": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <g class="dl-body">
+        <ellipse cx="100" cy="40" rx="11" ry="10" fill="#1c1c1e"/>
+        <rect x="93" y="50" width="14" height="34" rx="4" fill="#1c1c1e"/>
+        <line x1="93" y1="84" x2="84" y2="120" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
+        <line x1="107" y1="84" x2="116" y2="120" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
+        <line x1="100" y1="58" x2="100" y2="105" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <rect x="70" y="102" width="60" height="5" rx="2" fill="#10b981"/>
+      </g>
+    </svg>
+  `,
+  "romanian deadlift": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <g class="rdl-body">
+        <ellipse cx="100" cy="36" rx="11" ry="10" fill="#1c1c1e"/>
+        <rect x="93" y="46" width="14" height="40" rx="4" fill="#1c1c1e"/>
+        <line x1="93" y1="86" x2="86" y2="124" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
+        <line x1="107" y1="86" x2="114" y2="124" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
+        <line x1="100" y1="58" x2="100" y2="100" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <rect x="74" y="96" width="52" height="5" rx="2" fill="#10b981"/>
+      </g>
+    </svg>
+  `,
+  "cable lat pulldown": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <line x1="100" y1="0" x2="100" y2="38" stroke="#1c1c1e" stroke-width="2"/>
+      <ellipse cx="100" cy="60" rx="11" ry="10" fill="#1c1c1e"/>
+      <rect x="93" y="70" width="14" height="36" rx="4" fill="#1c1c1e"/>
+      <line x1="93" y1="106" x2="86" y2="130" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+      <line x1="107" y1="106" x2="114" y2="130" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+      <g class="lp-arms">
+        <line x1="93" y1="74" x2="88" y2="38" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <line x1="107" y1="74" x2="112" y2="38" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <rect x="70" y="34" width="60" height="5" rx="2" fill="#10b981"/>
+      </g>
+    </svg>
+  `,
+  "lat pulldown": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <line x1="100" y1="0" x2="100" y2="38" stroke="#1c1c1e" stroke-width="2"/>
+      <ellipse cx="100" cy="60" rx="11" ry="10" fill="#1c1c1e"/>
+      <rect x="93" y="70" width="14" height="36" rx="4" fill="#1c1c1e"/>
+      <line x1="93" y1="106" x2="86" y2="130" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+      <line x1="107" y1="106" x2="114" y2="130" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+      <g class="lp-arms">
+        <line x1="93" y1="74" x2="88" y2="38" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <line x1="107" y1="74" x2="112" y2="38" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <rect x="70" y="34" width="60" height="5" rx="2" fill="#10b981"/>
+      </g>
+    </svg>
+  `,
+  "barbell row": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <g class="row-body">
+        <ellipse cx="70" cy="56" rx="11" ry="10" fill="#1c1c1e"/>
+        <rect x="78" y="58" width="60" height="12" rx="4" fill="#1c1c1e" transform="rotate(8 78 58)"/>
+        <line x1="135" y1="76" x2="135" y2="118" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
+        <line x1="135" y1="118" x2="146" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+        <g class="row-arms">
+          <line x1="110" y1="72" x2="118" y2="98" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+          <rect x="108" y="98" width="34" height="5" rx="2" fill="#10b981"/>
+        </g>
+      </g>
+    </svg>
+  `,
+  "chest-supported row": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <rect x="46" y="86" width="100" height="6" rx="2" fill="#cbd5e1"/>
+      <ellipse cx="68" cy="74" rx="11" ry="10" fill="#1c1c1e"/>
+      <rect x="78" y="76" width="58" height="11" rx="3" fill="#1c1c1e"/>
+      <g class="cr-arms">
+        <line x1="124" y1="80" x2="138" y2="56" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <rect x="128" y="48" width="22" height="5" rx="2" fill="#10b981"/>
+      </g>
+    </svg>
+  `,
+  "hammer curl": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <ellipse cx="100" cy="36" rx="11" ry="10" fill="#1c1c1e"/>
+      <rect x="93" y="46" width="14" height="50" rx="4" fill="#1c1c1e"/>
+      <line x1="93" y1="96" x2="86" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+      <line x1="107" y1="96" x2="114" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+      <g class="hc-arms">
+        <line x1="93" y1="50" x2="80" y2="86" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <line x1="107" y1="50" x2="120" y2="86" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="80" cy="86" r="6" fill="#10b981"/>
+        <circle cx="120" cy="86" r="6" fill="#10b981"/>
+      </g>
+    </svg>
+  `,
+  "bicep curl": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <ellipse cx="100" cy="36" rx="11" ry="10" fill="#1c1c1e"/>
+      <rect x="93" y="46" width="14" height="50" rx="4" fill="#1c1c1e"/>
+      <line x1="93" y1="96" x2="86" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+      <line x1="107" y1="96" x2="114" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+      <g class="bc-arms">
+        <line x1="93" y1="50" x2="80" y2="86" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <line x1="107" y1="50" x2="120" y2="86" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <rect x="62" y="84" width="76" height="5" rx="2" fill="#10b981"/>
+      </g>
+    </svg>
+  `,
+  "tricep pushdown": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <line x1="100" y1="0" x2="100" y2="46" stroke="#1c1c1e" stroke-width="2"/>
+      <ellipse cx="100" cy="56" rx="11" ry="10" fill="#1c1c1e"/>
+      <rect x="93" y="66" width="14" height="46" rx="4" fill="#1c1c1e"/>
+      <line x1="93" y1="112" x2="86" y2="130" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+      <line x1="107" y1="112" x2="114" y2="130" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+      <g class="tp-arms">
+        <line x1="93" y1="70" x2="86" y2="96" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <line x1="107" y1="70" x2="114" y2="96" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+        <rect x="78" y="92" width="44" height="5" rx="2" fill="#10b981"/>
+      </g>
+    </svg>
+  `,
+  "hip thrust": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <rect x="34" y="78" width="60" height="8" rx="3" fill="#cbd5e1"/>
+      <ellipse cx="58" cy="68" rx="10" ry="9" fill="#1c1c1e"/>
+      <rect x="66" y="76" width="60" height="10" rx="3" fill="#1c1c1e"/>
+      <g class="ht-body">
+        <line x1="124" y1="82" x2="142" y2="118" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
+        <line x1="142" y1="118" x2="156" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+        <ellipse cx="120" cy="78" rx="14" ry="6" fill="#10b981"/>
+      </g>
+    </svg>
+  `,
+  "calf raise": `
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+      <ellipse cx="100" cy="32" rx="11" ry="10" fill="#1c1c1e"/>
+      <rect x="93" y="42" width="14" height="58" rx="4" fill="#1c1c1e"/>
+      <g class="cl-legs">
+        <line x1="93" y1="100" x2="90" y2="126" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
+        <line x1="107" y1="100" x2="110" y2="126" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
+      </g>
+      <rect x="78" y="124" width="44" height="6" rx="2" fill="#10b981"/>
+    </svg>
+  `,
+};
+const GENERIC_ANIMATION = `
+  <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
+    <ellipse cx="100" cy="40" rx="11" ry="10" fill="#1c1c1e"/>
+    <rect x="93" y="50" width="14" height="46" rx="4" fill="#1c1c1e"/>
+    <line x1="93" y1="96" x2="86" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+    <line x1="107" y1="96" x2="114" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
+    <g class="gen-arms">
+      <line x1="93" y1="56" x2="80" y2="86" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+      <line x1="107" y1="56" x2="120" y2="86" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
+      <rect x="62" y="82" width="76" height="6" rx="2" fill="#10b981"/>
+    </g>
+  </svg>
+`;
 function getGifForExercise(name) {
   if (!name) return null;
   const key = String(name).toLowerCase().trim();
@@ -2984,6 +3555,15 @@ function getGifForExercise(name) {
     if (key.includes(k)) return EXERCISE_GIFS[k];
   }
   return null;
+}
+function getAnimationForExercise(name) {
+  if (!name) return GENERIC_ANIMATION;
+  const key = String(name).toLowerCase().trim();
+  if (EXERCISE_ANIMATIONS[key]) return EXERCISE_ANIMATIONS[key];
+  for (const k of Object.keys(EXERCISE_ANIMATIONS)) {
+    if (key.includes(k)) return EXERCISE_ANIMATIONS[k];
+  }
+  return GENERIC_ANIMATION;
 }
 
 // ============ BEEP (alarm at 10s remaining) ============
@@ -3085,21 +3665,27 @@ function showRestOverlay(state) {
   overlay.classList.add("active");
   overlay.setAttribute("aria-hidden", "false");
 
-  // Header + GIF
+  // Header + form reference (real GIF if configured, else inline SVG animation)
   document.getElementById("rest-exname").textContent = state.exerciseName || "Rest";
-  setRestGif(state.exerciseName);
+  setRestForm(state.exerciseName);
 
-  // Reset cue cards (empty, will populate on schedule)
+  // Get the exercise-specific cues
+  const cueSet = getCuesForExercise(state.exerciseName);
+
+  // Wipe + repopulate sections
   const beforeEl = document.getElementById("rest-cues-before");
   const duringEl = document.getElementById("rest-cues-during");
+  const duringSection = document.getElementById("rest-during-section");
   beforeEl.innerHTML = "";
   duringEl.innerHTML = "";
-  // Pre-render all 4 cues but hidden; reveal on schedule based on elapsed time
+  // "During lift" section is hidden until the before-cues have shown.
+  duringSection.classList.remove("revealed");
+
   const cues = [
-    { text: CUES_BEFORE_LIFT[0], at: 0,  container: beforeEl },
-    { text: CUES_BEFORE_LIFT[1], at: 5,  container: beforeEl },
-    { text: CUES_DURING_LIFT[0], at: 30, container: duringEl },
-    { text: CUES_DURING_LIFT[1], at: 35, container: duringEl },
+    { text: cueSet.before[0], at: 0,  container: beforeEl, type: "before" },
+    { text: cueSet.before[1], at: 5,  container: beforeEl, type: "before" },
+    { text: cueSet.during[0], at: 20, container: duringEl, type: "during" },
+    { text: cueSet.during[1], at: 30, container: duringEl, type: "during" },
   ];
   cues.forEach(c => {
     const el = document.createElement("div");
@@ -3108,16 +3694,18 @@ function showRestOverlay(state) {
     c.container.appendChild(el);
     c.el = el;
   });
-  // Schedule reveals based on elapsed
+
+  // Schedule reveals based on actual elapsed time, so resuming mid-rest works.
   const elapsedNow = (Date.now() - state.startedAt) / 1000;
   cues.forEach(c => {
     const delay = Math.max(0, c.at - elapsedNow) * 1000;
-    if (delay === 0) {
-      // already past — reveal immediately
-      requestAnimationFrame(() => c.el.classList.add("in"));
-    } else {
-      __restCueTimeouts.push(setTimeout(() => c.el.classList.add("in"), delay));
-    }
+    const reveal = () => {
+      c.el.classList.add("in");
+      // Reveal the "During lift" header as soon as the first during cue appears.
+      if (c.type === "during") duringSection.classList.add("revealed");
+    };
+    if (delay === 0) requestAnimationFrame(reveal);
+    else __restCueTimeouts.push(setTimeout(reveal, delay));
   });
 
   // Bottom row reset
@@ -3127,19 +3715,26 @@ function showRestOverlay(state) {
   startRestRaf();
 }
 
-function setRestGif(exerciseName) {
+function setRestForm(exerciseName) {
   const img = document.getElementById("rest-gif");
   const fb = document.getElementById("rest-gif-fallback");
   const url = getGifForExercise(exerciseName);
   if (url) {
+    // External GIF/photo override
     img.onload = () => { img.style.display = "block"; fb.style.display = "none"; };
-    img.onerror = () => { img.style.display = "none"; fb.style.display = "flex"; img.src = ""; };
+    img.onerror = () => { img.style.display = "none"; fb.style.display = "flex"; img.src = ""; renderAnimationFallback(exerciseName); };
     img.src = url;
   } else {
+    // Always-on inline SVG animation — never broken
     img.style.display = "none";
     img.src = "";
     fb.style.display = "flex";
+    renderAnimationFallback(exerciseName);
   }
+}
+function renderAnimationFallback(exerciseName) {
+  const fb = document.getElementById("rest-gif-fallback");
+  fb.innerHTML = getAnimationForExercise(exerciseName);
 }
 
 function startRestRaf() {
