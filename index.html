@@ -778,6 +778,140 @@
     margin-bottom: 6px;
   }
 
+  /* Words tab — Spanish word of the day log */
+  .word-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 14px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 6px;
+    cursor: pointer;
+  }
+  .word-row:active { transform: scale(0.99); }
+  .word-row .word-spanish { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+  .word-row .word-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .word-row .ti { color: var(--muted); font-size: 18px; }
+
+  .word-detail-head {
+    text-align: center;
+    padding: 28px 18px 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 12px;
+  }
+  .word-detail-head .spanish {
+    font-size: 38px; font-weight: 800;
+    letter-spacing: -0.02em; line-height: 1.05;
+    color: var(--text);
+  }
+  .word-detail-head .phonetic {
+    font-size: 14px; color: var(--muted);
+    font-family: var(--font-mono, monospace);
+    margin-top: 8px;
+    letter-spacing: 0.08em;
+  }
+  .word-detail-head .word-date {
+    font-size: 11px; color: var(--muted);
+    margin-top: 12px;
+    text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600;
+  }
+  .word-detail-section {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+  .word-detail-section .label {
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .word-detail-section input,
+  .word-detail-section textarea {
+    width: 100%; box-sizing: border-box;
+    font-family: inherit; font-size: 15px;
+    background: transparent;
+    border: none; padding: 0;
+    resize: none; color: var(--text);
+    line-height: 1.4;
+  }
+  .word-detail-section input:focus,
+  .word-detail-section textarea:focus { outline: none; }
+  .word-detail-section input::placeholder,
+  .word-detail-section textarea::placeholder { color: var(--muted); font-style: italic; }
+
+  .word-section-cap {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--muted);
+    margin: 16px 4px 6px;
+  }
+  .word-section-cap:first-of-type { margin-top: 6px; }
+
+  .word-review-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 11px 14px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 5px;
+    cursor: pointer;
+    gap: 10px;
+  }
+  .word-review-row:active { transform: scale(0.99); }
+  .word-review-row.done {
+    background: var(--accent-dim);
+    border-color: rgba(16, 185, 129, 0.45);
+  }
+  .word-review-row.shown {
+    background: rgba(186, 117, 23, 0.08);
+    border-color: rgba(186, 117, 23, 0.3);
+  }
+  .word-review-row .review-english {
+    font-size: 15px; font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .word-review-row.done .review-english { color: var(--accent); }
+  .word-review-row .review-meta {
+    font-size: 11px; color: var(--muted); margin-top: 2px;
+  }
+  .word-review-tick {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+  }
+  .word-review-row.done .word-review-tick {
+    background: var(--accent); border-color: var(--accent);
+  }
+  .word-review-row.done .word-review-tick::after {
+    font-family: "tabler-icons"; content: "\ea5e"; font-size: 13px; font-weight: 400;
+  }
+  .word-review-row.shown .word-review-tick {
+    background: #BA7517; border-color: #BA7517;
+  }
+  .word-review-row.shown .word-review-tick::after {
+    font-family: "tabler-icons"; content: "\eb05"; font-size: 12px;
+  }
+
+  #word-review-result { font-size: 13px; font-weight: 600; margin-top: 8px; min-height: 18px; line-height: 1.4; }
+  #word-review-result.correct { color: var(--accent); }
+  #word-review-result.wrong { color: var(--danger); }
+  #word-review-result .reveal-spanish {
+    display: inline-block;
+    background: var(--card-2);
+    padding: 2px 8px; border-radius: 6px;
+    margin-left: 4px;
+    color: var(--text);
+    font-weight: 700;
+  }
+  #word-review-english {
+    font-size: 26px; font-weight: 800;
+    letter-spacing: -0.02em; line-height: 1.1;
+    margin: 8px 0 16px;
+  }
+
   /* Lift section */
 
   /* Generic icon buttons (used in Lift) */
@@ -1231,6 +1365,39 @@
     </div>
   </section>
 
+  <!-- WORDS (Spanish word of the day log) -->
+  <section class="view" id="view-words">
+    <!-- Populated by renderWords() -->
+  </section>
+
+  <!-- Spanish word REVIEW modal — quiz a prior word -->
+  <div id="word-review-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);">Translate to Spanish</div>
+      <div id="word-review-english"></div>
+      <input id="word-review-input" type="text" placeholder="Type in Spanish" autocapitalize="off" autocorrect="off" autocomplete="off" style="width: 100%; padding: 12px; font-size: 18px; text-align: center; background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box;" />
+      <div id="word-review-result"></div>
+      <div class="mc-btns" style="margin-top: 12px;">
+        <button id="word-review-cancel" class="mc-cancel">Cancel</button>
+        <button id="word-review-submit" class="mc-confirm">Check</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spanish word modal — appears when the habit is ticked -->
+  <div id="word-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="mc-icon"><i class="ti ti-language"></i></div>
+      <h3>Spanish word of the day</h3>
+      <p>Type the Spanish word you learned today. We'll auto-translate and add a phonetic spelling.</p>
+      <input id="word-input" type="text" placeholder="e.g. perro" autocapitalize="off" autocorrect="off" style="width: 100%; padding: 12px; font-size: 18px; text-align: center; background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; margin-bottom: 14px;" />
+      <div class="mc-btns">
+        <button id="word-cancel" class="mc-cancel">Cancel</button>
+        <button id="word-save" class="mc-confirm">Save</button>
+      </div>
+    </div>
+  </div>
+
   <!-- LIFT (progressive overload) -->
   <section class="view" id="view-lift">
     <!-- Populated by renderLift() -->
@@ -1370,6 +1537,7 @@
     <div class="tab" data-view="lift"><i class="ti ti-barbell ticon" aria-hidden="true"></i>Lift</div>
     <div class="tab" data-view="weight"><i class="ti ti-scale ticon" aria-hidden="true"></i>Weight</div>
     <div class="tab" data-view="progress"><i class="ti ti-chart-line ticon" aria-hidden="true"></i>Progress</div>
+    <div class="tab" data-view="words"><i class="ti ti-language ticon" aria-hidden="true"></i>Words</div>
   </nav>
 
 <script>
@@ -1392,13 +1560,14 @@ const DEFAULT_HABITS = [
   { id: 11, icon: "ti-stretching",  name: "Calisthenics",        cat: "Fitness" },
   { id: 12, icon: "ti-barbell",     name: "Weights",             cat: "Fitness" },
   // Wellness (Cold shower first)
-  { id: 16, icon: "ti-snowflake",   name: "Cold shower",         cat: "Wellness" },
-  { id: 13, icon: "ti-bed",         name: "8h sleep",            cat: "Wellness" },
-  { id: 14, icon: "ti-droplet",     name: "2L water",            cat: "Wellness" },
-  { id: 15, icon: "ti-book",        name: "Reading before bed",  cat: "Wellness" },
-  { id: 8,  icon: "ti-hourglass",   name: "12h fast",            cat: "Wellness" },
-  { id: 6,  icon: "ti-bottle-off",  name: "No alcohol",          cat: "Wellness" },
-  { id: 7,  icon: "ti-coffee",      name: "Max 2 coffees",       cat: "Wellness" }
+  { id: 16, icon: "ti-snowflake",   name: "Cold shower",            cat: "Wellness" },
+  { id: 13, icon: "ti-bed",         name: "8h sleep",               cat: "Wellness" },
+  { id: 14, icon: "ti-droplet",     name: "2L water",               cat: "Wellness" },
+  { id: 15, icon: "ti-book",        name: "Reading before bed",     cat: "Wellness" },
+  { id: 8,  icon: "ti-hourglass",   name: "12h fast",               cat: "Wellness" },
+  { id: 6,  icon: "ti-bottle-off",  name: "No alcohol",             cat: "Wellness" },
+  { id: 7,  icon: "ti-coffee",      name: "Max 2 coffees",          cat: "Wellness" },
+  { id: 17, icon: "ti-language",    name: "Spanish word of the day", cat: "Wellness" }
 ];
 
 // Default lift days + exercises seeded on first run
@@ -1448,7 +1617,7 @@ function loadData() {
     const raw = localStorage.getItem(KEY);
     if (raw) return JSON.parse(raw);
   } catch (e) {}
-  return { habits: DEFAULT_HABITS.slice(), log: {}, weights: [], nextId: 17 };
+  return { habits: DEFAULT_HABITS.slice(), log: {}, weights: [], nextId: 18 };
 }
 function defaultWorkouts() {
   return JSON.parse(JSON.stringify(DEFAULT_WORKOUTS));
@@ -1461,6 +1630,16 @@ if (!data.workouts) {
   data.workouts = defaultWorkouts();
   saveData();
 }
+// Migration: ensure Spanish word habit + log exist on already-installed accounts
+function ensureSpanishMigration() {
+  if (!data.spanishWords) data.spanishWords = [];
+  if (!data.habits.some(h => h.name === "Spanish word of the day")) {
+    const newId = data.nextId || 18;
+    data.habits.push({ id: newId, icon: "ti-language", name: "Spanish word of the day", cat: "Wellness" });
+    data.nextId = newId + 1;
+  }
+}
+ensureSpanishMigration();
 
 // Local-time YYYY-MM-DD — using UTC would roll the day at the wrong time in Melbourne
 function localDateKey(d) {
@@ -1496,7 +1675,7 @@ document.querySelectorAll(".tab").forEach(t => {
     document.querySelectorAll(".view").forEach(x => x.classList.remove("active"));
     t.classList.add("active");
     document.getElementById("view-" + t.dataset.view).classList.add("active");
-    const titles = { lift: "Lift", weight: "Weight", progress: "Progress" };
+    const titles = { lift: "Lift", weight: "Weight", progress: "Progress", words: "Word of the day" };
     if (t.dataset.view !== "today") {
       // For non-today tabs, set greeting plainly. renderToday() handles the count for Today.
       document.getElementById("greeting").textContent = titles[t.dataset.view];
@@ -1553,6 +1732,17 @@ function renderToday() {
       const id = Number(el.dataset.id);
       const tk = todayKey();
       const log = getLog(tk);
+      const habit = data.habits.find(h => h.id === id);
+      // Special: Spanish word of the day — prompt for the word before ticking
+      if (habit && habit.name === "Spanish word of the day" && !log[id]) {
+        showWordModal((word) => {
+          if (!word) return; // user cancelled
+          log[id] = true;
+          saveData();
+          renderAll();
+        });
+        return;
+      }
       if (log[id]) delete log[id]; else log[id] = true;
       if (Object.keys(log).length === 0) delete data.log[tk];
       saveData(); renderAll();
@@ -3573,6 +3763,336 @@ function buildBigChart(sessions) {
   });
 })();
 
+// ============ SPANISH WORD OF THE DAY ============
+let wordsState = { mode: 'list', wordId: null };
+
+// Rough Spanish-to-phonetic mapper. Spanish is highly phonetic so this gets close.
+function spanishPhonetic(word) {
+  if (!word) return "";
+  let w = word.toLowerCase().trim();
+  // Multi-letter combinations first (order matters)
+  w = w.replace(/qu([ei])/g, "k$1");
+  w = w.replace(/ll/g, "y");
+  w = w.replace(/ch/g, "ch");
+  w = w.replace(/ñ/g, "ny");
+  w = w.replace(/rr/g, "RR");
+  // Context-sensitive consonants
+  w = w.replace(/c([ei])/g, "s$1");
+  w = w.replace(/g([ei])/g, "h$1");
+  // Single-letter substitutions
+  w = w.replace(/j/g, "h");
+  w = w.replace(/v/g, "b");
+  w = w.replace(/z/g, "s");
+  w = w.replace(/h/g, "");
+  w = w.replace(/c/g, "k");
+  // Vowels
+  w = w.replace(/á/g, "AH");
+  w = w.replace(/é/g, "EH");
+  w = w.replace(/í/g, "EE");
+  w = w.replace(/ó/g, "OH");
+  w = w.replace(/ú/g, "OO");
+  w = w.replace(/a/g, "ah");
+  w = w.replace(/e/g, "eh");
+  w = w.replace(/i/g, "ee");
+  w = w.replace(/o/g, "oh");
+  w = w.replace(/u/g, "oo");
+  return w.toUpperCase();
+}
+
+// Free translation via MyMemory (no API key needed, ~5k chars/day)
+async function translateSpanishToEnglish(spanish) {
+  try {
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(spanish)}&langpair=es|en`;
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 5000);
+    const res = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(t);
+    const json = await res.json();
+    if (json && json.responseStatus === 200 && json.responseData) {
+      return json.responseData.translatedText || null;
+    }
+  } catch (e) { console.warn("translation failed", e); }
+  return null;
+}
+
+function showWordModal(onDone) {
+  const m = document.getElementById("word-modal");
+  if (!m) { onDone(null); return; }
+  const input = document.getElementById("word-input");
+  input.value = "";
+  m.classList.add("show");
+  setTimeout(() => input.focus(), 100);
+
+  const saveBtn = document.getElementById("word-save");
+  const cancelBtn = document.getElementById("word-cancel");
+
+  const cleanup = () => {
+    m.classList.remove("show");
+    saveBtn.removeEventListener("click", onSave);
+    cancelBtn.removeEventListener("click", onCancel);
+    input.removeEventListener("keydown", onKey);
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Save";
+  };
+  const onSave = async () => {
+    const v = input.value.trim();
+    if (!v) { input.focus(); return; }
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving…";
+    const english = await translateSpanishToEnglish(v);
+    const word = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      spanish: v,
+      english: english || "",
+      phonetic: spanishPhonetic(v),
+      sentence: ""
+    };
+    if (!data.spanishWords) data.spanishWords = [];
+    data.spanishWords.unshift(word);
+    saveData();
+    cleanup();
+    onDone(word);
+  };
+  const onCancel = () => { cleanup(); onDone(null); };
+  const onKey = (e) => { if (e.key === "Enter") onSave(); };
+
+  saveBtn.addEventListener("click", onSave);
+  cancelBtn.addEventListener("click", onCancel);
+  input.addEventListener("keydown", onKey);
+}
+
+function renderWords() {
+  const root = document.getElementById("view-words");
+  if (!root) return;
+  if (wordsState.mode === 'detail') renderWordsDetail(root);
+  else renderWordsList(root);
+}
+
+// Normalize Spanish input for forgiving comparison (case + accents + punctuation)
+function normalizeSpanish(s) {
+  return (s || "")
+    .toLowerCase()
+    .trim()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[¿¡!?.,;:"']/g, "")
+    .replace(/\s+/g, " ");
+}
+function wordReviewStateToday(w) {
+  if (!w.reviews) return null;
+  return w.reviews[todayKey()] || null;  // "correct" | "shown" | null
+}
+
+function showWordReviewModal(word) {
+  const m = document.getElementById("word-review-modal");
+  if (!m || !word) return;
+  document.getElementById("word-review-english").textContent = word.english || word.spanish;
+  const input = document.getElementById("word-review-input");
+  const result = document.getElementById("word-review-result");
+  const submitBtn = document.getElementById("word-review-submit");
+  const cancelBtn = document.getElementById("word-review-cancel");
+  input.value = "";
+  result.textContent = "";
+  result.className = "";
+  submitBtn.textContent = "Check";
+  m.classList.add("show");
+  setTimeout(() => input.focus(), 100);
+
+  let attempts = 0;
+  const teardown = () => {
+    m.classList.remove("show");
+    submitBtn.onclick = null;
+    cancelBtn.onclick = null;
+    input.onkeydown = null;
+  };
+  const onClose = () => { teardown(); renderWords(); };
+  const onWrongAfterReveal = () => {
+    if (!word.reviews) word.reviews = {};
+    word.reviews[todayKey()] = "shown";
+    saveData();
+    onClose();
+  };
+  const onSubmit = () => {
+    const guess = input.value;
+    if (!guess.trim()) { input.focus(); return; }
+    if (normalizeSpanish(guess) === normalizeSpanish(word.spanish)) {
+      if (!word.reviews) word.reviews = {};
+      word.reviews[todayKey()] = "correct";
+      saveData();
+      result.className = "correct";
+      result.innerHTML = `<i class="ti ti-check"></i> Correct — ${escapeHtml(word.spanish)}`;
+      submitBtn.textContent = "Continue";
+      submitBtn.onclick = onClose;
+      return;
+    }
+    attempts++;
+    if (attempts >= 2) {
+      result.className = "wrong";
+      result.innerHTML = `Answer: <span class="reveal-spanish">${escapeHtml(word.spanish)}</span>`;
+      submitBtn.textContent = "Got it";
+      submitBtn.onclick = onWrongAfterReveal;
+    } else {
+      result.className = "wrong";
+      result.textContent = "Not quite — try again.";
+      input.value = "";
+      input.focus();
+    }
+  };
+
+  submitBtn.onclick = onSubmit;
+  cancelBtn.onclick = () => teardown();
+  input.onkeydown = (e) => { if (e.key === "Enter") submitBtn.click(); };
+}
+
+function renderWordsList(root) {
+  const words = data.spanishWords || [];
+  const tk = todayKey();
+  const todayWord = words.find(w => w.date && w.date.slice(0, 10) === tk);
+  const priorWords = words.filter(w => !w.date || w.date.slice(0, 10) !== tk);
+
+  let html = "";
+
+  if (todayWord || priorWords.length > 0) {
+    html += `<p class="subtitle">Today's word, plus a quick review of the ones you've already learned.</p>`;
+  }
+
+  if (todayWord) {
+    html += `<div class="word-section-cap">Today</div>`;
+    html += `
+      <div class="word-row" data-word-id="${todayWord.id}">
+        <div style="flex: 1; min-width: 0;">
+          <div class="word-spanish">${escapeHtml(todayWord.spanish)}</div>
+          <div class="word-meta">${todayWord.english ? escapeHtml(todayWord.english) : 'tap to edit'}</div>
+        </div>
+        <i class="ti ti-chevron-right" aria-hidden="true"></i>
+      </div>
+    `;
+  }
+
+  if (priorWords.length > 0) {
+    const pending = priorWords.filter(w => wordReviewStateToday(w) !== "correct").length;
+    const total = priorWords.length;
+    const headLabel = pending === 0 ? `Review · all done today` : `Review · ${pending} of ${total}`;
+    html += `<div class="word-section-cap">${headLabel}</div>`;
+    html += `<p class="subtitle" style="font-size: 12px; margin: -2px 4px 8px;">Tap a word and type it in Spanish to tick it off.</p>`;
+    html += priorWords.map(w => {
+      const state = wordReviewStateToday(w);
+      const klass = state === "correct" ? "done" : (state === "shown" ? "shown" : "");
+      const d = new Date(w.date);
+      const dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+      const sub = state === "correct" ? "Reviewed today" : (state === "shown" ? "Saw the answer" : dateStr);
+      return `
+        <div class="word-review-row ${klass}" data-word-id="${w.id}">
+          <div>
+            <div class="review-english">${escapeHtml(w.english || w.spanish)}</div>
+            <div class="review-meta">${sub}</div>
+          </div>
+          <div class="word-review-tick"></div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  if (!todayWord && priorWords.length === 0) {
+    html += `
+      <div class="empty-state" style="padding: 40px 20px;">
+        <i class="ti ti-language" style="font-size: 40px; color: var(--muted); margin-bottom: 8px; display: block;"></i>
+        No words yet.<br/>
+        Tick "Spanish word of the day" on Today to log one.
+      </div>
+    `;
+  }
+
+  root.innerHTML = html;
+
+  // Today's word → open detail view (edit fields)
+  if (todayWord) {
+    const t = root.querySelector(`.word-row[data-word-id="${todayWord.id}"]`);
+    if (t) t.addEventListener("click", () => {
+      wordsState = { mode: 'detail', wordId: todayWord.id };
+      renderWords(); window.scrollTo({ top: 0 });
+    });
+  }
+
+  // Prior words → quiz modal (or detail if already done)
+  root.querySelectorAll(".word-review-row").forEach(row => {
+    row.addEventListener("click", () => {
+      const id = Number(row.dataset.wordId);
+      const w = (data.spanishWords || []).find(x => x.id === id);
+      if (!w) return;
+      const state = wordReviewStateToday(w);
+      if (state) {
+        wordsState = { mode: 'detail', wordId: id };
+        renderWords();
+      } else {
+        showWordReviewModal(w);
+      }
+    });
+  });
+}
+
+function renderWordsDetail(root) {
+  const word = (data.spanishWords || []).find(w => w.id === wordsState.wordId);
+  if (!word) { wordsState = { mode: 'list', wordId: null }; renderWords(); return; }
+  const d = new Date(word.date);
+  const dateStr = d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+
+  root.innerHTML = `
+    <div class="session-header" style="margin-bottom: 12px;">
+      <button class="lift-back" id="word-back" aria-label="Back"><i class="ti ti-chevron-left"></i></button>
+      <div class="session-meta"><strong>Word of the day</strong><br/>${dateStr}</div>
+    </div>
+    <div class="word-detail-head">
+      <div class="spanish">${escapeHtml(word.spanish)}</div>
+      <div class="phonetic">${escapeHtml(word.phonetic || '—')}</div>
+    </div>
+
+    <div class="word-detail-section">
+      <div class="label">English</div>
+      <input type="text" id="word-english" placeholder="e.g. dog" value="${escapeHtml(word.english || '')}" />
+    </div>
+
+    <div class="word-detail-section">
+      <div class="label">Phonetic</div>
+      <input type="text" id="word-phonetic" placeholder="PEH-rroh" value="${escapeHtml(word.phonetic || '')}" />
+    </div>
+
+    <div class="word-detail-section">
+      <div class="label">In a sentence</div>
+      <textarea id="word-sentence" rows="2" placeholder="e.g. Tengo un perro grande.">${escapeHtml(word.sentence || '')}</textarea>
+    </div>
+
+    <button class="btn danger wide" id="word-delete" style="margin-top: 14px;">Delete word</button>
+  `;
+
+  document.getElementById("word-back").addEventListener("click", () => {
+    wordsState = { mode: 'list', wordId: null };
+    renderWords();
+  });
+
+  ['english', 'phonetic', 'sentence'].forEach(field => {
+    const el = document.getElementById(`word-${field}`);
+    el.addEventListener("change", () => {
+      word[field] = el.value.trim();
+      // If phonetic changed, update the heading too
+      if (field === 'phonetic') {
+        const ph = document.querySelector('.word-detail-head .phonetic');
+        if (ph) ph.textContent = word.phonetic || '—';
+      }
+      saveData();
+    });
+  });
+
+  document.getElementById("word-delete").addEventListener("click", () => {
+    if (!confirm("Delete this word?")) return;
+    data.spanishWords = (data.spanishWords || []).filter(w => w.id !== word.id);
+    saveData();
+    wordsState = { mode: 'list', wordId: null };
+    renderWords();
+  });
+}
+
 // ============ RENDER ============
 function renderAll() {
   renderToday();
@@ -3583,6 +4103,7 @@ function renderAll() {
   renderWeight();
   renderHabitsEditor();
   renderLift();
+  renderWords();
 }
 renderAll();
 showQuoteSplash(); // brief quote overlay on every app open
@@ -3669,6 +4190,7 @@ async function pullFromCloud() {
       });
       if (rows.last_checkin_at) data.lastCheckin = rows.last_checkin_at;
       if (rows.shown_edu_tips) data.shownEduTips = rows.shown_edu_tips;
+      ensureSpanishMigration(); // ensure new Spanish-word feature works for older cloud data
       __origSaveData(); // save to localStorage without re-triggering push
       renderAll();
     } else {
