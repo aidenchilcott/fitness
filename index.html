@@ -1762,53 +1762,59 @@ if (!data.workouts) {
   saveData();
 }
 
-// Migration: drop deprecated default habits that have been removed from the app.
-// Matches Spanish word of the day, 10,000 steps, and Calisthenics by name pattern
-// so existing accounts get cleaned up on next load.
-if (Array.isArray(data.habits)) {
-  const before = data.habits.length;
-  const dropPatterns = [
-    /spanish word/i,
-    /10[,.]?000\s*steps/i,
-    /^calisthenics$/i,
-  ];
-  data.habits = data.habits.filter(h => !dropPatterns.some(p => p.test(h.name || "")));
-  if (data.habits.length !== before) saveData();
-}
+// All cleanup migrations — wrapped in a function so they re-run after every
+// cloud pull (otherwise pullFromCloud restores deprecated data we just deleted).
+function runMigrations() {
+  let dirty = false;
 
-// Migration: rename the old "Shoulders" lift day to "Arms" and swap its exercises
-// to the new arm-focused set. Triggers on EITHER the day name OR if exercise 109
-// is still the old overhead/shoulder lift — so even if the user renamed the day
-// manually, the new arm lineup still slots in.
-if (data.workouts && Array.isArray(data.workouts.days)) {
-  const armsDay = data.workouts.days.find(d => d.id === 3);
-  const ex109 = data.workouts.exercises && data.workouts.exercises.find(e => e.id === 109);
-  const dayNameLooksOld = armsDay && /shoulder/i.test(armsDay.name || "");
-  const exerciseLooksOld = ex109 && /overhead|shoulder/i.test(ex109.name || "");
-  if (armsDay && (dayNameLooksOld || exerciseLooksOld)) {
-    armsDay.name = "Arms";
-    armsDay.exerciseIds = [109, 110, 111, 112];
-    const newArmExercises = [
-      { id: 109, name: "Dips" },
-      { id: 110, name: "Barbell curl" },
-      { id: 111, name: "Skullcrusher" },
-      { id: 112, name: "Hammer curl" },
+  // Drop deprecated default habits.
+  if (Array.isArray(data.habits)) {
+    const before = data.habits.length;
+    const dropPatterns = [
+      /spanish word/i,
+      /10[,.]?000\s*steps/i,
+      /^calisthenics$/i,
     ];
-    for (const ex of newArmExercises) {
-      const existing = data.workouts.exercises.find(e => e.id === ex.id);
-      if (existing) existing.name = ex.name;
-      else data.workouts.exercises.push(ex);
-    }
-    saveData();
+    data.habits = data.habits.filter(h => !dropPatterns.some(p => p.test(h.name || "")));
+    if (data.habits.length !== before) dirty = true;
   }
-}
 
-// Migration: drop the Legs day (id 6) from existing accounts.
-if (data.workouts && Array.isArray(data.workouts.days)) {
-  const before = data.workouts.days.length;
-  data.workouts.days = data.workouts.days.filter(d => !(d.id === 6 && /^legs$/i.test(d.name || "")));
-  if (data.workouts.days.length !== before) saveData();
+  // Drop the Legs day (id 6).
+  if (data.workouts && Array.isArray(data.workouts.days)) {
+    const before = data.workouts.days.length;
+    data.workouts.days = data.workouts.days.filter(d => !(d.id === 6 && /^legs$/i.test(d.name || "")));
+    if (data.workouts.days.length !== before) dirty = true;
+  }
+
+  // Shoulders → Arms. Triggers on EITHER day name OR if exercise 109 is still
+  // the old overhead/shoulder press.
+  if (data.workouts && Array.isArray(data.workouts.days)) {
+    const armsDay = data.workouts.days.find(d => d.id === 3);
+    const ex109 = data.workouts.exercises && data.workouts.exercises.find(e => e.id === 109);
+    const dayNameLooksOld = armsDay && /shoulder/i.test(armsDay.name || "");
+    const exerciseLooksOld = ex109 && /overhead|shoulder/i.test(ex109.name || "");
+    if (armsDay && (dayNameLooksOld || exerciseLooksOld)) {
+      armsDay.name = "Arms";
+      armsDay.exerciseIds = [109, 110, 111, 112];
+      const newArmExercises = [
+        { id: 109, name: "Dips" },
+        { id: 110, name: "Barbell curl" },
+        { id: 111, name: "Skullcrusher" },
+        { id: 112, name: "Hammer curl" },
+      ];
+      for (const ex of newArmExercises) {
+        const existing = data.workouts.exercises.find(e => e.id === ex.id);
+        if (existing) existing.name = ex.name;
+        else data.workouts.exercises.push(ex);
+      }
+      dirty = true;
+    }
+  }
+
+  if (dirty) saveData();
+  return dirty;
 }
+runMigrations();
 
 // Local-time YYYY-MM-DD — using UTC would roll the day at the wrong time in Melbourne
 function localDateKey(d) {
@@ -5317,7 +5323,11 @@ async function pullFromCloud() {
       });
       if (rows.last_checkin_at) data.lastCheckin = rows.last_checkin_at;
       if (rows.shown_edu_tips) data.shownEduTips = rows.shown_edu_tips;
-      __origSaveData(); // save to localStorage without re-triggering push
+      // Re-apply local-only migrations the cloud snapshot doesn't know about.
+      // (e.g. deprecated habits like "Spanish word of the day" that we removed.)
+      const migrated = runMigrations();
+      __origSaveData();              // save merged result locally
+      if (migrated) pushToCloud();    // and push the cleaned snapshot back to cloud
       renderAll();
     } else {
       // First time signing in on this account — push existing local data up
