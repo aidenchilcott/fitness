@@ -431,9 +431,9 @@
   .rest-overlay .rest-exname {
     color: var(--muted);
     text-align: center;
-    font-size: 10px; font-weight: 700;
+    font-size: 20px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.18em;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
   }
   .rest-overlay .rest-gif-card {
     background: var(--card-2);
@@ -449,50 +449,15 @@
     object-fit: cover;
     display: block;
   }
-  .rest-overlay .rest-gif-fallback {
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 4px;
-    width: 100%; height: 100%;
-    color: var(--text);
-    padding: 8px;
-  }
-  .rest-overlay .rest-gif-fallback .form-svg {
-    width: 86%; max-width: 280px; height: auto;
-    display: block;
-  }
-  .rest-overlay .rest-gif-fallback i { font-size: 48px; color: var(--muted); }
-  .rest-overlay .rest-gif-label {
-    font-size: 10px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.15em;
-    color: var(--muted);
-  }
-  /* Subtle bench-press / squat / pulldown loops — arms/body pulse with the rep */
-  @keyframes formArmsUp   { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
-  @keyframes formArmsDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(12px); } }
-  @keyframes formBodyDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(14px); } }
-  @keyframes formBodyHinge{ 0%, 100% { transform: rotate(0); }   50% { transform: rotate(14deg); transform-origin: 100px 50px; } }
-  .form-svg .bp-arms,
-  .form-svg .dp-arms,
-  .form-svg .sp-arms,
-  .form-svg .lp-arms,
-  .form-svg .tp-arms { animation: formArmsUp 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-  .form-svg .hc-arms,
-  .form-svg .bc-arms,
-  .form-svg .gen-arms { animation: formArmsDown 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-  .form-svg .sq-body { animation: formBodyDown 2.4s ease-in-out infinite; }
-  .form-svg .dl-body,
-  .form-svg .rdl-body { animation: formBodyHinge 2.4s ease-in-out infinite; }
-  .form-svg .row-arms { animation: formArmsDown 2.0s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-  .form-svg .ht-body  { animation: formArmsUp 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-  .form-svg .cl-legs  { animation: formBodyDown 2.0s ease-in-out infinite; transform-origin: 100px 100px; }
+  /* GIF card collapses to nothing if no asset is found — no placeholder text or icon. */
+  .rest-overlay .rest-gif-card.empty { display: none; }
 
-  .rest-overlay .rest-section { margin-bottom: 18px; }
+  .rest-overlay .rest-section { margin-bottom: 22px; }
   .rest-overlay .rest-section-title {
     color: var(--muted);
-    font-size: 11px; font-weight: 700;
+    font-size: 22px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.15em;
-    margin: 0 0 10px;
+    margin: 0 0 14px;
   }
   /* "During lift" section is hidden until the first during-cue is scheduled to appear */
   .rest-overlay .rest-during-section {
@@ -509,10 +474,12 @@
     background: var(--card);
     color: var(--text);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 14px;
-    font-size: 14px;
-    line-height: 1.4;
+    border-radius: 14px;
+    padding: 18px 20px;
+    font-size: 28px;
+    line-height: 1.3;
+    font-weight: 600;
+    letter-spacing: -0.01em;
     opacity: 0;
     transform: translateY(8px);
     transition: opacity 0.6s ease, transform 0.6s ease;
@@ -521,30 +488,47 @@
     opacity: 1;
     transform: translateY(0);
   }
+  .rest-overlay .rest-cue.emphasis {
+    background: var(--accent-dim);
+    border-color: rgba(16, 185, 129, 0.45);
+    color: var(--accent);
+    font-weight: 800;
+    text-align: center;
+  }
   .rest-overlay .rest-bottom {
     position: relative; z-index: 2;
     padding: 14px 18px calc(env(safe-area-inset-bottom, 0px) + 16px);
     background: var(--bg);
     border-top: 1px solid var(--border);
+    touch-action: none;
+    cursor: ns-resize;
   }
+  .rest-overlay .rest-bottom::before {
+    content: "";
+    display: block;
+    width: 40px; height: 4px;
+    background: var(--border); border-radius: 2px;
+    margin: -4px auto 8px;
+  }
+  .rest-overlay .rest-bottom.dragging::before { background: var(--accent); }
   .rest-overlay .rest-ready {
     text-align: center;
     color: var(--accent);
-    font-size: 14px; font-weight: 700;
+    font-size: 28px; font-weight: 700;
     height: 0; overflow: hidden; margin: 0;
     transition: height 0.25s ease, margin 0.25s ease;
   }
   .rest-overlay .rest-ready.show {
-    height: 18px;
-    margin: 0 0 10px;
+    height: 36px;
+    margin: 0 0 14px;
   }
   .rest-overlay .rest-timer-row {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
   .rest-overlay .rest-time-num {
     color: var(--text);
-    font-size: 26px; font-weight: 800;
+    font-size: 52px; font-weight: 800;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
   }
@@ -553,8 +537,8 @@
     color: var(--text);
     border: 1px solid var(--border);
     border-radius: 999px;
-    padding: 8px 18px;
-    font-size: 13px; font-weight: 600;
+    padding: 14px 26px;
+    font-size: 18px; font-weight: 600;
     cursor: pointer;
     font-family: inherit;
   }
@@ -839,139 +823,237 @@
 
   /* (Old tip-overlay was here — now unified into .rest-overlay above.) */
 
-  /* Words tab — Spanish word of the day log */
-  .word-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 12px 14px;
+  /* Ai-Den tab */
+  .aiden-wrap { padding: 0 4px; }
+  .aiden-mark { text-align: center; padding: 12px 0 8px; }
+  .aiden-mark .name { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+  .aiden-mark .name .accent { color: var(--accent); }
+  .aiden-mark .sub { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+  .aiden-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-top: 18px;
+  }
+  .aiden-role-card {
     background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; margin-bottom: 6px;
-    cursor: pointer;
+    border-radius: 16px; padding: 22px 14px;
+    text-align: center; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    transition: transform 0.12s ease, border-color 0.12s ease;
   }
-  .word-row:active { transform: scale(0.99); }
-  .word-row .word-spanish { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
-  .word-row .word-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .word-row .ti { color: var(--muted); font-size: 18px; }
-
-  .word-detail-head {
-    text-align: center;
-    padding: 28px 18px 24px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    margin-bottom: 12px;
+  .aiden-role-card:active { transform: scale(0.985); }
+  .aiden-role-card.physio { background: var(--accent-dim); border-color: rgba(16, 185, 129, 0.4); }
+  .aiden-role-card i { font-size: 30px; color: var(--text); }
+  .aiden-role-card .role-name { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .aiden-role-card .role-desc { font-size: 11px; color: var(--muted); line-height: 1.35; }
+  .aiden-key-setup {
+    margin-top: 16px; padding: 14px;
+    background: var(--card-2); border-radius: 12px;
+    display: flex; flex-direction: column; gap: 8px;
   }
-  .word-detail-head .spanish {
-    font-size: 38px; font-weight: 800;
-    letter-spacing: -0.02em; line-height: 1.05;
-    color: var(--text);
-  }
-  .word-detail-head .phonetic {
-    font-size: 14px; color: var(--muted);
-    font-family: var(--font-mono, monospace);
-    margin-top: 8px;
-    letter-spacing: 0.08em;
-  }
-  .word-detail-head .word-date {
-    font-size: 11px; color: var(--muted);
-    margin-top: 12px;
-    text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600;
-  }
-  .word-detail-section {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 8px;
-  }
-  .word-detail-section .label {
-    font-size: 10px; font-weight: 700;
+  .aiden-key-setup .label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
     text-transform: uppercase; letter-spacing: 0.1em;
-    color: var(--muted);
+  }
+  .aiden-key-setup input {
+    width: 100%; padding: 10px 12px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--card); color: var(--text);
+    font-family: ui-monospace, monospace; font-size: 13px;
+    box-sizing: border-box;
+  }
+  .aiden-key-setup .help { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .aiden-key-setup .save-btn {
+    padding: 10px 14px;
+    background: var(--accent); color: white; border: 0;
+    border-radius: 999px; font-weight: 700; font-size: 13px;
+    font-family: inherit; cursor: pointer;
+  }
+
+  /* Role detail screen (chat) */
+  .aiden-role-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 0 14px; margin-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .aiden-role-head .back-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--card-2); color: var(--text); border: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-family: inherit; cursor: pointer;
+  }
+  .aiden-role-head h2 { flex: 1; margin: 0; font-size: 19px; font-weight: 700; }
+  .aiden-role-head .clear-btn {
+    background: transparent; color: var(--muted); border: 0;
+    font-size: 12px; font-family: inherit; cursor: pointer;
+  }
+
+  .aiden-chat {
+    display: flex; flex-direction: column; gap: 10px;
+    padding-bottom: 96px; padding-top: 8px;
+    min-height: 200px;
+  }
+  .aiden-empty {
+    text-align: center; padding: 28px 14px; color: var(--muted);
+    font-size: 14px; line-height: 1.5;
+  }
+  .aiden-empty .ti { font-size: 36px; color: var(--border); margin-bottom: 8px; display: block; }
+  .aiden-msg {
+    border-radius: 14px; padding: 12px 14px;
+    font-size: 14px; line-height: 1.55;
+    max-width: 92%; word-wrap: break-word;
+  }
+  .aiden-msg.user {
+    background: var(--accent-dim); border: 1px solid rgba(16, 185, 129, 0.3);
+    align-self: flex-end; color: var(--text);
+  }
+  .aiden-msg.assistant {
+    background: var(--card-2); align-self: flex-start; color: var(--text);
+  }
+  .aiden-msg.thinking { background: var(--card-2); color: var(--muted); font-style: italic; }
+  .aiden-msg.error {
+    background: rgba(220, 38, 38, 0.08); color: var(--danger);
+    border: 1px solid rgba(220, 38, 38, 0.25);
+    align-self: stretch; max-width: 100%; font-size: 13px;
+  }
+  .aiden-msg strong { font-weight: 700; }
+  .aiden-msg ul, .aiden-msg ol { margin: 6px 0; padding-left: 18px; }
+  .aiden-msg li { margin: 2px 0; }
+  .aiden-msg p { margin: 0 0 8px; }
+  .aiden-msg p:last-child { margin: 0; }
+
+  .aiden-input-row {
+    position: fixed;
+    bottom: calc(var(--safe-bottom) + 70px);
+    left: 0; right: 0;
+    padding: 10px 14px;
+    background: var(--bg); border-top: 1px solid var(--border);
+    display: flex; gap: 8px; z-index: 25;
+  }
+  .aiden-input-row input {
+    flex: 1; padding: 12px 16px;
+    border: 1px solid var(--border); border-radius: 999px;
+    background: var(--card); color: var(--text);
+    font-size: 15px; font-family: inherit;
+    outline: none;
+  }
+  .aiden-input-row input:focus { border-color: var(--accent); }
+  .aiden-input-row button {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--accent); color: white;
+    border: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-family: inherit; cursor: pointer; flex-shrink: 0;
+  }
+  .aiden-input-row button:disabled { background: var(--border); color: var(--muted); }
+
+  /* Physio */
+  .physio-add-btn {
+    width: 100%; padding: 14px;
+    margin-bottom: 10px;
+    background: var(--accent); color: white; border: 0;
+    border-radius: 12px; font-size: 15px; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .physio-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px;
+    margin-bottom: 8px; cursor: pointer;
+  }
+  .physio-card .top {
+    display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 6px;
   }
-  .word-detail-section input,
-  .word-detail-section textarea {
-    width: 100%; box-sizing: border-box;
-    font-family: inherit; font-size: 15px;
-    background: transparent;
-    border: none; padding: 0;
-    resize: none; color: var(--text);
-    line-height: 1.4;
+  .physio-card .name { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .physio-card .pain-pill {
+    font-size: 12px; padding: 4px 10px;
+    background: var(--card-2); border-radius: 999px;
+    color: var(--text); font-weight: 700;
   }
-  .word-detail-section input:focus,
-  .word-detail-section textarea:focus { outline: none; }
-  .word-detail-section input::placeholder,
-  .word-detail-section textarea::placeholder { color: var(--muted); font-style: italic; }
-
-  .word-section-cap {
-    font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.1em;
-    color: var(--muted);
-    margin: 16px 4px 6px;
+  .physio-card .pain-pill.high { background: rgba(220, 38, 38, 0.12); color: var(--danger); }
+  .physio-card .pain-pill.med  { background: rgba(186, 117, 23, 0.12); color: #BA7517; }
+  .physio-card .pain-pill.low  { background: rgba(16, 185, 129, 0.15); color: var(--accent); }
+  .physio-card .meta { font-size: 11px; color: var(--muted); }
+  .physio-empty {
+    text-align: center; padding: 40px 14px;
+    color: var(--muted); font-size: 14px; line-height: 1.5;
   }
-  .word-section-cap:first-of-type { margin-top: 6px; }
+  .physio-empty .ti { font-size: 40px; color: var(--border); margin-bottom: 10px; display: block; }
 
-  .word-review-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 11px 14px;
+  .physio-form { padding: 4px 0; }
+  .physio-form .field { margin-bottom: 14px; }
+  .physio-form label {
+    display: block; font-size: 11px; font-weight: 700;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.1em; margin-bottom: 6px;
+  }
+  .physio-form input, .physio-form select, .physio-form textarea {
+    width: 100%; padding: 12px 14px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--card); color: var(--text);
+    font-size: 15px; font-family: inherit;
+    box-sizing: border-box; outline: none;
+  }
+  .physio-form input:focus, .physio-form select:focus, .physio-form textarea:focus { border-color: var(--accent); }
+  .physio-form textarea { resize: vertical; min-height: 70px; }
+  .physio-form .pain-readout {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 6px;
+  }
+  .physio-form .pain-readout input[type=range] {
+    flex: 1; padding: 0; height: 28px;
+    accent-color: var(--accent);
+  }
+  .physio-form .pain-readout .pain-val {
+    font-weight: 800; font-size: 22px; min-width: 30px; text-align: right;
+  }
+  .physio-actions {
+    display: flex; gap: 8px; margin-top: 16px;
+  }
+  .physio-actions button {
+    flex: 1; padding: 14px;
+    border: 0; border-radius: 999px;
+    font-size: 14px; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+  }
+  .physio-actions .save { background: var(--accent); color: white; }
+  .physio-actions .cancel { background: var(--card-2); color: var(--text); }
+  .physio-actions .delete { background: transparent; color: var(--danger); flex: 0 0 auto; padding: 14px 18px; }
+
+  .injury-detail-head {
     background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; margin-bottom: 5px;
-    cursor: pointer;
-    gap: 10px;
+    border-radius: 14px; padding: 18px;
+    margin-bottom: 12px;
   }
-  .word-review-row:active { transform: scale(0.99); }
-  .word-review-row.done {
-    background: var(--accent-dim);
-    border-color: rgba(16, 185, 129, 0.45);
+  .injury-detail-head .injury-name {
+    font-size: 24px; font-weight: 800; letter-spacing: -0.02em;
   }
-  .word-review-row.shown {
-    background: rgba(186, 117, 23, 0.08);
-    border-color: rgba(186, 117, 23, 0.3);
+  .injury-detail-head .injury-meta {
+    font-size: 12px; color: var(--muted); margin-top: 4px;
   }
-  .word-review-row .review-english {
-    font-size: 15px; font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.01em;
+  .injury-section {
+    background: var(--card-2); border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 10px;
   }
-  .word-review-row.done .review-english { color: var(--accent); }
-  .word-review-row .review-meta {
-    font-size: 11px; color: var(--muted); margin-top: 2px;
+  .injury-section h4 {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.12em;
+    margin: 0 0 8px;
   }
-  .word-review-tick {
-    width: 22px; height: 22px; border-radius: 50%;
-    border: 1.5px solid var(--border);
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    color: white;
+  .injury-section .body { font-size: 14px; line-height: 1.6; color: var(--text); }
+  .injury-section .body ul { margin: 6px 0; padding-left: 18px; }
+  .injury-section .body li { margin: 3px 0; }
+  .injury-rating-list { display: flex; flex-direction: column; gap: 6px; }
+  .injury-rating {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 12px;
   }
-  .word-review-row.done .word-review-tick {
-    background: var(--accent); border-color: var(--accent);
+  .injury-rating .top {
+    display: flex; align-items: baseline; justify-content: space-between;
   }
-  .word-review-row.done .word-review-tick::after {
-    font-family: "tabler-icons"; content: "\ea5e"; font-size: 13px; font-weight: 400;
-  }
-  .word-review-row.shown .word-review-tick {
-    background: #BA7517; border-color: #BA7517;
-  }
-  .word-review-row.shown .word-review-tick::after {
-    font-family: "tabler-icons"; content: "\eb05"; font-size: 12px;
-  }
+  .injury-rating .when { font-size: 11px; color: var(--muted); }
+  .injury-rating .pain-num { font-weight: 800; font-size: 16px; }
+  .injury-rating .notes { font-size: 12px; color: var(--muted); margin-top: 4px; font-style: italic; line-height: 1.4; }
 
-  #word-review-result { font-size: 13px; font-weight: 600; margin-top: 8px; min-height: 18px; line-height: 1.4; }
-  #word-review-result.correct { color: var(--accent); }
-  #word-review-result.wrong { color: var(--danger); }
-  #word-review-result .reveal-spanish {
-    display: inline-block;
-    background: var(--card-2);
-    padding: 2px 8px; border-radius: 6px;
-    margin-left: 4px;
-    color: var(--text);
-    font-weight: 700;
-  }
-  #word-review-english {
-    font-size: 26px; font-weight: 800;
-    letter-spacing: -0.02em; line-height: 1.1;
-    margin: 8px 0 16px;
-  }
 
   /* Lift section */
 
@@ -1026,6 +1108,15 @@
   }
   .session-meta { flex: 1; font-size: 12px; color: var(--muted); line-height: 1.3; }
   .session-meta strong { color: var(--text); font-weight: 700; font-size: 13px; }
+  .lift-prev-ex {
+    background: var(--card-2); border: 1px solid var(--border);
+    border-radius: 10px;
+    width: 38px; height: 38px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text); font-size: 20px;
+    cursor: pointer;
+  }
+  .lift-prev-ex:active { background: var(--border); }
   .exercise-title {
     font-size: 32px; font-weight: 800;
     letter-spacing: -0.02em;
@@ -1164,117 +1255,111 @@
   .exercise-pill input:focus { outline: none; }
   .new-ex-input { padding: 10px; font-size: 14px; }
 
-  /* Progressive overload progress page */
-  .prog-day-head {
-    display: flex; justify-content: space-between; align-items: baseline;
-    margin: 18px 4px 6px;
-  }
-  .prog-day-head:first-child { margin-top: 4px; }
-  .prog-day-name {
-    font-size: 13px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.1em;
-    color: var(--muted);
-  }
-  .prog-day-meta {
-    font-size: 11px; color: var(--muted);
-  }
-  .prog-exercise {
-    display: grid;
-    grid-template-columns: 1fr 86px auto;
-    gap: 10px; align-items: center;
+  /* Challenge tab — Intermittent Fasting + No Alcohol */
+  .challenge-card {
     background: var(--card); border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 12px;
-    margin-bottom: 5px;
+    border-radius: 18px; padding: 20px;
+    margin-bottom: 14px;
   }
-  .prog-name { font-size: 13px; font-weight: 600; line-height: 1.2; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .prog-spark { display: flex; align-items: center; height: 28px; }
-  .prog-stats { text-align: right; }
-  .prog-current { font-size: 14px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
-  .prog-current .unit { font-size: 10px; color: var(--muted); font-weight: 500; margin-left: 1px; }
-  .prog-change { font-size: 11px; font-weight: 700; margin-top: 3px; font-variant-numeric: tabular-nums; }
-  .prog-change.up { color: var(--accent); }
-  .prog-change.down { color: var(--danger); }
-  .prog-change.flat { color: var(--muted); }
-  .prog-exercise.empty {
-    grid-template-columns: 1fr auto;
-    color: var(--muted); font-style: italic; font-size: 12px;
+  .challenge-card.active {
+    border-color: var(--accent);
+    background: linear-gradient(180deg, var(--accent-dim) 0%, var(--card) 60%);
   }
-  .prog-exercise.empty .prog-current,
-  .prog-exercise.empty .prog-change { display: none; }
-  .prog-exercise:active { transform: scale(0.99); }
-
-  /* Detail view (after tapping into an exercise) */
-  .prog-detail-head {
-    display: flex; align-items: center; gap: 8px;
-    margin: 4px 0 12px;
-  }
-  .prog-detail-back {
-    background: var(--card-2); border: 1px solid var(--border);
-    border-radius: 10px;
-    width: 36px; height: 36px; flex-shrink: 0;
+  .challenge-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .challenge-head .ico {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--card-2); color: var(--text);
     display: flex; align-items: center; justify-content: center;
-    color: var(--text); font-size: 20px; cursor: pointer;
+    font-size: 22px; flex-shrink: 0;
   }
-  .prog-detail-title { flex: 1; min-width: 0; }
-  .prog-detail-name {
-    font-size: 20px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1;
+  .challenge-card.active .challenge-head .ico { background: var(--accent); color: white; }
+  .challenge-head .meta { flex: 1; }
+  .challenge-head h3 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
+  .challenge-head .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .challenge-timer {
+    text-align: center; padding: 10px 0 18px;
   }
-  .prog-detail-day {
-    font-size: 12px; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;
-    margin-top: 3px;
+  .challenge-timer .big {
+    font-size: 48px; font-weight: 800; letter-spacing: -0.03em;
+    line-height: 1; color: var(--text);
+    font-variant-numeric: tabular-nums;
   }
-  .prog-summary {
-    display: grid; grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px; margin-bottom: 12px;
+  .challenge-timer .label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.12em;
+    margin-top: 6px;
   }
-  .prog-summary-tile {
-    background: var(--card-2); border-radius: 10px; padding: 10px;
+
+  .challenge-start-btn {
+    width: 100%; padding: 16px;
+    border: 0; border-radius: 999px;
+    background: var(--accent); color: white;
+    font-weight: 800; font-size: 15px;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .challenge-stop-btn {
+    width: 100%; padding: 12px;
+    border: 1px solid var(--border); border-radius: 999px;
+    background: transparent; color: var(--danger);
+    font-weight: 700; font-size: 13px;
+    cursor: pointer; font-family: inherit;
+    margin-top: 12px;
+  }
+
+  .challenge-now {
+    background: var(--accent); color: white;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin: 12px 0 16px;
+  }
+  .challenge-now .stage {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    opacity: 0.85; margin-bottom: 4px;
+  }
+  .challenge-now .text { font-size: 14px; line-height: 1.45; font-weight: 600; }
+
+  .challenge-feed {
+    margin-top: 12px;
+  }
+  .challenge-feed .feed-cap {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.12em;
+    margin: 0 0 8px;
+  }
+  .feed-row {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 10px 12px; border-radius: 10px;
+    background: var(--card-2);
+    margin-bottom: 6px;
+  }
+  .feed-row.past { opacity: 0.55; }
+  .feed-row.next {
+    background: var(--card);
+    border: 1px dashed var(--border);
+  }
+  .feed-row .h {
+    font-size: 12px; font-weight: 800; color: var(--accent);
+    min-width: 44px; padding-top: 1px;
+    font-variant-numeric: tabular-nums;
+  }
+  .feed-row.past .h { color: var(--muted); }
+  .feed-row.next .h { color: var(--muted); }
+  .feed-row .b { font-size: 13px; line-height: 1.45; color: var(--text); }
+
+  .challenge-intro {
     text-align: center;
+    padding: 10px 4px 20px;
   }
-  .prog-summary-tile .v {
-    font-size: 18px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums;
+  .challenge-intro .label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.12em;
+    margin-bottom: 4px;
   }
-  .prog-summary-tile .v .unit { font-size: 11px; color: var(--muted); font-weight: 500; margin-left: 1px; }
-  .prog-summary-tile .v.up { color: var(--accent); }
-  .prog-summary-tile .v.down { color: var(--danger); }
-  .prog-summary-tile .l {
-    font-size: 10px; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;
-    margin-top: 4px;
-  }
-  .prog-big-chart {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 10px;
-    margin-bottom: 12px;
-  }
-  .prog-history {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 8px 12px;
-  }
-  .prog-history-row {
-    display: grid; grid-template-columns: 80px 70px 1fr;
-    gap: 10px; align-items: baseline;
-    padding: 10px 0;
-    border-bottom: 0.5px solid var(--border);
-  }
-  .prog-history-row:last-child { border-bottom: none; }
-  .prog-history-date {
-    font-size: 12px; font-weight: 600; color: var(--text);
-  }
-  .prog-history-date .rel {
-    display: block; font-size: 10px; color: var(--muted); font-weight: 500; margin-top: 1px;
-  }
-  .prog-history-max {
-    font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums;
-  }
-  .prog-history-max .unit { font-size: 10px; color: var(--muted); font-weight: 500; margin-left: 1px; }
-  .prog-history-sets {
-    font-size: 11px; color: var(--muted);
-    font-variant-numeric: tabular-nums; line-height: 1.4;
-    text-align: right;
-  }
+  .challenge-intro h2 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+  .challenge-intro p { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
 
   /* Gear icon header on Today */
   .today-head {
@@ -1339,10 +1424,9 @@
     <div id="habit-list"></div>
   </section>
 
-  <!-- PROGRESS · Progressive overload graphs (lift weight progression) -->
-  <section class="view" id="view-progress">
-    <p class="subtitle" style="margin-bottom: 8px;">Your weight gains over time</p>
-    <div id="prog-list"></div>
+  <!-- CHALLENGE · Streak counters with hour-by-hour health benefits -->
+  <section class="view" id="view-challenge">
+    <!-- Populated by renderChallenge() -->
   </section>
 
   <!-- SETTINGS · Hidden from tab bar, opened via gear icon on Today -->
@@ -1426,42 +1510,14 @@
     </div>
   </section>
 
-  <!-- WORDS (Spanish word of the day log) -->
-  <section class="view" id="view-words">
-    <!-- Populated by renderWords() -->
-  </section>
-
-  <!-- Spanish word REVIEW modal — quiz a prior word -->
-  <div id="word-review-modal" class="modal-overlay" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);">Translate to Spanish</div>
-      <div id="word-review-english"></div>
-      <input id="word-review-input" type="text" placeholder="Type in Spanish" autocapitalize="off" autocorrect="off" autocomplete="off" style="width: 100%; padding: 12px; font-size: 18px; text-align: center; background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box;" />
-      <div id="word-review-result"></div>
-      <div class="mc-btns" style="margin-top: 12px;">
-        <button id="word-review-cancel" class="mc-cancel">Cancel</button>
-        <button id="word-review-submit" class="mc-confirm">Check</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Spanish word modal — appears when the habit is ticked -->
-  <div id="word-modal" class="modal-overlay" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <div class="mc-icon"><i class="ti ti-language"></i></div>
-      <h3>Spanish word of the day</h3>
-      <p>Type the Spanish word you learned today. We'll auto-translate and add a phonetic spelling.</p>
-      <input id="word-input" type="text" placeholder="e.g. perro" autocapitalize="off" autocorrect="off" style="width: 100%; padding: 12px; font-size: 18px; text-align: center; background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; margin-bottom: 14px;" />
-      <div class="mc-btns">
-        <button id="word-cancel" class="mc-cancel">Cancel</button>
-        <button id="word-save" class="mc-confirm">Save</button>
-      </div>
-    </div>
-  </div>
 
   <!-- LIFT (progressive overload) -->
   <section class="view" id="view-lift">
     <!-- Populated by renderLift() -->
+  </section>
+
+  <section class="view" id="view-aiden">
+    <!-- Populated by renderAiden() -->
   </section>
 
 
@@ -1572,10 +1628,6 @@
 
       <div class="rest-gif-card" id="rest-gif-card">
         <img class="rest-gif" id="rest-gif" alt="" style="display:none;" />
-        <div class="rest-gif-fallback" id="rest-gif-fallback">
-          <i class="ti ti-barbell"></i>
-          <div class="rest-gif-label">Form reference</div>
-        </div>
       </div>
 
       <div class="rest-section">
@@ -1606,8 +1658,8 @@
     <div class="tab active" data-view="today"><i class="ti ti-checks ticon" aria-hidden="true"></i>Today</div>
     <div class="tab" data-view="lift"><i class="ti ti-barbell ticon" aria-hidden="true"></i>Lift</div>
     <div class="tab" data-view="weight"><i class="ti ti-scale ticon" aria-hidden="true"></i>Weight</div>
-    <div class="tab" data-view="progress"><i class="ti ti-chart-line ticon" aria-hidden="true"></i>Progress</div>
-    <div class="tab" data-view="words"><i class="ti ti-language ticon" aria-hidden="true"></i>Words</div>
+    <div class="tab" data-view="challenge"><i class="ti ti-flame ticon" aria-hidden="true"></i>Challenge</div>
+    <div class="tab" data-view="aiden"><i class="ti ti-message-circle ticon" aria-hidden="true"></i>Ai-Den</div>
   </nav>
 
 <script>
@@ -1624,6 +1676,7 @@ const DEFAULT_HABITS = [
   { id: 3,  icon: "ti-meat",        name: "High-protein meal 3", cat: "Nutrition" },
   { id: 4,  icon: "ti-meat",        name: "High-protein meal 4", cat: "Nutrition" },
   { id: 5,  icon: "ti-pill",        name: "Creatine",            cat: "Nutrition" },
+  { id: 18, icon: "ti-cake-off",    name: "No cheat meals",      cat: "Nutrition" },
   // Fitness
   { id: 9,  icon: "ti-walk",        name: "10,000 steps",        cat: "Fitness" },
   { id: 10, icon: "ti-run",         name: "Run",                 cat: "Fitness" },
@@ -1637,7 +1690,6 @@ const DEFAULT_HABITS = [
   { id: 8,  icon: "ti-hourglass",   name: "12h fast",               cat: "Wellness" },
   { id: 6,  icon: "ti-bottle-off",  name: "No alcohol",             cat: "Wellness" },
   { id: 7,  icon: "ti-coffee",      name: "Max 2 coffees",          cat: "Wellness" },
-  { id: 17, icon: "ti-language",    name: "Spanish word of the day", cat: "Wellness" }
 ];
 
 // Default lift days + exercises seeded on first run
@@ -1700,16 +1752,6 @@ if (!data.workouts) {
   data.workouts = defaultWorkouts();
   saveData();
 }
-// Migration: ensure Spanish word habit + log exist on already-installed accounts
-function ensureSpanishMigration() {
-  if (!data.spanishWords) data.spanishWords = [];
-  if (!data.habits.some(h => h.name === "Spanish word of the day")) {
-    const newId = data.nextId || 18;
-    data.habits.push({ id: newId, icon: "ti-language", name: "Spanish word of the day", cat: "Wellness" });
-    data.nextId = newId + 1;
-  }
-}
-ensureSpanishMigration();
 
 // Local-time YYYY-MM-DD — using UTC would roll the day at the wrong time in Melbourne
 function localDateKey(d) {
@@ -1745,7 +1787,7 @@ document.querySelectorAll(".tab").forEach(t => {
     document.querySelectorAll(".view").forEach(x => x.classList.remove("active"));
     t.classList.add("active");
     document.getElementById("view-" + t.dataset.view).classList.add("active");
-    const titles = { lift: "Lift", weight: "Weight", progress: "Progress", words: "Word of the day" };
+    const titles = { lift: "Lift", weight: "Weight", challenge: "Challenge", aiden: "Ai-Den" };
     if (t.dataset.view !== "today") {
       // For non-today tabs, set greeting plainly. renderToday() handles the count for Today.
       document.getElementById("greeting").textContent = titles[t.dataset.view];
@@ -1803,16 +1845,6 @@ function renderToday() {
       const tk = todayKey();
       const log = getLog(tk);
       const habit = data.habits.find(h => h.id === id);
-      // Special: Spanish word of the day — prompt for the word before ticking
-      if (habit && habit.name === "Spanish word of the day" && !log[id]) {
-        showWordModal((word) => {
-          if (!word) return; // user cancelled
-          log[id] = true;
-          saveData();
-          renderAll();
-        });
-        return;
-      }
       if (log[id]) delete log[id]; else log[id] = true;
       if (Object.keys(log).length === 0) delete data.log[tk];
       saveData(); renderAll();
@@ -3277,6 +3309,25 @@ const GENERIC_CUES = {
     "Exhale on the hard part, full range of motion."
   ]
 };
+// Category-based reps + cadence recommendation. Shown as the first cue of every set
+// so you know your target before warming up.
+function getTargetsForExercise(name) {
+  const key = String(name || "").toLowerCase();
+  if (key.includes("bench press") || key.includes("squat") || key.includes("deadlift")) {
+    return "5–8 reps · 3-1-1 tempo";
+  }
+  if (key.includes("press") || key.includes("row") || key.includes("pulldown") || key.includes("hip thrust") || key.includes("romanian") || key.includes("rdl")) {
+    return "6–10 reps · 3-1-1 tempo";
+  }
+  if (key.includes("pushdown") || key.includes("skullcrusher") || key.includes("hammer")) {
+    return "10–15 reps · 2-1-2 tempo";
+  }
+  if (key.includes("curl") || key.includes("fly") || key.includes("raise") || key.includes("extension") || key.includes("face pull") || key.includes("pec deck")) {
+    return "10–15 reps · 2-1-2 tempo";
+  }
+  if (key.includes("calf")) return "12–20 reps · 2-1-2 tempo";
+  return "8–12 reps · 2-1-2 tempo";
+}
 function getCuesForExercise(name) {
   if (!name) return GENERIC_CUES;
   const key = String(name).toLowerCase().trim();
@@ -3288,15 +3339,14 @@ function getCuesForExercise(name) {
 }
 
 // ============ EXERCISE FORM VISUALS ============
-// Inline animated SVGs — light theme, side-profile stick figures showing the
-// rep pattern. Always render (no external dependencies). To use a real GIF
-// instead, drop a URL into EXERCISE_GIFS — it takes priority over the SVG.
-// Real exercise GIFs sourced from JahelCuadrado/ExerciseGymGifsDB on GitHub,
-// served via jsDelivr CDN. Lookup is substring-based so "Barbell bench press"
-// (default workout name) matches the "bench press" key below.
-// Broken URLs fall back to the inline SVG animation via onerror.
+// Real GIFs from ExerciseGymGifsDB where the movement matches exactly.
+// Static photos from free-exercise-db for exercises where no exact GIF exists.
+// Substring lookup so "Barbell bench press" matches "bench press".
+// If both fail, the card hides itself silently (no placeholder image).
 const GIF_BASE = "https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0";
+const IMG_BASE = "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises";
 const EXERCISE_GIFS = {
+  // === GIFs (exact movement match) ===
   // CHEST
   "bench press":                 GIF_BASE + "/pectorals/barbell-bench-press.gif",
   "incline dumbbell press":      GIF_BASE + "/pectorals/dumbbell-incline-bench-press.gif",
@@ -3307,10 +3357,8 @@ const EXERCISE_GIFS = {
   // BACK / LATS
   "cable lat pulldown":          GIF_BASE + "/lats/cable-pulldown.gif",
   "lat pulldown":                GIF_BASE + "/lats/cable-pulldown.gif",
-  "cable wide-grip lat pulldown":GIF_BASE + "/lats/twin-handle-parallel-grip-lat-pulldown.gif",
-  "wide-grip lat pulldown":      GIF_BASE + "/lats/twin-handle-parallel-grip-lat-pulldown.gif",
   "barbell row":                 GIF_BASE + "/upper-back/barbell-bent-over-row.gif",
-  "chest-supported row":         GIF_BASE + "/upper-back/barbell-incline-row.gif",
+  "chest-supported row":         GIF_BASE + "/upper-back/lever-bent-over-row.gif",
 
   // SHOULDERS
   "shoulder press":              GIF_BASE + "/delts/dumbbell-seated-shoulder-press.gif",
@@ -3318,8 +3366,6 @@ const EXERCISE_GIFS = {
   "arnold press":                GIF_BASE + "/delts/dumbbell-arnold-press.gif",
   "lateral raise":               GIF_BASE + "/delts/dumbbell-lateral-raise.gif",
   "cable lateral raise":         GIF_BASE + "/delts/cable-lateral-raise.gif",
-  "reverse pec deck":            GIF_BASE + "/delts/dumbbell-reverse-fly.gif",
-  "face pull":                   GIF_BASE + "/delts/cable-rear-delt-row-with-rope.gif",
 
   // ARMS
   "hammer curl":                 GIF_BASE + "/biceps/dumbbell-hammer-curl.gif",
@@ -3340,213 +3386,13 @@ const EXERCISE_GIFS = {
   "barbell hip thrust":          GIF_BASE + "/glutes/barbell-hip-thrust.gif",
   "calf raise":                  GIF_BASE + "/calves/lever-standing-calf-raise.gif",
   "standing calf raise":         GIF_BASE + "/calves/lever-standing-calf-raise.gif",
+
+  // === Static photos (used where no exact-match GIF exists) ===
+  "face pull":                   IMG_BASE + "/Face_Pull/images/0.jpg",
+  "reverse pec deck":            IMG_BASE + "/Reverse_Flyes/images/0.jpg",
+  "cable wide-grip lat pulldown":IMG_BASE + "/Wide-Grip_Lat_Pulldown/images/0.jpg",
+  "wide-grip lat pulldown":      IMG_BASE + "/Wide-Grip_Lat_Pulldown/images/0.jpg",
 };
-const EXERCISE_ANIMATIONS = {
-  "bench press": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <rect x="40" y="92" width="120" height="6" rx="2" fill="#1c1c1e"/>
-      <rect x="96" y="98" width="8" height="22" fill="#1c1c1e"/>
-      <ellipse cx="60" cy="78" rx="14" ry="9" fill="#1c1c1e"/>
-      <rect x="74" y="74" width="58" height="9" rx="3" fill="#1c1c1e"/>
-      <g class="bp-arms">
-        <line x1="92" y1="80" x2="100" y2="60" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <line x1="110" y1="80" x2="118" y2="60" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <rect x="86" y="54" width="46" height="4" rx="2" fill="#10b981"/>
-      </g>
-    </svg>
-  `,
-  "incline dumbbell press": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <line x1="50" y1="120" x2="150" y2="60" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-      <line x1="60" y1="120" x2="60" y2="130" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-      <ellipse cx="150" cy="55" rx="10" ry="8" fill="#1c1c1e"/>
-      <g class="dp-arms">
-        <line x1="138" y1="68" x2="148" y2="40" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="148" cy="36" r="6" fill="#10b981"/>
-      </g>
-    </svg>
-  `,
-  "shoulder press": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <ellipse cx="100" cy="48" rx="11" ry="10" fill="#1c1c1e"/>
-      <rect x="93" y="58" width="14" height="42" rx="4" fill="#1c1c1e"/>
-      <line x1="93" y1="100" x2="86" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-      <line x1="107" y1="100" x2="114" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-      <g class="sp-arms">
-        <line x1="93" y1="62" x2="80" y2="46" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <line x1="107" y1="62" x2="120" y2="46" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <rect x="70" y="40" width="60" height="5" rx="2" fill="#10b981"/>
-      </g>
-    </svg>
-  `,
-  "squat": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <g class="sq-body">
-        <ellipse cx="100" cy="40" rx="11" ry="10" fill="#1c1c1e"/>
-        <rect x="93" y="50" width="14" height="38" rx="4" fill="#1c1c1e"/>
-        <line x1="93" y1="88" x2="84" y2="120" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
-        <line x1="107" y1="88" x2="116" y2="120" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
-        <line x1="84" y1="120" x2="76" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-        <line x1="116" y1="120" x2="124" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-        <rect x="70" y="32" width="60" height="5" rx="2" fill="#10b981"/>
-      </g>
-    </svg>
-  `,
-  "deadlift": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <g class="dl-body">
-        <ellipse cx="100" cy="40" rx="11" ry="10" fill="#1c1c1e"/>
-        <rect x="93" y="50" width="14" height="34" rx="4" fill="#1c1c1e"/>
-        <line x1="93" y1="84" x2="84" y2="120" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
-        <line x1="107" y1="84" x2="116" y2="120" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
-        <line x1="100" y1="58" x2="100" y2="105" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <rect x="70" y="102" width="60" height="5" rx="2" fill="#10b981"/>
-      </g>
-    </svg>
-  `,
-  "romanian deadlift": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <g class="rdl-body">
-        <ellipse cx="100" cy="36" rx="11" ry="10" fill="#1c1c1e"/>
-        <rect x="93" y="46" width="14" height="40" rx="4" fill="#1c1c1e"/>
-        <line x1="93" y1="86" x2="86" y2="124" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
-        <line x1="107" y1="86" x2="114" y2="124" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
-        <line x1="100" y1="58" x2="100" y2="100" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <rect x="74" y="96" width="52" height="5" rx="2" fill="#10b981"/>
-      </g>
-    </svg>
-  `,
-  "cable lat pulldown": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <line x1="100" y1="0" x2="100" y2="38" stroke="#1c1c1e" stroke-width="2"/>
-      <ellipse cx="100" cy="60" rx="11" ry="10" fill="#1c1c1e"/>
-      <rect x="93" y="70" width="14" height="36" rx="4" fill="#1c1c1e"/>
-      <line x1="93" y1="106" x2="86" y2="130" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-      <line x1="107" y1="106" x2="114" y2="130" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-      <g class="lp-arms">
-        <line x1="93" y1="74" x2="88" y2="38" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <line x1="107" y1="74" x2="112" y2="38" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <rect x="70" y="34" width="60" height="5" rx="2" fill="#10b981"/>
-      </g>
-    </svg>
-  `,
-  "lat pulldown": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <line x1="100" y1="0" x2="100" y2="38" stroke="#1c1c1e" stroke-width="2"/>
-      <ellipse cx="100" cy="60" rx="11" ry="10" fill="#1c1c1e"/>
-      <rect x="93" y="70" width="14" height="36" rx="4" fill="#1c1c1e"/>
-      <line x1="93" y1="106" x2="86" y2="130" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-      <line x1="107" y1="106" x2="114" y2="130" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-      <g class="lp-arms">
-        <line x1="93" y1="74" x2="88" y2="38" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <line x1="107" y1="74" x2="112" y2="38" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <rect x="70" y="34" width="60" height="5" rx="2" fill="#10b981"/>
-      </g>
-    </svg>
-  `,
-  "barbell row": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <g class="row-body">
-        <ellipse cx="70" cy="56" rx="11" ry="10" fill="#1c1c1e"/>
-        <rect x="78" y="58" width="60" height="12" rx="4" fill="#1c1c1e" transform="rotate(8 78 58)"/>
-        <line x1="135" y1="76" x2="135" y2="118" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
-        <line x1="135" y1="118" x2="146" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-        <g class="row-arms">
-          <line x1="110" y1="72" x2="118" y2="98" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-          <rect x="108" y="98" width="34" height="5" rx="2" fill="#10b981"/>
-        </g>
-      </g>
-    </svg>
-  `,
-  "chest-supported row": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <rect x="46" y="86" width="100" height="6" rx="2" fill="#cbd5e1"/>
-      <ellipse cx="68" cy="74" rx="11" ry="10" fill="#1c1c1e"/>
-      <rect x="78" y="76" width="58" height="11" rx="3" fill="#1c1c1e"/>
-      <g class="cr-arms">
-        <line x1="124" y1="80" x2="138" y2="56" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <rect x="128" y="48" width="22" height="5" rx="2" fill="#10b981"/>
-      </g>
-    </svg>
-  `,
-  "hammer curl": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <ellipse cx="100" cy="36" rx="11" ry="10" fill="#1c1c1e"/>
-      <rect x="93" y="46" width="14" height="50" rx="4" fill="#1c1c1e"/>
-      <line x1="93" y1="96" x2="86" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-      <line x1="107" y1="96" x2="114" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-      <g class="hc-arms">
-        <line x1="93" y1="50" x2="80" y2="86" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <line x1="107" y1="50" x2="120" y2="86" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <circle cx="80" cy="86" r="6" fill="#10b981"/>
-        <circle cx="120" cy="86" r="6" fill="#10b981"/>
-      </g>
-    </svg>
-  `,
-  "bicep curl": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <ellipse cx="100" cy="36" rx="11" ry="10" fill="#1c1c1e"/>
-      <rect x="93" y="46" width="14" height="50" rx="4" fill="#1c1c1e"/>
-      <line x1="93" y1="96" x2="86" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-      <line x1="107" y1="96" x2="114" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-      <g class="bc-arms">
-        <line x1="93" y1="50" x2="80" y2="86" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <line x1="107" y1="50" x2="120" y2="86" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <rect x="62" y="84" width="76" height="5" rx="2" fill="#10b981"/>
-      </g>
-    </svg>
-  `,
-  "tricep pushdown": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <line x1="100" y1="0" x2="100" y2="46" stroke="#1c1c1e" stroke-width="2"/>
-      <ellipse cx="100" cy="56" rx="11" ry="10" fill="#1c1c1e"/>
-      <rect x="93" y="66" width="14" height="46" rx="4" fill="#1c1c1e"/>
-      <line x1="93" y1="112" x2="86" y2="130" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-      <line x1="107" y1="112" x2="114" y2="130" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-      <g class="tp-arms">
-        <line x1="93" y1="70" x2="86" y2="96" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <line x1="107" y1="70" x2="114" y2="96" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-        <rect x="78" y="92" width="44" height="5" rx="2" fill="#10b981"/>
-      </g>
-    </svg>
-  `,
-  "hip thrust": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <rect x="34" y="78" width="60" height="8" rx="3" fill="#cbd5e1"/>
-      <ellipse cx="58" cy="68" rx="10" ry="9" fill="#1c1c1e"/>
-      <rect x="66" y="76" width="60" height="10" rx="3" fill="#1c1c1e"/>
-      <g class="ht-body">
-        <line x1="124" y1="82" x2="142" y2="118" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
-        <line x1="142" y1="118" x2="156" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-        <ellipse cx="120" cy="78" rx="14" ry="6" fill="#10b981"/>
-      </g>
-    </svg>
-  `,
-  "calf raise": `
-    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-      <ellipse cx="100" cy="32" rx="11" ry="10" fill="#1c1c1e"/>
-      <rect x="93" y="42" width="14" height="58" rx="4" fill="#1c1c1e"/>
-      <g class="cl-legs">
-        <line x1="93" y1="100" x2="90" y2="126" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
-        <line x1="107" y1="100" x2="110" y2="126" stroke="#1c1c1e" stroke-width="6" stroke-linecap="round"/>
-      </g>
-      <rect x="78" y="124" width="44" height="6" rx="2" fill="#10b981"/>
-    </svg>
-  `,
-};
-const GENERIC_ANIMATION = `
-  <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" class="form-svg">
-    <ellipse cx="100" cy="40" rx="11" ry="10" fill="#1c1c1e"/>
-    <rect x="93" y="50" width="14" height="46" rx="4" fill="#1c1c1e"/>
-    <line x1="93" y1="96" x2="86" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-    <line x1="107" y1="96" x2="114" y2="128" stroke="#1c1c1e" stroke-width="5" stroke-linecap="round"/>
-    <g class="gen-arms">
-      <line x1="93" y1="56" x2="80" y2="86" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-      <line x1="107" y1="56" x2="120" y2="86" stroke="#1c1c1e" stroke-width="4" stroke-linecap="round"/>
-      <rect x="62" y="82" width="76" height="6" rx="2" fill="#10b981"/>
-    </g>
-  </svg>
-`;
 function getGifForExercise(name) {
   if (!name) return null;
   const key = String(name).toLowerCase().trim();
@@ -3555,15 +3401,6 @@ function getGifForExercise(name) {
     if (key.includes(k)) return EXERCISE_GIFS[k];
   }
   return null;
-}
-function getAnimationForExercise(name) {
-  if (!name) return GENERIC_ANIMATION;
-  const key = String(name).toLowerCase().trim();
-  if (EXERCISE_ANIMATIONS[key]) return EXERCISE_ANIMATIONS[key];
-  for (const k of Object.keys(EXERCISE_ANIMATIONS)) {
-    if (key.includes(k)) return EXERCISE_ANIMATIONS[k];
-  }
-  return GENERIC_ANIMATION;
 }
 
 // ============ BEEP (alarm at 10s remaining) ============
@@ -3681,15 +3518,18 @@ function showRestOverlay(state) {
   // "During lift" section is hidden until the before-cues have shown.
   duringSection.classList.remove("revealed");
 
+  // First cue is always reps + cadence — appears immediately so you know your target.
+  const targetsText = getTargetsForExercise(state.exerciseName);
   const cues = [
-    { text: cueSet.before[0], at: 0,  container: beforeEl, type: "before" },
-    { text: cueSet.before[1], at: 5,  container: beforeEl, type: "before" },
-    { text: cueSet.during[0], at: 20, container: duringEl, type: "during" },
-    { text: cueSet.during[1], at: 30, container: duringEl, type: "during" },
+    { text: targetsText,       at: 0,  container: beforeEl, type: "before", emphasis: true },
+    { text: cueSet.before[0],  at: 3,  container: beforeEl, type: "before" },
+    { text: cueSet.before[1],  at: 8,  container: beforeEl, type: "before" },
+    { text: cueSet.during[0],  at: 20, container: duringEl, type: "during" },
+    { text: cueSet.during[1],  at: 30, container: duringEl, type: "during" },
   ];
   cues.forEach(c => {
     const el = document.createElement("div");
-    el.className = "rest-cue";
+    el.className = "rest-cue" + (c.emphasis ? " emphasis" : "");
     el.textContent = c.text;
     c.container.appendChild(el);
     c.el = el;
@@ -3716,25 +3556,19 @@ function showRestOverlay(state) {
 }
 
 function setRestForm(exerciseName) {
+  const card = document.getElementById("rest-gif-card");
   const img = document.getElementById("rest-gif");
-  const fb = document.getElementById("rest-gif-fallback");
   const url = getGifForExercise(exerciseName);
-  if (url) {
-    // External GIF/photo override
-    img.onload = () => { img.style.display = "block"; fb.style.display = "none"; };
-    img.onerror = () => { img.style.display = "none"; fb.style.display = "flex"; img.src = ""; renderAnimationFallback(exerciseName); };
-    img.src = url;
-  } else {
-    // Always-on inline SVG animation — never broken
+  if (!url) {
     img.style.display = "none";
     img.src = "";
-    fb.style.display = "flex";
-    renderAnimationFallback(exerciseName);
+    card.classList.add("empty");
+    return;
   }
-}
-function renderAnimationFallback(exerciseName) {
-  const fb = document.getElementById("rest-gif-fallback");
-  fb.innerHTML = getAnimationForExercise(exerciseName);
+  img.onload = () => { img.style.display = "block"; card.classList.remove("empty"); };
+  img.onerror = () => { img.style.display = "none"; img.src = ""; card.classList.add("empty"); };
+  card.classList.remove("empty");
+  img.src = url;
 }
 
 function startRestRaf() {
@@ -3799,10 +3633,67 @@ function stopRestTimer() {
   document.getElementById("rest-ready").classList.remove("show");
 }
 
-// Wire skip button + resume on tab-return + boot resume
+// Wire skip button + drag-to-shorten + resume on tab-return + boot resume
 (function wireRest() {
   const skip = document.getElementById("rest-skip");
   if (skip) skip.addEventListener("click", stopRestTimer);
+
+  // Drag the timer number / progress line down to shorten the rest
+  // (floor: 60s, ceiling: 90s). Pulling further DOWN = shorter.
+  const REST_MIN = 60;
+  const REST_MAX = REST_TIMER_DURATION; // 90
+  const grip = document.querySelector(".rest-overlay .rest-bottom");
+  if (grip) {
+    let dragging = false;
+    let startY = 0;
+    let startDuration = 0;
+    let originalRemaining = 0;
+
+    const onStart = (clientY) => {
+      const s = loadRestState();
+      if (!s) return;
+      dragging = true;
+      startY = clientY;
+      startDuration = s.duration;
+      originalRemaining = Math.max(0, s.duration - (Date.now() - s.startedAt) / 1000);
+      grip.classList.add("dragging");
+    };
+    const onMove = (clientY) => {
+      if (!dragging) return;
+      const s = loadRestState();
+      if (!s) return;
+      // 1px down = 0.5s shorter. Pull down ~60px → minimum.
+      const dy = clientY - startY;
+      let newDuration = startDuration - dy * 0.5;
+      newDuration = Math.max(REST_MIN, Math.min(REST_MAX, newDuration));
+      // Keep the elapsed-so-far constant — adjust duration only.
+      const elapsed = startDuration - originalRemaining;
+      const newStartedAt = Date.now() - elapsed * 1000;
+      const next = { ...s, duration: Math.round(newDuration), startedAt: newStartedAt };
+      saveRestState(next);
+      // Live update the number while dragging
+      const numEl = document.getElementById("rest-time-num");
+      if (numEl) numEl.textContent = Math.ceil(newDuration - elapsed);
+    };
+    const onEnd = () => {
+      if (!dragging) return;
+      dragging = false;
+      grip.classList.remove("dragging");
+    };
+
+    // Touch
+    grip.addEventListener("touchstart", e => { if (e.touches[0]) onStart(e.touches[0].clientY); }, { passive: true });
+    grip.addEventListener("touchmove",  e => {
+      if (!dragging) return;
+      if (e.touches[0]) { e.preventDefault(); onMove(e.touches[0].clientY); }
+    }, { passive: false });
+    grip.addEventListener("touchend",  onEnd);
+    grip.addEventListener("touchcancel", onEnd);
+    // Mouse (for desktop testing)
+    grip.addEventListener("mousedown", e => onStart(e.clientY));
+    window.addEventListener("mousemove", e => onMove(e.clientY));
+    window.addEventListener("mouseup", onEnd);
+  }
 
   // When the tab comes back to focus, re-sync the timer from wall-clock state
   document.addEventListener("visibilitychange", () => {
@@ -3811,7 +3702,6 @@ function stopRestTimer() {
     if (!s) return;
     const remaining = Math.max(0, s.duration - (Date.now() - s.startedAt) / 1000);
     if (remaining <= 0) { stopRestTimer(); return; }
-    // overlay may have been closed — re-render & restart raf
     showRestOverlay(s);
   });
 
@@ -4106,6 +3996,7 @@ function renderLiftSession(root, dayId, exIdx) {
     `;
   }
 
+  const hasPrev = exIdx > 0;
   root.innerHTML = `
     <div class="session-header">
       <button class="lift-back" id="lift-quit" aria-label="Back to day list"><i class="ti ti-chevron-left"></i></button>
@@ -4113,6 +4004,7 @@ function renderLiftSession(root, dayId, exIdx) {
         <strong>${escapeHtml(day.name)}</strong><br/>
         Exercise ${exIdx + 1} of ${day.exerciseIds.length}
       </div>
+      ${hasPrev ? `<button class="lift-prev-ex" id="lift-prev-ex" aria-label="Previous exercise"><i class="ti ti-arrow-left"></i></button>` : ''}
     </div>
     <h1 class="exercise-title">${escapeHtml(exercise.name)}</h1>
     <div id="set-blocks">${setBlocks}</div>
@@ -4127,20 +4019,36 @@ function renderLiftSession(root, dayId, exIdx) {
   document.getElementById("lift-quit").addEventListener("click", () => {
     liftState = { mode: 'list' }; renderLift();
   });
+  const prevBtn = document.getElementById("lift-prev-ex");
+  if (prevBtn) prevBtn.addEventListener("click", () => {
+    liftState = { mode: 'session', dayId, exIdx: Math.max(0, exIdx - 1) };
+    renderLift(); window.scrollTo({ top: 0 });
+  });
+  // Silent persist on every keystroke — guarantees the typed value never gets lost
+  // even if the user immediately taps a button or backgrounds the app.
+  const silentPersist = (inp) => {
+    const idx = Number(inp.dataset.idx);
+    const field = inp.dataset.field;
+    const raw = String(inp.value).trim();
+    if (raw.endsWith(".")) return; // mid-typing decimal — wait for the next digit
+    const v = raw === '' ? 0 : Number(raw);
+    while (sessEx.sets.length <= idx) sessEx.sets.push({ w: 0, r: 0 });
+    sessEx.sets[idx][field] = isNaN(v) ? 0 : v;
+    saveData();
+  };
+
   root.querySelectorAll(".input-row input").forEach(inp => {
+    // Every keystroke → silent save. No DND / rest timer here.
+    inp.addEventListener("input", () => silentPersist(inp));
+    // Commit + DND gate + rest timer happens on blur / Enter (the "I'm done with this number" signal).
     inp.addEventListener("change", () => {
       const idx = Number(inp.dataset.idx);
       const field = inp.dataset.field;
-      const raw = inp.value.trim();
+      const raw = String(inp.value).trim();
       const v = raw === '' ? 0 : Number(raw);
 
-      // Helper: actually save the value
       const commit = () => {
-        while (sessEx.sets.length <= idx) sessEx.sets.push({ w: 0, r: 0 });
-        sessEx.sets[idx][field] = isNaN(v) ? 0 : v;
-        saveData();
-        // Reps confirmed → kick off 90s rest timer with the exercise's tip
-        // BUT skip the timer on the last set — no need to rest before moving to the next exercise
+        silentPersist(inp);
         const isLastSet = idx === blockCount - 1;
         if (field === 'r' && v > 0 && !isLastSet) startRestTimer(exercise.name);
       };
@@ -4149,19 +4057,31 @@ function renderLiftSession(root, dayId, exIdx) {
       if (field === 'r' && v > 0 && !isDndConfirmed(dayId)) {
         showDndModal(
           () => { markDndConfirmed(dayId); commit(); },
-          () => { inp.value = ''; }  // user cancelled — clear the input
+          () => { inp.value = ''; silentPersist(inp); }  // user cancelled — clear the input AND state
         );
         return;
       }
-
       commit();
     });
+    // Flush on blur AND when the page is hidden — iOS sometimes kills the page before change fires.
+    inp.addEventListener("blur", () => silentPersist(inp));
+  });
+  // Also: when the app goes to background mid-typing, save whatever is in every input.
+  const flushLiftInputs = () => {
+    if (document.visibilityState !== "hidden") return;
+    root.querySelectorAll(".input-row input").forEach(silentPersist);
+  };
+  document.addEventListener("visibilitychange", flushLiftInputs);
+  window.addEventListener("pagehide", () => {
+    root.querySelectorAll(".input-row input").forEach(silentPersist);
   });
   document.getElementById("add-extra-set").addEventListener("click", () => {
     sessEx.sets.push({ w: 0, r: 0 });
     saveData(); renderLift();
   });
   document.getElementById("submit-exercise").addEventListener("click", () => {
+    // Final flush: read every input one more time before moving on. Belt-and-braces.
+    root.querySelectorAll(".input-row input").forEach(silentPersist);
     sessEx.sets = sessEx.sets.filter(s => Number(s.w) > 0 || Number(s.r) > 0);
     if (sessEx.sets.length === 0) {
       session.exercises = session.exercises.filter(e => e.exerciseId !== exId);
@@ -4244,292 +4164,6 @@ function renderLiftComplete(root, dayId) {
 }
 
 // ============ PROGRESSIVE OVERLOAD GRAPHS (new "Progress" tab) ============
-function sparkPath(points, W, H) {
-  if (points.length < 2) {
-    if (points.length === 1) {
-      // Single point: draw a flat dot
-      return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><circle cx="${W/2}" cy="${H/2}" r="2" fill="var(--accent)"/></svg>`;
-    }
-    return "";
-  }
-  const ws = points.map(p => p.w);
-  const min = Math.min(...ws), max = Math.max(...ws);
-  const range = Math.max(max - min, 0.5);
-  const pad = 3;
-  const stepX = (W - 2 * pad) / (points.length - 1);
-  const coords = points.map((p, i) => {
-    const x = pad + i * stepX;
-    const y = H - pad - ((p.w - min) / range) * (H - 2 * pad);
-    return x.toFixed(1) + "," + y.toFixed(1);
-  });
-  // Smooth path via Catmull-Rom
-  const path = coords.reduce((acc, c, i) => {
-    if (i === 0) return "M " + c;
-    return acc + " L " + c;
-  }, "");
-  const lastX = pad + (points.length - 1) * stepX;
-  const lastY = H - pad - ((points[points.length - 1].w - min) / range) * (H - 2 * pad);
-  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" preserveAspectRatio="none">
-    <path d="${path}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="2.5" fill="var(--accent)"/>
-  </svg>`;
-}
-
-// State: which exercise (if any) is being inspected on the Progress tab
-let progressDetailExId = null;
-
-function renderProgressView() {
-  const wrap = document.getElementById("prog-list");
-  if (!wrap) return;
-  // Show the detail view if user has tapped into an exercise
-  if (progressDetailExId !== null) {
-    renderProgressDetail(wrap, progressDetailExId);
-    return;
-  }
-  const days = data.workouts.days || [];
-
-  let html = "";
-
-  for (const day of days) {
-    const sessions = data.workouts.sessions
-      .filter(s => s.dayId === day.id)
-      .sort((a, b) => a.date.localeCompare(b.date));
-
-    // Per-exercise series (max weight per session)
-    const seriesById = new Map();
-    for (const exId of day.exerciseIds) seriesById.set(exId, []);
-    for (const s of sessions) {
-      for (const ex of s.exercises) {
-        if (!seriesById.has(ex.exerciseId)) continue;
-        const maxW = ex.sets.length ? Math.max(...ex.sets.map(set => Number(set.w) || 0)) : 0;
-        if (maxW > 0) seriesById.get(ex.exerciseId).push({ date: s.date, w: maxW });
-      }
-    }
-
-    // Always render the day — even if no sessions yet — so the user sees their whole plan
-    const sessionsLabel = sessions.length === 0
-      ? "not started"
-      : `${sessions.length} session${sessions.length === 1 ? '' : 's'}`;
-
-    html += `
-      <div class="prog-day-head">
-        <span class="prog-day-name">${escapeHtml(day.name)}</span>
-        <span class="prog-day-meta">${sessionsLabel}</span>
-      </div>
-    `;
-
-    for (const exId of day.exerciseIds) {
-      const ex = data.workouts.exercises.find(e => e.id === exId);
-      if (!ex) continue;
-      const series = seriesById.get(exId) || [];
-      if (series.length === 0) {
-        html += `
-          <div class="prog-exercise empty" data-ex-id="${exId}" role="button" tabindex="0">
-            <div class="prog-name">${escapeHtml(ex.name)}</div>
-            <div style="color: var(--muted); font-size: 11px;">no data yet</div>
-          </div>
-        `;
-        continue;
-      }
-      const current = series[series.length - 1].w;
-      const first = series[0].w;
-      const change = current - first;
-      const cls = change > 0 ? 'up' : (change < 0 ? 'down' : 'flat');
-      const sign = change > 0 ? '+' : '';
-      const changeText = series.length === 1 ? 'first session' : `${sign}${change} kg`;
-
-      html += `
-        <div class="prog-exercise" data-ex-id="${exId}" role="button" tabindex="0">
-          <div class="prog-name">${escapeHtml(ex.name)}</div>
-          <div class="prog-spark">${sparkPath(series, 82, 24)}</div>
-          <div class="prog-stats">
-            <div class="prog-current">${current}<span class="unit">kg</span></div>
-            <div class="prog-change ${cls}">${changeText}</div>
-          </div>
-        </div>
-      `;
-    }
-  }
-
-  if (days.length === 0) {
-    html = `
-      <div class="empty-state" style="padding: 40px 20px; margin-top: 12px;">
-        <i class="ti ti-chart-line" style="font-size: 40px; color: var(--muted); margin-bottom: 8px; display: block;"></i>
-        No workout days set up yet.<br/>
-        Open the Lift tab, tap the gear, and add your routine.
-      </div>
-    `;
-  }
-
-  wrap.innerHTML = html;
-
-  // Wire row taps → open detail
-  wrap.querySelectorAll(".prog-exercise[data-ex-id]").forEach(row => {
-    row.addEventListener("click", () => {
-      progressDetailExId = Number(row.dataset.exId);
-      renderProgressView();
-      window.scrollTo({ top: 0 });
-    });
-  });
-}
-
-// Detail view: full chart + per-session breakdown
-function renderProgressDetail(wrap, exId) {
-  const ex = data.workouts.exercises.find(e => e.id === exId);
-  if (!ex) { progressDetailExId = null; renderProgressView(); return; }
-
-  // Find the day that contains this exercise
-  const day = data.workouts.days.find(d => d.exerciseIds.includes(exId));
-  const dayName = day ? day.name : "";
-
-  // Gather all sessions that contain this exercise, with max weight per session
-  const sessions = data.workouts.sessions
-    .filter(s => (s.exercises || []).some(e => e.exerciseId === exId))
-    .map(s => {
-      const sEx = s.exercises.find(e => e.exerciseId === exId);
-      const setsCopy = (sEx.sets || []).map(set => ({ w: Number(set.w) || 0, r: Number(set.r) || 0 }));
-      const maxW = setsCopy.length ? Math.max(...setsCopy.map(set => set.w)) : 0;
-      return { date: s.date, sets: setsCopy, maxW };
-    })
-    .filter(s => s.maxW > 0)
-    .sort((a, b) => a.date.localeCompare(b.date));
-
-  if (sessions.length === 0) {
-    wrap.innerHTML = `
-      <div class="prog-detail-head">
-        <button class="prog-detail-back" id="prog-back" aria-label="Back"><i class="ti ti-chevron-left"></i></button>
-        <div class="prog-detail-title">
-          <div class="prog-detail-name">${escapeHtml(ex.name)}</div>
-          ${dayName ? `<div class="prog-detail-day">${escapeHtml(dayName)}</div>` : ''}
-        </div>
-      </div>
-      <div class="empty-state">No sessions logged yet for this exercise.</div>
-    `;
-    document.getElementById("prog-back").addEventListener("click", () => {
-      progressDetailExId = null; renderProgressView();
-    });
-    return;
-  }
-
-  const current = sessions[sessions.length - 1].maxW;
-  const first = sessions[0].maxW;
-  const change = current - first;
-  const max = Math.max(...sessions.map(s => s.maxW));
-  const changeSign = change > 0 ? '+' : '';
-  const changeCls = change > 0 ? 'up' : (change < 0 ? 'down' : '');
-
-  // Big chart (320x180) with axis labels
-  const chart = buildBigChart(sessions);
-
-  // Build session rows (newest first for the list)
-  const rows = sessions.slice().reverse().map(s => `
-    <div class="prog-history-row">
-      <div class="prog-history-date">
-        ${formatShortDate(s.date)}
-        <span class="rel">${formatRelativeDate(s.date)}</span>
-      </div>
-      <div class="prog-history-max">${s.maxW}<span class="unit">kg</span></div>
-      <div class="prog-history-sets">${s.sets.map(set => `${set.w}×${set.r}`).join(' · ')}</div>
-    </div>
-  `).join("");
-
-  wrap.innerHTML = `
-    <div class="prog-detail-head">
-      <button class="prog-detail-back" id="prog-back" aria-label="Back"><i class="ti ti-chevron-left"></i></button>
-      <div class="prog-detail-title">
-        <div class="prog-detail-name">${escapeHtml(ex.name)}</div>
-        ${dayName ? `<div class="prog-detail-day">${escapeHtml(dayName)}</div>` : ''}
-      </div>
-    </div>
-
-    <div class="prog-summary">
-      <div class="prog-summary-tile"><div class="v">${current}<span class="unit">kg</span></div><div class="l">Current</div></div>
-      <div class="prog-summary-tile"><div class="v ${changeCls}">${changeSign}${change}<span class="unit">kg</span></div><div class="l">Total change</div></div>
-      <div class="prog-summary-tile"><div class="v">${max}<span class="unit">kg</span></div><div class="l">PR</div></div>
-    </div>
-
-    <div class="prog-big-chart">${chart}</div>
-
-    <div class="prog-history">${rows}</div>
-  `;
-
-  document.getElementById("prog-back").addEventListener("click", () => {
-    progressDetailExId = null; renderProgressView();
-  });
-}
-
-function formatShortDate(iso) {
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-}
-
-function buildBigChart(sessions) {
-  const W = 320, H = 180, padL = 30, padR = 12, padT = 14, padB = 28;
-  const ws = sessions.map(s => s.maxW);
-  const minW = Math.min(...ws), maxW = Math.max(...ws);
-  const pad = Math.max((maxW - minW) * 0.18, 1.5);
-  const yMin = Math.floor(minW - pad);
-  const yMax = Math.ceil(maxW + pad);
-
-  // X-axis maps session index to x position
-  const stepX = sessions.length > 1 ? (W - padL - padR) / (sessions.length - 1) : 0;
-  const xFor = i => padL + i * stepX;
-  const yFor = w => H - padB - ((w - yMin) / Math.max(yMax - yMin, 0.001)) * (H - padT - padB);
-
-  const pts = sessions.map((s, i) => ({ x: xFor(i), y: yFor(s.maxW), kg: s.maxW, date: s.date }));
-
-  // Smooth path
-  function smoothPath(p) {
-    if (p.length === 1) return `M ${p[0].x.toFixed(1)} ${p[0].y.toFixed(1)}`;
-    let d = `M ${p[0].x.toFixed(1)} ${p[0].y.toFixed(1)}`;
-    for (let i = 0; i < p.length - 1; i++) {
-      const p0 = p[i - 1] || p[i];
-      const p1 = p[i];
-      const p2 = p[i + 1];
-      const p3 = p[i + 2] || p2;
-      const cp1x = p1.x + (p2.x - p0.x) / 6;
-      const cp1y = p1.y + (p2.y - p0.y) / 6;
-      const cp2x = p2.x - (p3.x - p1.x) / 6;
-      const cp2y = p2.y - (p3.y - p1.y) / 6;
-      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
-    }
-    return d;
-  }
-
-  const path = smoothPath(pts);
-  const dots = pts.map(p =>
-    `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="var(--accent)"/>
-     <text x="${p.x.toFixed(1)}" y="${(p.y - 8).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="700" fill="var(--text)">${p.kg}</text>`
-  ).join("");
-
-  // Y-axis labels (just min and max)
-  const yLabels = `
-    <text x="${padL - 6}" y="${yFor(yMax).toFixed(1) + 3}" text-anchor="end" font-size="9" fill="var(--muted)">${yMax}</text>
-    <text x="${padL - 6}" y="${yFor(yMin).toFixed(1) + 3}" text-anchor="end" font-size="9" fill="var(--muted)">${yMin}</text>
-  `;
-
-  // X-axis labels: first, middle (if ≥3 points), last
-  const xLabels = [];
-  xLabels.push(`<text x="${pts[0].x.toFixed(1)}" y="${H - 8}" text-anchor="start" font-size="9" fill="var(--muted)">${formatShortDate(pts[0].date)}</text>`);
-  if (pts.length >= 3) {
-    const mid = Math.floor(pts.length / 2);
-    xLabels.push(`<text x="${pts[mid].x.toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="9" fill="var(--muted)">${formatShortDate(pts[mid].date)}</text>`);
-  }
-  if (pts.length > 1) {
-    xLabels.push(`<text x="${pts[pts.length - 1].x.toFixed(1)}" y="${H - 8}" text-anchor="end" font-size="9" fill="var(--muted)">${formatShortDate(pts[pts.length - 1].date)}</text>`);
-  }
-
-  return `
-    <svg viewBox="0 0 ${W} ${H}" style="width: 100%; height: auto; display: block;" preserveAspectRatio="none">
-      <line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="var(--border)" stroke-width="1"/>
-      <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H - padB}" stroke="var(--border)" stroke-width="1"/>
-      <path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      ${dots}
-      ${yLabels}
-      ${xLabels.join("")}
-    </svg>
-  `;
-}
 
 // Gear icon on Today opens the (hidden) Settings view
 (function wireGear() {
@@ -4545,334 +4179,926 @@ function buildBigChart(sessions) {
   });
 })();
 
-// ============ SPANISH WORD OF THE DAY ============
-let wordsState = { mode: 'list', wordId: null };
 
-// Rough Spanish-to-phonetic mapper. Spanish is highly phonetic so this gets close.
-function spanishPhonetic(word) {
-  if (!word) return "";
-  let w = word.toLowerCase().trim();
-  // Multi-letter combinations first (order matters)
-  w = w.replace(/qu([ei])/g, "k$1");
-  w = w.replace(/ll/g, "y");
-  w = w.replace(/ch/g, "ch");
-  w = w.replace(/ñ/g, "ny");
-  w = w.replace(/rr/g, "RR");
-  // Context-sensitive consonants
-  w = w.replace(/c([ei])/g, "s$1");
-  w = w.replace(/g([ei])/g, "h$1");
-  // Single-letter substitutions
-  w = w.replace(/j/g, "h");
-  w = w.replace(/v/g, "b");
-  w = w.replace(/z/g, "s");
-  w = w.replace(/h/g, "");
-  w = w.replace(/c/g, "k");
-  // Vowels
-  w = w.replace(/á/g, "AH");
-  w = w.replace(/é/g, "EH");
-  w = w.replace(/í/g, "EE");
-  w = w.replace(/ó/g, "OH");
-  w = w.replace(/ú/g, "OO");
-  w = w.replace(/a/g, "ah");
-  w = w.replace(/e/g, "eh");
-  w = w.replace(/i/g, "ee");
-  w = w.replace(/o/g, "oh");
-  w = w.replace(/u/g, "oo");
-  return w.toUpperCase();
+// ============ AI-DEN (Chef · Trainer · Stretching · Physio) ============
+const AIDEN_PROMPTS = {
+  chef: `You are Aiden's personal chef + nutrition coach, trained on The Renaissance Diet 2.0 (Israetel/Hoffmann/Smith — science-backed body-composition nutrition). Aiden is in a hypertrophy / lean-gain phase.
+
+FORMAT RULES:
+- Default response: **3 bullet points max**, each ≤ 1 short sentence.
+- Be specific — grams, calories, macros, dosages, timing. No fluff, no intros, no caveats.
+- If he asks for a meal idea: 1 bullet = the meal, 1 bullet = the macros (P/C/F + total kcal), 1 bullet = the cue (e.g. "swap rice for sweet potato if you want lower GI").
+- If he asks about a specific food: 1 bullet = macros per 100g or per typical serving, 1 bullet = how it fits his goal, 1 bullet = a smart swap or pairing.
+- If he asks a strategy question (e.g. "should I cut?"): 3 bullets max, direct opinion grounded in the REFERENCE.
+
+REFERENCE — The Renaissance Diet 2.0 priority hierarchy (in order of importance):
+1. **Calories** — the foundation. Bulk = small daily surplus (250–500 kcal). Cut = small deficit (300–500 kcal). Maintenance = match TDEE. Body comp follows energy balance over weeks, not days.
+2. **Macronutrients** — split the calories:
+   - Protein: **0.7–1.0 g per lb bodyweight per day** (or 1.6–2.2 g/kg). Hits all the bases for hypertrophy. Non-negotiable in a cut.
+   - Fat: 0.3–0.5 g per lb bodyweight (or 0.7–1.1 g/kg). Minimum 20% of calories for hormone health. Don't go below.
+   - Carbs: the remainder of calories. Drives training performance and recovery. Push carbs higher when training hard.
+3. **Nutrient timing** — meaningful but secondary:
+   - 3–6 protein-feeding meals per day, 0.2–0.4 g/kg protein per meal.
+   - Pre-workout: carbs + protein 1–3h before. Post-workout: protein + carbs within 1–2h.
+   - Distribute protein evenly through the day for max MPS (muscle protein synthesis).
+4. **Food composition** — micros + fiber. Hit 25–35g fiber/day. Most calories from minimally processed sources. Save processed / hyperpalatable foods for ~10–15% of intake.
+5. **Hydration** — water = ~bodyweight in lbs × 0.5–1 oz per day, more if sweating. Electrolytes (sodium, potassium, magnesium) matter when training hard or fasted.
+6. **Supplements** — order of value: creatine 5g/day (real effect), caffeine 200–400mg pre-training, vitamin D if low, fish oil 1–3g EPA+DHA, whey protein for convenience. Almost everything else is marginal.
+
+DIET PHASES (Renaissance approach):
+- **Maintenance**: match TDEE, focus on training. Default 3–6 months between bulk/cut.
+- **Lean bulk**: +250–500 kcal/day. Gain 0.25–0.5% bodyweight per week. Stop when fat gain starts outpacing muscle.
+- **Cut**: −300–500 kcal/day. Lose 0.5–1% bodyweight per week. Push protein up (1.0+ g/lb), keep training intensity high, lose fat — not muscle.
+- **Mini-cuts** (4–6 weeks aggressive deficit) work for periodic fat reduction without losing momentum.
+
+QUICK CALCULATIONS (use when relevant):
+- TDEE rough estimate = bodyweight in lbs × 14–16 (16 if active).
+- Protein per meal: target ≥ 0.4 g/kg or ~30–40g for a 70–90kg male.
+- 1g protein = 4 kcal. 1g carb = 4 kcal. 1g fat = 9 kcal.
+
+ALWAYS prefer evidence-based, specific answers over vague "eat clean" advice.`,
+  trainer: `You are Aiden's personal trainer. He's working on hypertrophy and progressive overload. You are trained on the IPTA Certified Personal Trainer curriculum (full reference below). Ground your answers in those principles.
+
+When he asks about a SPECIFIC EXERCISE — give a tight, focused answer in this order:
+- **Setup** — stance, grip, scapular position, neutral spine cues.
+- **Execution** — the lift, including breathing (exhale on concentric, inhale on eccentric), tempo (default 2-1-2 unless he says otherwise), bar path / movement plane.
+- **Common mistakes** — 2–3 mistakes specifically for that lift.
+- **Target muscles** — primary + secondary.
+
+When he asks about a TRAINING CONCEPT (volume, frequency, rest, periodization, deloads, exercise selection, etc.) — give a short, evidence-based answer with concrete numbers from the IPTA framework where applicable. Use bullet points where they help, prose where they don't.
+
+Default assumptions for Aiden unless he says otherwise:
+- Goal: hypertrophy (6–12 reps, 75–85% 1RM, 30–60s rest).
+- Volume target: MEV → MAV range per muscle per week (~10–20 working sets/week).
+- Compound first, isolation second.
+- Progressive overload tracked on top-set weight × reps.
+
+REFERENCE — IPTA CPT curriculum
+THE THREE RULES OF LIFTING (apply to nearly every exercise):
+1. **Keep it close** — load near the body's centerline. OHP stacks over spine. Deadlift bar drags up the shins. Distance = mechanical disadvantage + stabilizer stress.
+2. **Move in a straight line** — minimum-distance bar path. Bench press = slight J-curve, not big arcs. Pull-ups travel vertically, no swing.
+3. **Maintain a neutral spine** — core braced (Valsalva on heavy sets only, briefly). Squat and deadlift cues: chest up, hips back, head neutral. Avoid extension or rounding on rows / presses.
+
+INJURY-VULNERABLE ZONES + COUNTER-CUES:
+- **Knees**: prevent valgus, knees track over toes.
+- **Shoulders**: scapular retraction + depression, no excessive internal rotation overhead.
+- **Lower back**: neutral spine on deadlift / squat / row — core braced before the rep starts.
+
+BREATHING:
+- Exhale on the concentric (lifting), inhale on the eccentric (lowering).
+- Valsalva (held breath + braced core) only on heavy near-1RM lifts, briefly — prolonged Valsalva spikes BP and causes dizziness.
+
+PROGRAM DESIGN VARIABLES:
+- **Sets**: 1–3 warm-up sets + 3–5 working sets per exercise.
+- **Reps**:
+  • 1–5 → strength & power
+  • 6–12 → hypertrophy
+  • 12–30 → muscular endurance
+- **Intensity (%1RM)**:
+  • 90%+ → power / max strength
+  • 75–85% → hypertrophy
+  • <60% → endurance & stability
+  Or use RPE 1–10 (10 = maximal). Hypertrophy work usually targets RPE 7–9.
+- **Tempo** — 4-digit code (eccentric-pause-concentric-pause). Slower tempos increase time under tension; useful for hypertrophy and control. Default 2-1-2-0.
+- **Volume = sets × reps × load**. Track weekly volume per muscle.
+  • MV — maintenance volume (minimum to maintain).
+  • MEV — minimum effective volume for growth.
+  • MAV — maximal adaptive volume (sweet spot).
+  • MRV — max recoverable volume (ceiling).
+- **Rest periods**:
+  • 30–60s → hypertrophy (metabolic stress)
+  • 2–5 min → strength / power (recovery for force production)
+- **Frequency** — most muscles respond well to 2× / week, sometimes 3×.
+
+RESISTANCE PROTOCOLS:
+- **Multiple sets > single sets** for strength and hypertrophy beyond beginner stage.
+- **Common schemes**: 3×10 hypertrophy; 5×5 strength; 4×12 endurance.
+- **Pyramids** — increase weight, drop reps (e.g. 10@50% → 8@60% → 6@70% → 4@80% → 2@90% → 1@100%).
+- **Supersets** — two exercises back-to-back: opposing groups (curls/extensions), same group (bench / fly), or upper/lower.
+- **Drop sets** — set to failure, immediately reduce ~20% and continue. Maximal fatigue, hypertrophy-focused.
+- **Circuit training** — sequence of exercises with minimal rest. Endurance + conditioning.
+
+ADAPTATIONS — what you're actually causing:
+- **Neurological (weeks 1–4)**: motor unit recruitment ↑, synchronization ↑, inhibitory reflexes ↓. Strength gains before visible hypertrophy.
+- **Muscular**: type II fiber size ↑ via myofibrillar protein synthesis (hypertrophy). Type I fiber capillarization + mitochondria ↑ (endurance).
+- **Skeletal / connective**: bone mineral density ↑ via weight-bearing work; tendons / ligaments thicken in response to progressive overload.
+- **Metabolic**: ATP, creatine phosphate, glycogen stores ↑; lactate buffering ↑.
+- **Endocrine**: testosterone + GH spike acutely with heavy compound work; chronic cortisol = bad (overtraining signal); insulin sensitivity improves.
+
+PERIODIZATION:
+- **Stimulus–fatigue–recovery–adaptation** — every training session creates fatigue. If recovery is insufficient before the next session, you regress. Balance volume / intensity / rest.
+- **Fitness–fatigue paradigm** — high loads raise both. A periodized plan lets fatigue dissipate while keeping fitness high.
+- **General Adaptation Syndrome (Selye)** — alarm → resistance development → exhaustion. Overtraining lives in stage 3.
+- **Deload every 6–8 weeks** — drop volume ~40% or intensity 10–15%, same exercises. Recovers connective tissue + nervous system.
+
+ASSESSMENT MINDSET (when he asks about progress or technique problems):
+- Observe form checkpoints at every phase (setup, mid-rep, lockout).
+- Verbal cues > corrections during the rep.
+- Address muscular imbalances proactively (e.g. weak external rotators → shoulder issues).
+
+End of REFERENCE. Be direct, specific, and evidence-based.`,
+  stretching: `You are Aiden's stretching coach, trained on The Stretching Bible by Lexie Williamson (2017, 952 pages, Yoga Sports Coach approach). Use the book's structure and principles (in REFERENCE below) when planning his routine.
+
+When Aiden names a sore area, body part, sport, or time of day, deliver a guided **5-minute routine** as a numbered list of 4–6 stretches. For each:
+- **Stretch name** (use the book's anatomical/sport categories where it fits, e.g. "Cat-Cow for Back and Sides", "Quad Stretch for Upper Legs").
+- **Duration** — typical hold is 30–60s, or 5–10 slow breaths for dynamic / gentle movements.
+- **How to do it** — one sentence on positioning and the cue.
+- **Feel** — where the stretch should be felt (so he knows it's working) and what to avoid forcing.
+
+Start with one short sentence about why those muscles tend to get tight (sitting, sport, etc.). End with one quick reminder: pain-free range, breathe deeply, never force a stretch.
+
+If he says a SPORT, use the book's sport-specific approach: warm-up = dynamic mobility before activity, cool-down = static holds after. Pick the right type for context (e.g. "after my run" → cool-down statics; "before tennis" → dynamic warm-up).
+
+If he says it's BEDTIME or STRESS, choose passive floor-based stretches (no balance needed) and emphasise slow deep breathing — these are the "Pre-Bed Relaxer" / "Stress Reducer" patterns from the book.
+
+REFERENCE — The Stretching Bible structure & principles
+PHILOSOPHY:
+• Pre-hab > rehab. A few minutes of stretching after exercise (or sedentary work) prevents most issues.
+• Functional > pretzel. Emphasis is on simple, functional techniques, not extreme flexibility.
+• Pain-free range. Never force or bounce. If it hurts, ease off.
+• Gentle / Intermediate / Advanced levels exist for every routine — start gentle if unsure.
+• Dynamic before activity, static after. Hold times typically 30–60s for static; 5–10 breaths for dynamic.
+• Breath unlocks the stretch. Deep nasal breathing on the hold deepens the release.
+
+ANATOMICAL SECTIONS (use these as your taxonomy when targeting a body part):
+1. NECK & SHOULDERS — common stretches: head rolls, ear-to-shoulder, chin tucks, cross-body arm stretch (posterior delt), behind-the-back clasp, doorway pec stretch, levator scapulae stretch, thread-the-needle, cat-cow shoulders.
+2. WRISTS & HANDS — wrist circles, prayer stretch (palms together push down), reverse prayer, finger fans, eagle wrists, wrist flexor stretch (arm extended, palm up, pull fingers back), wrist extensor stretch (palm down).
+3. BACK & SIDES — cat-cow, child's pose, supine spinal twist, seated side bend, standing lateral stretch, cobra (also strengthens), thread-the-needle, sphinx, prone press-up.
+4. HIPS & BUTTOCKS — pigeon, figure-4 (supine glute), 90/90, butterfly, frog, lizard, hip flexor lunge, kneeling psoas stretch, happy baby, fire log.
+5. UPPER LEGS — standing quad pull, kneeling hip flexor + quad, seated hamstring fold, supine hamstring (with strap), straddle fold, IT band cross-leg stretch, adductor side lunge.
+6. LOWER LEGS & FEET — downward-dog calf pedal, wall calf stretch (gastrocnemius), bent-knee wall stretch (soleus), toe stretch on wall, plantar fascia ball roll, foot-on-block stretch, toe yoga, kneeling shin stretch.
+
+PRE-MADE SEQUENCES (use these contexts to shape routine):
+• Morning Wake-Up — gentle whole-body to mobilise after sleep.
+• Commuter — short routine in/around the car or seat.
+• Desk Worker — neck, shoulders, hips, wrists, lower back. Mostly subtle, can be done at the desk.
+• Manual Worker — lower back, hamstrings, shoulders, wrists; counter the gripping/lifting.
+• Five-minute time-pressed routines.
+• Better Posture — chest opener, upper back, glutes, plus cobra for spine strength.
+• Stretches for Children / Teenagers / Seniors — gentler, attention to growth or mobility.
+• Eight Stretches with a Strap — supine hamstring, shoulder stretches, side bends with strap as a lever.
+• Stress Reducer — head rolls, child's pose, supine twist, legs-up-wall.
+• Pre-Bed Relaxer — passive floor stretches, deep breathing, no balance needed.
+• Total Body Flexibility — Gentle / Intermediate / Advanced full-body sequences.
+
+SPORT SECTION — for each of these 20 sports there's a 6-stretch warm-up (dynamic) and 10-stretch cool-down (static):
+American Football, Archery & Shooting, Baseball & Softball, Basketball & Netball, Cricket, Cycling, Golf, Hiking & Walking, Hockey (Ice & Field), Kayaking & Canoeing, Rowing, Rugby, Running, Soccer, Skiing & Snowboarding, Swimming, Tennis & Racquet Sports, Triathlon, Watersports, Weight Training. When Aiden names a sport, draw on the typical demands (e.g. cycling → hip flexors, hamstrings, lower back, neck; running → calves, hamstrings, hip flexors, IT band; weight training → chest opener, hip flexors, lats, posterior chain).
+
+WARM-UP vs COOL-DOWN:
+• Warm-up = dynamic mobility (leg swings, arm circles, lunges with rotation). 5–10 reps, build temperature.
+• Cool-down = static holds (30–60s each). Reduce DOMS, restore length.
+
+End of REFERENCE.`,
+  physio: `You are a physiotherapy assistant trained on two evidence-based rehab protocols (full details in REFERENCE below). Aiden just described an injury. Provide a clear, structured initial recovery plan with these short headers:
+
+**Likely cause** — what's happening anatomically, 2–3 sentences.
+**Immediate care** — RICE, NSAIDs / heat / activity modification, sleep position.
+**Recovery exercises** — 4–6 exercises from the REFERENCE below where applicable. For each: name, target muscle, sets × reps, frequency per week, and one technique cue. Prefer the AAOS protocol for shoulder/rotator cuff injuries and the PEAK protocol for knee/quad/hip/calf/balance issues. If neither protocol directly applies, give evidence-based exercises in the same format.
+**Progression** — when and how to add load (typical guideline: 1-pound increments for shoulder, move to next band colour for knee).
+**Red flags** — when to see a doctor or physio in person.
+
+Keep it concise, structured, and grounded in the REFERENCE protocols. Do not be alarmist. Always remind the user this is general guidance, not a substitute for in-person assessment.
+
+REFERENCE A — AAOS Rotator Cuff & Shoulder Conditioning Program
+Target muscles: deltoids, trapezius, rhomboids, teres, supraspinatus, infraspinatus, subscapularis, biceps, triceps.
+STRETCHES (5–6 days/week, hold each 30s, relax 30s between):
+1. Pendulum — deltoids/supraspinatus/infraspinatus/subscapularis — 2×10, swing forward-back, side-to-side, circular. Lean on table, don't lock knees.
+2. Crossover Arm Stretch — posterior deltoid — 4 each side. Pull arm across chest, hold at upper arm (not elbow).
+3. Passive Internal Rotation (with stick) — subscapularis — 4 each side, stretch front of shoulder, no twisting.
+4. Passive External Rotation (with stick) — infraspinatus/teres minor — 4 each side, elbow stays at side.
+5. Sleeper Stretch — infraspinatus/teres minor — 4 reps × 3/day, daily. Side-lying, push affected arm down.
+STRENGTHENING (3 days/week, elastic band, progress 3×8 → 3×12; for free-weight rotation work start light and progress to 5–7lb max):
+6. Standing Row — middle/lower trapezius — 3×8. Squeeze shoulder blades on the pull.
+7. External Rotation with Arm Abducted 90° — infraspinatus, teres minor — 3×8 band, elbow at shoulder height.
+8. Internal Rotation (band) — pectoralis, subscapularis — 3×8, elbow pinned to side.
+9. External Rotation (band) — infraspinatus, teres minor, posterior delt — 3×8, elbow pinned to side.
+10. Elbow Flexion (DB) — biceps — 3×8 → 3×12, start light, max 5lb. 2s hold at top.
+11. Elbow Extension (DB) — triceps — 3×8 → 3×12, max 5lb. Support upper arm with opposite hand.
+12. Trapezius Strengthening (one-arm row variant) — middle/posterior delt, supraspinatus, mid trap — 3–4×20 light → 3×15 with 5–7lb. Thumbs-up at top.
+13. Scapula Setting (prone) — middle trap, serratus — 3×10, pinch shoulder blades, no shrug.
+14. Scapular Retraction/Protraction (prone with weight) — middle trap, serratus — 2×10 → 3×15, no shrug.
+15. Bent-Over Horizontal Abduction (prone, DB) — mid/low trap, infraspinatus, teres minor, posterior delt — 3×8 → 3×12, max 5lb.
+16. Lying Internal/External Rotation (DB) — full rotator cuff — 3–4×20 light → 3×15 at 5–7lb. Drop elbow to 45° if 90° hurts.
+17. Side-lying External Rotation (DB) — infraspinatus, teres minor, posterior delt — 2×8–10 → 3×5, max 5lb.
+18. Side-lying Internal Rotation (DB) — subscapularis, teres major — 2×8–10 → 3×5, max 5lb. Don't roll body back.
+
+REFERENCE B — PEAK Knee Osteoarthritis Program (University of Melbourne)
+Principles: 5–6 exercises per session, 3 sessions/week. Elastic band colour progression: RED (lightest) → GREEN → BLUE → BLACK (hardest). Focus on technique, knee tracks over foot, pain-free range, slow eccentric. Stop if symptoms worsen unreasonably.
+QUADS (Q1–Q17, choose 2–3):
+Q1 Seated Knee Extension — quads — slowly extend over 2s, hold 5s, lower over 2s.
+Q2 Inner Range Quads Over Roll — VMO emphasis — towel under knee, slow lift heel.
+Q3 Sit-to-Stand (no hands) — quads/glutes — progress: lower chair → 3s pause above seat → add weight.
+Q4 Chair Stands with Weight on Arthritis Leg — 70% weight on affected side.
+Q5 Step-Ups — quads/glutes — slow up, slow down, drive through heel.
+Q6 Forward Touch-Downs From Step — quads (eccentric) — control descent, tap heel, return.
+Q7/Q8 Same with 2kg (chest, hands, or one-hand-balanced).
+Q9 Partial Wall Squats — quads — slide back, knees over toes, 30–60° flexion.
+Q10 Split-Leg Wall Squats — single-leg quads.
+Q11 Controlled Squats — chair support, knees track over feet.
+Q12/Q13 Forwards/Backwards Sliding (towel/plastic bag), progress with elastic band.
+Q14/Q15 Step-to-Standing Balance One Leg (+ arm movements for progression).
+Q16/Q17 Sideways Sliding (± elastic band).
+HIP ABDUCTORS / GLUTES (HA1–HA4, choose 1–2):
+HA1 Side Leg Raises Standing — gluteus medius — keep pelvis level.
+HA2 Crab Walking (elastic band around ankles) — partial squat, side-step.
+HA3 Wall Push — single-leg glute med — push hip into wall.
+HA4 Wall Push with Deeper Knee Bending — progression.
+HAMSTRING / GLUTE (HG1–HG9, choose 1–2):
+HG1 Bridging — glute max/hamstring — squeeze glutes at top.
+HG2 Split-Leg Bridge — single-leg progression.
+HG3 Single-Leg Bridge — full single-leg.
+HG4 Standing Hamstring Curls Over Bench — slow eccentric.
+HG5 Hamstring Curls with Elastic Band — progress band colour.
+HG6 Seated Knee Flexion — pull heel back through resistance.
+HG7 Hip Extension Knee Bent — glute max isolation.
+HG8 Hip Extension Knee Straight — glute + hamstring.
+HG9 Hip Extension Knee Straight with Band.
+CALF (C1–C4, choose 1):
+C1 Double Calf Raises — full ROM, slow lower.
+C2 Single Calf Raises — progression.
+C3 Calf Raises Over Step Edge — full stretch at bottom.
+C4 Single Calf Raises Over Step Edge.
+BALANCE (B1–B3+, choose 1):
+B1 Tandem Stance — heel-to-toe, 30–60s hold.
+B2 Forward Taps — tap forward and return, eyes ahead.
+B3 Single-Leg Stance — start with support, progress to eyes closed.
+
+End of REFERENCE.`,
+};
+const AIDEN_ROLES = [
+  { id: "chef",       name: "Chef",       icon: "ti-chef-hat",   desc: "Food, calories, macros" },
+  { id: "trainer",    name: "Trainer",    icon: "ti-barbell",    desc: "Exercise execution, form" },
+  { id: "stretching", name: "Stretching", icon: "ti-stretching", desc: "5-min routine for sore areas" },
+  { id: "physio",     name: "Physio",     icon: "ti-activity",   desc: "Track and recover injuries" },
+];
+let aidenState = { role: null, physioView: "list", physioInjuryId: null };
+
+function ensureAidenData() {
+  if (!data.aidenChat) data.aidenChat = { chef: [], trainer: [], stretching: [] };
+  if (!data.injuries) data.injuries = [];
+  if (typeof data.anthropicKey !== "string") data.anthropicKey = "";
 }
 
-// Free translation via MyMemory (no API key needed, ~5k chars/day)
-async function translateSpanishToEnglish(spanish) {
-  try {
-    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(spanish)}&langpair=es|en`;
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 5000);
-    const res = await fetch(url, { signal: ctrl.signal });
-    clearTimeout(t);
-    const json = await res.json();
-    if (json && json.responseStatus === 200 && json.responseData) {
-      return json.responseData.translatedText || null;
+async function callClaude(systemPrompt, messages) {
+  ensureAidenData();
+  if (!data.anthropicKey) throw new Error("no-key");
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "x-api-key": data.anthropicKey,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages,
+    }),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error("api-error: " + errText);
+  }
+  const j = await res.json();
+  return (j.content || []).filter(c => c.type === "text").map(c => c.text).join("\n").trim();
+}
+
+// Light markdown → HTML (bold, bullets, headers, paragraphs). Forgiving.
+function aidenFormat(s) {
+  if (!s) return "";
+  let html = String(s);
+  html = html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  // Headers (### / ## / #)
+  html = html.replace(/^###\s+(.+)$/gm, "<strong>$1</strong>");
+  html = html.replace(/^##\s+(.+)$/gm,  "<strong>$1</strong>");
+  html = html.replace(/^#\s+(.+)$/gm,   "<strong>$1</strong>");
+  // Bold
+  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  // Bullet/numbered lists
+  const lines = html.split("\n");
+  let out = []; let inUl = false; let inOl = false;
+  for (const raw of lines) {
+    const ulm = raw.match(/^[-*]\s+(.+)$/);
+    const olm = raw.match(/^\d+\.\s+(.+)$/);
+    if (ulm) {
+      if (inOl) { out.push("</ol>"); inOl = false; }
+      if (!inUl) { out.push("<ul>"); inUl = true; }
+      out.push(`<li>${ulm[1]}</li>`);
+    } else if (olm) {
+      if (inUl) { out.push("</ul>"); inUl = false; }
+      if (!inOl) { out.push("<ol>"); inOl = true; }
+      out.push(`<li>${olm[1]}</li>`);
+    } else {
+      if (inUl) { out.push("</ul>"); inUl = false; }
+      if (inOl) { out.push("</ol>"); inOl = false; }
+      if (raw.trim()) out.push(`<p>${raw}</p>`);
     }
-  } catch (e) { console.warn("translation failed", e); }
-  return null;
+  }
+  if (inUl) out.push("</ul>");
+  if (inOl) out.push("</ol>");
+  return out.join("");
 }
 
-function showWordModal(onDone) {
-  const m = document.getElementById("word-modal");
-  if (!m) { onDone(null); return; }
-  const input = document.getElementById("word-input");
-  input.value = "";
-  m.classList.add("show");
-  setTimeout(() => input.focus(), 100);
-
-  const saveBtn = document.getElementById("word-save");
-  const cancelBtn = document.getElementById("word-cancel");
-
-  const cleanup = () => {
-    m.classList.remove("show");
-    saveBtn.removeEventListener("click", onSave);
-    cancelBtn.removeEventListener("click", onCancel);
-    input.removeEventListener("keydown", onKey);
-    saveBtn.disabled = false;
-    saveBtn.textContent = "Save";
-  };
-  const onSave = async () => {
-    const v = input.value.trim();
-    if (!v) { input.focus(); return; }
-    saveBtn.disabled = true;
-    saveBtn.textContent = "Saving…";
-    const english = await translateSpanishToEnglish(v);
-    const word = {
-      id: Date.now(),
-      date: new Date().toISOString(),
-      spanish: v,
-      english: english || "",
-      phonetic: spanishPhonetic(v),
-      sentence: ""
-    };
-    if (!data.spanishWords) data.spanishWords = [];
-    data.spanishWords.unshift(word);
-    saveData();
-    cleanup();
-    onDone(word);
-  };
-  const onCancel = () => { cleanup(); onDone(null); };
-  const onKey = (e) => { if (e.key === "Enter") onSave(); };
-
-  saveBtn.addEventListener("click", onSave);
-  cancelBtn.addEventListener("click", onCancel);
-  input.addEventListener("keydown", onKey);
-}
-
-function renderWords() {
-  const root = document.getElementById("view-words");
+function renderAiden() {
+  ensureAidenData();
+  const root = document.getElementById("view-aiden");
   if (!root) return;
-  if (wordsState.mode === 'detail') renderWordsDetail(root);
-  else renderWordsList(root);
+  if (aidenState.role === null) return renderAidenHome(root);
+  if (aidenState.role === "physio") return renderPhysio(root);
+  return renderAidenChat(root, aidenState.role);
 }
 
-// Normalize Spanish input for forgiving comparison (case + accents + punctuation)
-function normalizeSpanish(s) {
-  return (s || "")
-    .toLowerCase()
-    .trim()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[¿¡!?.,;:"']/g, "")
-    .replace(/\s+/g, " ");
-}
-function wordReviewStateToday(w) {
-  if (!w.reviews) return null;
-  return w.reviews[todayKey()] || null;  // "correct" | "shown" | null
+function renderAidenHome(root) {
+  root.innerHTML = `
+    <div class="aiden-wrap">
+      <div class="aiden-mark">
+        <div class="name">A<span class="accent">i</span>-Den</div>
+        <div class="sub">Chef · Personal Trainer · Stretching Coach · Physio</div>
+      </div>
+      <div class="aiden-grid">
+        ${AIDEN_ROLES.map(r => `
+          <div class="aiden-role-card ${r.id === "physio" ? "physio" : ""}" data-role="${r.id}">
+            <i class="ti ${r.icon}"></i>
+            <div class="role-name">${r.name}</div>
+            <div class="role-desc">${r.desc}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+  root.querySelectorAll(".aiden-role-card").forEach(el => {
+    el.addEventListener("click", () => {
+      aidenState.role = el.dataset.role;
+      aidenState.physioView = "list";
+      aidenState.physioInjuryId = null;
+      renderAiden();
+    });
+  });
 }
 
-function showWordReviewModal(word) {
-  const m = document.getElementById("word-review-modal");
-  if (!m || !word) return;
-  document.getElementById("word-review-english").textContent = word.english || word.spanish;
-  const input = document.getElementById("word-review-input");
-  const result = document.getElementById("word-review-result");
-  const submitBtn = document.getElementById("word-review-submit");
-  const cancelBtn = document.getElementById("word-review-cancel");
-  input.value = "";
-  result.textContent = "";
-  result.className = "";
-  submitBtn.textContent = "Check";
-  m.classList.add("show");
-  setTimeout(() => input.focus(), 100);
-
-  let attempts = 0;
-  const teardown = () => {
-    m.classList.remove("show");
-    submitBtn.onclick = null;
-    cancelBtn.onclick = null;
-    input.onkeydown = null;
+function renderAidenChat(root, role) {
+  const meta = AIDEN_ROLES.find(r => r.id === role);
+  const history = data.aidenChat[role] || [];
+  const hasKey = !!data.anthropicKey;
+  root.innerHTML = `
+    <div class="aiden-wrap">
+      <div class="aiden-role-head">
+        <button class="back-btn" id="ai-back" aria-label="Back"><i class="ti ti-chevron-left"></i></button>
+        <h2>${meta.name}</h2>
+        ${history.length ? `<button class="clear-btn" id="ai-clear">Clear</button>` : ""}
+      </div>
+      ${hasKey ? "" : `<div class="aiden-msg error">No Anthropic API key set. Go back and add one to enable ${meta.name}.</div>`}
+      <div class="aiden-chat" id="aiden-chat">
+        ${history.length === 0
+          ? `<div class="aiden-empty">
+              <i class="ti ${meta.icon}"></i>
+              ${role === "chef" ? "Ask about food, macros, calories. Short, direct answers." : ""}
+              ${role === "trainer" ? "Ask about any exercise or training principle." : ""}
+              ${role === "stretching" ? `Tell me where you're sore — e.g. "low back" — and I'll give a 5-min routine.` : ""}
+            </div>`
+          : history.map(m => `
+              <div class="aiden-msg ${m.role}">${m.role === "user" ? escapeHtml(m.content) : aidenFormat(m.content)}</div>
+            `).join("")
+        }
+      </div>
+      <div class="aiden-input-row">
+        <input type="text" id="ai-input" placeholder="${role === "stretching" ? "What's sore?" : "Ask…"}" autocomplete="off" ${hasKey ? "" : "disabled"} />
+        <button id="ai-send" ${hasKey ? "" : "disabled"} aria-label="Send"><i class="ti ti-arrow-right"></i></button>
+      </div>
+    </div>
+  `;
+  document.getElementById("ai-back").addEventListener("click", () => {
+    aidenState.role = null; renderAiden();
+  });
+  const clr = document.getElementById("ai-clear");
+  if (clr) clr.addEventListener("click", () => {
+    data.aidenChat[role] = [];
+    saveData(); renderAiden();
+  });
+  const input = document.getElementById("ai-input");
+  const sendBtn = document.getElementById("ai-send");
+  const send = async () => {
+    const text = input.value.trim();
+    if (!text || !hasKey) return;
+    input.value = "";
+    // Append user message
+    data.aidenChat[role].push({ role: "user", content: text });
+    // Append thinking placeholder
+    const thinkingIdx = data.aidenChat[role].push({ role: "assistant", content: "Thinking…", thinking: true }) - 1;
+    saveData(); renderAiden();
+    try {
+      const conv = data.aidenChat[role]
+        .filter(m => !m.thinking)
+        .map(m => ({ role: m.role, content: m.content }));
+      const reply = await callClaude(AIDEN_PROMPTS[role], conv);
+      data.aidenChat[role][thinkingIdx] = { role: "assistant", content: reply };
+    } catch (e) {
+      data.aidenChat[role][thinkingIdx] = { role: "assistant", content: "Couldn't reach Claude: " + (e.message || e), error: true };
+    }
+    saveData(); renderAiden();
   };
-  const onClose = () => { teardown(); renderWords(); };
-  const onWrongAfterReveal = () => {
-    if (!word.reviews) word.reviews = {};
-    word.reviews[todayKey()] = "shown";
-    saveData();
-    onClose();
-  };
-  const onSubmit = () => {
-    const guess = input.value;
-    if (!guess.trim()) { input.focus(); return; }
-    if (normalizeSpanish(guess) === normalizeSpanish(word.spanish)) {
-      if (!word.reviews) word.reviews = {};
-      word.reviews[todayKey()] = "correct";
+  sendBtn.addEventListener("click", send);
+  input.addEventListener("keydown", e => { if (e.key === "Enter") send(); });
+  setTimeout(() => input.focus(), 80);
+  // Scroll chat to bottom
+  const chat = document.getElementById("aiden-chat");
+  if (chat) chat.scrollTop = chat.scrollHeight;
+}
+
+/* ----- Physio ----- */
+function painClass(p) {
+  if (p >= 7) return "high";
+  if (p >= 4) return "med";
+  return "low";
+}
+function timeAgo(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  const diff = Date.now() - d.getTime();
+  const days = Math.floor(diff / (24 * 3600 * 1000));
+  if (days === 0) return "today";
+  if (days === 1) return "yesterday";
+  if (days < 7) return `${days} days ago`;
+  if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+  if (days < 365) return `${Math.floor(days / 30)} months ago`;
+  return `${Math.floor(days / 365)} years ago`;
+}
+
+function renderPhysio(root) {
+  if (aidenState.physioView === "add") return renderPhysioForm(root);
+  if (aidenState.physioView === "detail") return renderPhysioDetail(root);
+  return renderPhysioList(root);
+}
+
+function renderPhysioList(root) {
+  const injuries = data.injuries || [];
+  root.innerHTML = `
+    <div class="aiden-wrap">
+      <div class="aiden-role-head">
+        <button class="back-btn" id="ph-back" aria-label="Back"><i class="ti ti-chevron-left"></i></button>
+        <h2>Physio</h2>
+      </div>
+      <button class="physio-add-btn" id="ph-add"><i class="ti ti-plus"></i> Log an injury</button>
+      ${injuries.length === 0
+        ? `<div class="physio-empty">
+            <i class="ti ti-stethoscope"></i>
+            No injuries logged yet.<br/>
+            Tap above to add one — track pain over time and get AI recovery guidance.
+          </div>`
+        : injuries.map(inj => {
+            const latest = (inj.ratings && inj.ratings.length > 0) ? inj.ratings[inj.ratings.length - 1] : null;
+            const pain = latest ? latest.pain : inj.initialPain;
+            return `
+              <div class="physio-card" data-id="${inj.id}">
+                <div class="top">
+                  <div class="name">${escapeHtml(inj.name)}</div>
+                  <div class="pain-pill ${painClass(pain)}">${pain}/10</div>
+                </div>
+                <div class="meta">${escapeHtml(inj.muscleGroup || "")} · started ${timeAgo(inj.occurredAt)} · ${inj.ratings?.length || 0} logs</div>
+              </div>
+            `;
+          }).join("")
+      }
+    </div>
+  `;
+  document.getElementById("ph-back").addEventListener("click", () => {
+    aidenState.role = null; renderAiden();
+  });
+  document.getElementById("ph-add").addEventListener("click", () => {
+    aidenState.physioView = "add"; renderAiden();
+  });
+  root.querySelectorAll(".physio-card").forEach(el => {
+    el.addEventListener("click", () => {
+      aidenState.physioInjuryId = el.dataset.id;
+      aidenState.physioView = "detail";
+      renderAiden();
+    });
+  });
+}
+
+function renderPhysioForm(root) {
+  const isEdit = !!aidenState.physioInjuryId;
+  const inj = isEdit ? data.injuries.find(i => i.id === aidenState.physioInjuryId) : null;
+  root.innerHTML = `
+    <div class="aiden-wrap">
+      <div class="aiden-role-head">
+        <button class="back-btn" id="ph-cancel" aria-label="Back"><i class="ti ti-chevron-left"></i></button>
+        <h2>${isEdit ? "Edit injury" : "Log injury"}</h2>
+      </div>
+      <div class="physio-form">
+        <div class="field">
+          <label>What's the injury?</label>
+          <input type="text" id="ph-name" placeholder="e.g. Bad left shoulder" value="${inj ? escapeHtml(inj.name) : ""}" />
+        </div>
+        <div class="field">
+          <label>Muscle group / area</label>
+          <input type="text" id="ph-area" placeholder="e.g. Rotator cuff, lower back" value="${inj ? escapeHtml(inj.muscleGroup || "") : ""}" />
+        </div>
+        <div class="field">
+          <label>What does the pain feel like?</label>
+          <input type="text" id="ph-type" placeholder="e.g. Sharp, dull ache, pinching" value="${inj ? escapeHtml(inj.painType || "") : ""}" />
+        </div>
+        <div class="field">
+          <label>How intense (0–10)?</label>
+          <div class="pain-readout">
+            <input type="range" id="ph-pain" min="0" max="10" step="1" value="${inj ? inj.initialPain : 5}" />
+            <span class="pain-val" id="ph-pain-val">${inj ? inj.initialPain : 5}</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>When did it start?</label>
+          <input type="date" id="ph-when" value="${inj && inj.occurredAt ? inj.occurredAt.slice(0,10) : todayKey()}" />
+        </div>
+        <div class="physio-actions">
+          <button class="cancel" id="ph-cancel-btn">Cancel</button>
+          <button class="save" id="ph-save">${isEdit ? "Save" : "Log + get plan"}</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById("ph-cancel").addEventListener("click", () => {
+    aidenState.physioView = isEdit ? "detail" : "list"; renderAiden();
+  });
+  document.getElementById("ph-cancel-btn").addEventListener("click", () => {
+    aidenState.physioView = isEdit ? "detail" : "list"; renderAiden();
+  });
+  const painInp = document.getElementById("ph-pain");
+  const painVal = document.getElementById("ph-pain-val");
+  painInp.addEventListener("input", () => { painVal.textContent = painInp.value; });
+
+  document.getElementById("ph-save").addEventListener("click", async () => {
+    const name = document.getElementById("ph-name").value.trim();
+    if (!name) { alert("Give the injury a name."); return; }
+    const muscleGroup = document.getElementById("ph-area").value.trim();
+    const painType = document.getElementById("ph-type").value.trim();
+    const initialPain = Number(painInp.value);
+    const occurredAt = new Date(document.getElementById("ph-when").value + "T00:00:00").toISOString();
+
+    if (isEdit) {
+      Object.assign(inj, { name, muscleGroup, painType, initialPain, occurredAt });
       saveData();
-      result.className = "correct";
-      result.innerHTML = `<i class="ti ti-check"></i> Correct — ${escapeHtml(word.spanish)}`;
-      submitBtn.textContent = "Continue";
-      submitBtn.onclick = onClose;
+      aidenState.physioView = "detail";
+      renderAiden();
       return;
     }
-    attempts++;
-    if (attempts >= 2) {
-      result.className = "wrong";
-      result.innerHTML = `Answer: <span class="reveal-spanish">${escapeHtml(word.spanish)}</span>`;
-      submitBtn.textContent = "Got it";
-      submitBtn.onclick = onWrongAfterReveal;
-    } else {
-      result.className = "wrong";
-      result.textContent = "Not quite — try again.";
-      input.value = "";
-      input.focus();
-    }
-  };
-
-  submitBtn.onclick = onSubmit;
-  cancelBtn.onclick = () => teardown();
-  input.onkeydown = (e) => { if (e.key === "Enter") submitBtn.click(); };
-}
-
-function renderWordsList(root) {
-  const words = data.spanishWords || [];
-  const tk = todayKey();
-  const todayWord = words.find(w => w.date && w.date.slice(0, 10) === tk);
-  const priorWords = words.filter(w => !w.date || w.date.slice(0, 10) !== tk);
-
-  let html = "";
-
-  if (todayWord || priorWords.length > 0) {
-    html += `<p class="subtitle">Today's word, plus a quick review of the ones you've already learned.</p>`;
-  }
-
-  if (todayWord) {
-    html += `<div class="word-section-cap">Today</div>`;
-    html += `
-      <div class="word-row" data-word-id="${todayWord.id}">
-        <div style="flex: 1; min-width: 0;">
-          <div class="word-spanish">${escapeHtml(todayWord.spanish)}</div>
-          <div class="word-meta">${todayWord.english ? escapeHtml(todayWord.english) : 'tap to edit'}</div>
-        </div>
-        <i class="ti ti-chevron-right" aria-hidden="true"></i>
-      </div>
-    `;
-  }
-
-  if (priorWords.length > 0) {
-    const pending = priorWords.filter(w => wordReviewStateToday(w) !== "correct").length;
-    const total = priorWords.length;
-    const headLabel = pending === 0 ? `Review · all done today` : `Review · ${pending} of ${total}`;
-    html += `<div class="word-section-cap">${headLabel}</div>`;
-    html += `<p class="subtitle" style="font-size: 12px; margin: -2px 4px 8px;">Tap a word and type it in Spanish to tick it off.</p>`;
-    html += priorWords.map(w => {
-      const state = wordReviewStateToday(w);
-      const klass = state === "correct" ? "done" : (state === "shown" ? "shown" : "");
-      const d = new Date(w.date);
-      const dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-      const sub = state === "correct" ? "Reviewed today" : (state === "shown" ? "Saw the answer" : dateStr);
-      return `
-        <div class="word-review-row ${klass}" data-word-id="${w.id}">
-          <div>
-            <div class="review-english">${escapeHtml(w.english || w.spanish)}</div>
-            <div class="review-meta">${sub}</div>
-          </div>
-          <div class="word-review-tick"></div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  if (!todayWord && priorWords.length === 0) {
-    html += `
-      <div class="empty-state" style="padding: 40px 20px;">
-        <i class="ti ti-language" style="font-size: 40px; color: var(--muted); margin-bottom: 8px; display: block;"></i>
-        No words yet.<br/>
-        Tick "Spanish word of the day" on Today to log one.
-      </div>
-    `;
-  }
-
-  root.innerHTML = html;
-
-  // Today's word → open detail view (edit fields)
-  if (todayWord) {
-    const t = root.querySelector(`.word-row[data-word-id="${todayWord.id}"]`);
-    if (t) t.addEventListener("click", () => {
-      wordsState = { mode: 'detail', wordId: todayWord.id };
-      renderWords(); window.scrollTo({ top: 0 });
-    });
-  }
-
-  // Prior words → quiz modal (or detail if already done)
-  root.querySelectorAll(".word-review-row").forEach(row => {
-    row.addEventListener("click", () => {
-      const id = Number(row.dataset.wordId);
-      const w = (data.spanishWords || []).find(x => x.id === id);
-      if (!w) return;
-      const state = wordReviewStateToday(w);
-      if (state) {
-        wordsState = { mode: 'detail', wordId: id };
-        renderWords();
+    const newInj = {
+      id: String(Date.now()),
+      name, muscleGroup, painType, initialPain,
+      occurredAt,
+      createdAt: new Date().toISOString(),
+      treatments: "",
+      treatmentsLoading: true,
+      ratings: [{ when: new Date().toISOString(), pain: initialPain, notes: "Initial log." }],
+    };
+    data.injuries.push(newInj);
+    aidenState.physioInjuryId = newInj.id;
+    aidenState.physioView = "detail";
+    saveData();
+    renderAiden();
+    // Background: fetch the AI treatment plan
+    try {
+      if (data.anthropicKey) {
+        const summary = `Injury: ${name}. Area/muscle: ${muscleGroup || "unspecified"}. Pain type: ${painType || "unspecified"}. Intensity: ${initialPain}/10. Started: ${timeAgo(occurredAt)}.`;
+        const reply = await callClaude(AIDEN_PROMPTS.physio, [{ role: "user", content: summary }]);
+        newInj.treatments = reply;
       } else {
-        showWordReviewModal(w);
+        newInj.treatments = "Add an Anthropic API key in the Ai-Den home to fetch a recovery plan.";
       }
-    });
+    } catch (e) {
+      newInj.treatments = "Couldn't fetch recovery plan: " + (e.message || e);
+    }
+    newInj.treatmentsLoading = false;
+    saveData();
+    if (aidenState.physioInjuryId === newInj.id) renderAiden();
   });
 }
 
-function renderWordsDetail(root) {
-  const word = (data.spanishWords || []).find(w => w.id === wordsState.wordId);
-  if (!word) { wordsState = { mode: 'list', wordId: null }; renderWords(); return; }
-  const d = new Date(word.date);
-  const dateStr = d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+function renderPhysioDetail(root) {
+  const inj = data.injuries.find(i => i.id === aidenState.physioInjuryId);
+  if (!inj) { aidenState.physioView = "list"; renderAiden(); return; }
+  const ratings = (inj.ratings || []).slice().reverse();
+  root.innerHTML = `
+    <div class="aiden-wrap">
+      <div class="aiden-role-head">
+        <button class="back-btn" id="ph-back" aria-label="Back"><i class="ti ti-chevron-left"></i></button>
+        <h2>${escapeHtml(inj.name)}</h2>
+        <button class="clear-btn" id="ph-edit">Edit</button>
+      </div>
+      <div class="injury-detail-head">
+        <div class="injury-name">${escapeHtml(inj.name)}</div>
+        <div class="injury-meta">${escapeHtml(inj.muscleGroup || "—")} · ${escapeHtml(inj.painType || "—")} · started ${timeAgo(inj.occurredAt)}</div>
+      </div>
+
+      <div class="injury-section">
+        <h4>Log today's pain</h4>
+        <div class="pain-readout">
+          <input type="range" id="ph-newpain" min="0" max="10" step="1" value="${ratings[0] ? ratings[0].pain : inj.initialPain}" />
+          <span class="pain-val" id="ph-newpain-val">${ratings[0] ? ratings[0].pain : inj.initialPain}</span>
+        </div>
+        <textarea id="ph-newnotes" placeholder="Notes (what helped, what aggravated it, etc.)" style="margin-top: 10px;"></textarea>
+        <button class="physio-add-btn" id="ph-log-pain" style="margin: 10px 0 0;"><i class="ti ti-plus"></i> Add rating</button>
+      </div>
+
+      <div class="injury-section">
+        <h4>Recovery plan</h4>
+        <div class="body">${inj.treatmentsLoading ? "<em>Fetching plan from the physio…</em>" : (inj.treatments ? aidenFormat(inj.treatments) : "No plan yet.")}</div>
+      </div>
+
+      <div class="injury-section">
+        <h4>Pain history (${ratings.length})</h4>
+        <div class="injury-rating-list">
+          ${ratings.length === 0
+            ? `<div style="color: var(--muted); font-size: 13px;">No ratings yet.</div>`
+            : ratings.map(r => `
+                <div class="injury-rating">
+                  <div class="top">
+                    <span class="pain-num">${r.pain}/10</span>
+                    <span class="when">${timeAgo(r.when)}</span>
+                  </div>
+                  ${r.notes ? `<div class="notes">${escapeHtml(r.notes)}</div>` : ""}
+                </div>
+              `).join("")
+          }
+        </div>
+      </div>
+
+      <div class="physio-actions">
+        <button class="delete" id="ph-delete"><i class="ti ti-trash"></i> Delete injury</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("ph-back").addEventListener("click", () => {
+    aidenState.physioView = "list"; aidenState.physioInjuryId = null; renderAiden();
+  });
+  document.getElementById("ph-edit").addEventListener("click", () => {
+    aidenState.physioView = "add"; renderAiden();
+  });
+  const pn = document.getElementById("ph-newpain");
+  const pv = document.getElementById("ph-newpain-val");
+  pn.addEventListener("input", () => { pv.textContent = pn.value; });
+  document.getElementById("ph-log-pain").addEventListener("click", () => {
+    const pain = Number(pn.value);
+    const notes = document.getElementById("ph-newnotes").value.trim();
+    inj.ratings = inj.ratings || [];
+    inj.ratings.push({ when: new Date().toISOString(), pain, notes });
+    saveData(); renderAiden();
+  });
+  document.getElementById("ph-delete").addEventListener("click", () => {
+    if (!confirm(`Delete "${inj.name}" and all its ratings?`)) return;
+    data.injuries = data.injuries.filter(i => i.id !== inj.id);
+    aidenState.physioInjuryId = null;
+    aidenState.physioView = "list";
+    saveData(); renderAiden();
+  });
+}
+
+// ============ CHALLENGE TAB (fasting + no alcohol) ============
+// Each milestone: { at: hours_since_start, stage, body }
+const FASTING_BENEFITS = [
+  { at: 0,   stage: "Just started",      body: "Last meal is digesting. Insulin still elevated, blood glucose stable. Drink water." },
+  { at: 2,   stage: "Hour 2",            body: "Insulin starts dropping. Liver shifts focus from storing food to releasing energy from stores." },
+  { at: 4,   stage: "Hour 4",            body: "Food fully digested. Glycogen (stored carbs) becomes the primary fuel source." },
+  { at: 6,   stage: "Hour 6",            body: "Insulin near fasting baseline. Lipolysis begins — fat cells start releasing fatty acids into the blood." },
+  { at: 8,   stage: "Hour 8",            body: "Glycogen stores noticeably depleting. Fat oxidation ramps up. Hunger may peak around now and then pass." },
+  { at: 10,  stage: "Hour 10",           body: "Liver glycogen running low. Body shifts into fat-burning mode. Ketone production beginning." },
+  { at: 12,  stage: "Metabolic switch",  body: "Glycogen mostly depleted. Ketogenesis is now active — your brain starts using ketones for fuel alongside glucose." },
+  { at: 14,  stage: "Hour 14",           body: "Human Growth Hormone (HGH) starting to rise — preserves muscle, mobilises fat. Autophagy initiating: cells clean out damaged components." },
+  { at: 16,  stage: "Hour 16 — 16:8",    body: "Classic 16:8 finish line. Autophagy in full swing. HGH up 5×. Insulin sensitivity improving. Mental clarity often peaks here." },
+  { at: 18,  stage: "Hour 18",           body: "Deeper ketosis. Inflammation markers drop. Many people report sharper focus and stable energy without caffeine." },
+  { at: 20,  stage: "Hour 20",           body: "Stem cell production rising. Gut lining gets a break and starts repairing." },
+  { at: 24,  stage: "Hour 24 — full day",body: "Anti-inflammatory effects compound. BDNF (brain-derived neurotrophic factor) rising — protective for memory and learning. Glycogen fully depleted." },
+  { at: 30,  stage: "Hour 30",           body: "Deeper autophagy. Body is recycling old / damaged proteins more aggressively. This is the cellular cleanup window." },
+  { at: 36,  stage: "Hour 36",           body: "Ketone levels high. Significant reductions in oxidative stress. Mitochondrial repair active." },
+  { at: 42,  stage: "Hour 42",           body: "Insulin sensitivity reaches new highs. Some research suggests immune cell turnover starts here — old white blood cells recycled, new ones generated." },
+  { at: 48,  stage: "Hour 48 — 2 days",  body: "Peak autophagy window. Cellular regeneration in major organs. This is where the heavy maintenance happens. Drink electrolytes." },
+  { at: 60,  stage: "Hour 60",           body: "Deep ketosis. Body has fully adapted to fat-based fuel. Inflammation at multi-day lows." },
+  { at: 72,  stage: "Hour 72 — 3 days",  body: "Immune system 'reset' — Longo lab findings show full regeneration of immune cells. Stem cell production peaks. Break the fast slowly and carefully now." },
+];
+
+const ALCOHOL_BENEFITS = [
+  { at: 1,        stage: "Hour 1",          body: "Liver begins processing remaining alcohol. Blood alcohol drops ~0.015% per hour." },
+  { at: 6,        stage: "Hour 6",          body: "Alcohol fully metabolised. Dehydration kicks in — drink water. REM sleep tonight will be deeper than usual." },
+  { at: 12,       stage: "Hour 12",         body: "Blood sugar stabilising. Cortisol normalising. Liver enzymes start to drop from acute load." },
+  { at: 24,       stage: "Day 1",           body: "Sleep quality already noticeably better. Hydration returning. Hunger and energy patterns start resetting." },
+  { at: 48,       stage: "Day 2",           body: "Withdrawal symptoms (if any) usually peak by now. Liver detoxification at full speed. Brain neurotransmitters beginning to rebalance." },
+  { at: 72,       stage: "Day 3",           body: "Cravings starting to fade. Skin looks brighter — alcohol-driven inflammation drops fast. Energy more even through the day." },
+  { at: 168,      stage: "Week 1",          body: "REM sleep significantly improved. Liver fat already reducing. Blood pressure trending down. Mood swings settling." },
+  { at: 336,      stage: "Week 2",          body: "Visible skin clarity. Average weight loss of 1–2 kg from cutting empty calories. Mental clarity sharper. Liver enzymes near normal." },
+  { at: 504,      stage: "Week 3",          body: "Sleep architecture (deep + REM) fully restored. Anxiety dropping. Workouts feel easier — recovery markedly better." },
+  { at: 720,      stage: "Day 30",          body: "Liver fat down ~15–20%. Blood pressure normalised. Immune function stronger. Risk of heart disease starts measurably falling." },
+  { at: 1440,     stage: "Day 60",          body: "Sustained weight loss + body composition shifts. Hormonal balance (testosterone, cortisol) much improved. Resting heart rate lower." },
+  { at: 2160,     stage: "Day 90",          body: "Liver enzymes fully normalised in most people. Mental clarity peaks. Significantly reduced inflammation across the body. Memory and focus sharper." },
+  { at: 4320,     stage: "6 months",        body: "Risk of mouth, throat, oesophagus, liver cancer starting to drop measurably. Brain function continues improving. Decision-making clearer." },
+  { at: 8760,     stage: "1 year",          body: "Cardiovascular risk normalised in most people. Most addictive pathways quiet. Sleep, weight, mood, energy at new baseline. Major win." },
+];
+
+let __challengeTickerId = null;
+
+function ensureChallengeData() {
+  if (!data.challenges) data.challenges = { fasting: null, alcohol: null };
+  if (!data.challenges.fasting) data.challenges.fasting = { startedAt: null };
+  if (!data.challenges.alcohol) data.challenges.alcohol = { startedAt: null };
+}
+
+function hoursSince(iso) {
+  if (!iso) return 0;
+  return (Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60);
+}
+function formatFastClock(hoursElapsed) {
+  // Hh Mm — for short-term timers
+  const totalMin = Math.floor(hoursElapsed * 60);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return `${h}h ${String(m).padStart(2, "0")}m`;
+}
+function formatAlcoholClock(hoursElapsed) {
+  // Dd Hh Mm — for long-term streaks
+  const totalMin = Math.floor(hoursElapsed * 60);
+  const days = Math.floor(totalMin / (60 * 24));
+  const h = Math.floor((totalMin % (60 * 24)) / 60);
+  const m = totalMin % 60;
+  if (days > 0) return `${days}d ${h}h ${String(m).padStart(2, "0")}m`;
+  return `${h}h ${String(m).padStart(2, "0")}m`;
+}
+function currentStage(benefits, hoursElapsed) {
+  // The last milestone whose `at` is <= elapsed
+  let cur = benefits[0];
+  for (const b of benefits) {
+    if (b.at <= hoursElapsed) cur = b;
+    else break;
+  }
+  return cur;
+}
+function nextStage(benefits, hoursElapsed) {
+  return benefits.find(b => b.at > hoursElapsed) || null;
+}
+function pastStages(benefits, hoursElapsed) {
+  return benefits.filter(b => b.at <= hoursElapsed).slice(-3).reverse(); // last 3 hit, newest first
+}
+function formatBenefitHourLabel(at) {
+  if (at < 24) return `${at}h`;
+  const days = Math.round(at / 24);
+  return `${days}d`;
+}
+
+function renderChallenge() {
+  ensureChallengeData();
+  const root = document.getElementById("view-challenge");
+  if (!root) return;
+  const fast = data.challenges.fasting;
+  const alc = data.challenges.alcohol;
+  const fastH = hoursSince(fast.startedAt);
+  const alcH = hoursSince(alc.startedAt);
 
   root.innerHTML = `
-    <div class="session-header" style="margin-bottom: 12px;">
-      <button class="lift-back" id="word-back" aria-label="Back"><i class="ti ti-chevron-left"></i></button>
-      <div class="session-meta"><strong>Word of the day</strong><br/>${dateStr}</div>
-    </div>
-    <div class="word-detail-head">
-      <div class="spanish">${escapeHtml(word.spanish)}</div>
-      <div class="phonetic">${escapeHtml(word.phonetic || '—')}</div>
+    <div class="challenge-intro">
+      <div class="label">Challenges</div>
+      <h2>Build a streak</h2>
+      <p>Tap start. Your body changes by the hour.</p>
     </div>
 
-    <div class="word-detail-section">
-      <div class="label">English</div>
-      <input type="text" id="word-english" placeholder="e.g. dog" value="${escapeHtml(word.english || '')}" />
-    </div>
+    ${renderChallengeCard({
+      id: "fasting",
+      title: "Intermittent fasting",
+      sub: "Hour-by-hour body changes",
+      icon: "ti-hourglass",
+      active: !!fast.startedAt,
+      startedAt: fast.startedAt,
+      hours: fastH,
+      benefits: FASTING_BENEFITS,
+      formatClock: formatFastClock,
+      startLabel: "Start fast",
+      stopLabel: "End fast",
+    })}
 
-    <div class="word-detail-section">
-      <div class="label">Phonetic</div>
-      <input type="text" id="word-phonetic" placeholder="PEH-rroh" value="${escapeHtml(word.phonetic || '')}" />
-    </div>
-
-    <div class="word-detail-section">
-      <div class="label">In a sentence</div>
-      <textarea id="word-sentence" rows="2" placeholder="e.g. Tengo un perro grande.">${escapeHtml(word.sentence || '')}</textarea>
-    </div>
-
-    <button class="btn danger wide" id="word-delete" style="margin-top: 14px;">Delete word</button>
+    ${renderChallengeCard({
+      id: "alcohol",
+      title: "No alcohol",
+      sub: "Sober streak — recovery by the day",
+      icon: "ti-bottle-off",
+      active: !!alc.startedAt,
+      startedAt: alc.startedAt,
+      hours: alcH,
+      benefits: ALCOHOL_BENEFITS,
+      formatClock: formatAlcoholClock,
+      startLabel: "Start streak",
+      stopLabel: "Reset streak",
+    })}
   `;
 
-  document.getElementById("word-back").addEventListener("click", () => {
-    wordsState = { mode: 'list', wordId: null };
-    renderWords();
-  });
-
-  ['english', 'phonetic', 'sentence'].forEach(field => {
-    const el = document.getElementById(`word-${field}`);
-    el.addEventListener("change", () => {
-      word[field] = el.value.trim();
-      // If phonetic changed, update the heading too
-      if (field === 'phonetic') {
-        const ph = document.querySelector('.word-detail-head .phonetic');
-        if (ph) ph.textContent = word.phonetic || '—';
-      }
+  // Wire start / stop buttons
+  document.querySelectorAll(".challenge-start-btn[data-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      data.challenges[id].startedAt = new Date().toISOString();
       saveData();
+      renderChallenge();
+    });
+  });
+  document.querySelectorAll(".challenge-stop-btn[data-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      if (!confirm(id === "fasting" ? "End your fast?" : "Reset your no-alcohol streak?")) return;
+      data.challenges[id].startedAt = null;
+      saveData();
+      renderChallenge();
     });
   });
 
-  document.getElementById("word-delete").addEventListener("click", () => {
-    if (!confirm("Delete this word?")) return;
-    data.spanishWords = (data.spanishWords || []).filter(w => w.id !== word.id);
-    saveData();
-    wordsState = { mode: 'list', wordId: null };
-    renderWords();
-  });
+  // Run the live ticker only when this view is active
+  startChallengeTicker();
+}
+
+function renderChallengeCard(cfg) {
+  if (!cfg.active) {
+    return `
+      <div class="challenge-card">
+        <div class="challenge-head">
+          <div class="ico"><i class="ti ${cfg.icon}"></i></div>
+          <div class="meta">
+            <h3>${cfg.title}</h3>
+            <div class="sub">${cfg.sub}</div>
+          </div>
+        </div>
+        <button class="challenge-start-btn" data-id="${cfg.id}">
+          <i class="ti ti-player-play"></i> ${cfg.startLabel}
+        </button>
+        <div class="challenge-feed">
+          <div class="feed-cap">What to expect</div>
+          ${cfg.benefits.slice(0, 4).map(b => `
+            <div class="feed-row next">
+              <div class="h">${formatBenefitHourLabel(b.at)}</div>
+              <div class="b"><strong>${escapeHtml(b.stage)}</strong> — ${escapeHtml(b.body)}</div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+  const cur = currentStage(cfg.benefits, cfg.hours);
+  const next = nextStage(cfg.benefits, cfg.hours);
+  const past = pastStages(cfg.benefits, cfg.hours);
+  return `
+    <div class="challenge-card active">
+      <div class="challenge-head">
+        <div class="ico"><i class="ti ${cfg.icon}"></i></div>
+        <div class="meta">
+          <h3>${cfg.title}</h3>
+          <div class="sub">${cfg.sub}</div>
+        </div>
+      </div>
+      <div class="challenge-timer">
+        <div class="big" data-clock="${cfg.id}">${cfg.formatClock(cfg.hours)}</div>
+        <div class="label">elapsed</div>
+      </div>
+      <div class="challenge-now">
+        <div class="stage">${escapeHtml(cur.stage)}</div>
+        <div class="text">${escapeHtml(cur.body)}</div>
+      </div>
+      <div class="challenge-feed">
+        <div class="feed-cap">${next ? "What's next" : "Milestones"}</div>
+        ${next ? `
+          <div class="feed-row next">
+            <div class="h">${formatBenefitHourLabel(next.at)}</div>
+            <div class="b"><strong>${escapeHtml(next.stage)}</strong> — ${escapeHtml(next.body)}</div>
+          </div>` : ""}
+        ${past.map(b => `
+          <div class="feed-row past">
+            <div class="h">${formatBenefitHourLabel(b.at)}</div>
+            <div class="b"><strong>${escapeHtml(b.stage)}</strong> — ${escapeHtml(b.body)}</div>
+          </div>
+        `).join("")}
+      </div>
+      <button class="challenge-stop-btn" data-id="${cfg.id}">${cfg.stopLabel}</button>
+    </div>
+  `;
+}
+
+function startChallengeTicker() {
+  if (__challengeTickerId) return;
+  __challengeTickerId = setInterval(() => {
+    const view = document.getElementById("view-challenge");
+    if (!view || !view.classList.contains("active")) return;
+    // Lightweight tick: only update the live clock + check stage crossover
+    ensureChallengeData();
+    const fast = data.challenges.fasting;
+    const alc = data.challenges.alcohol;
+    if (fast.startedAt) {
+      const h = hoursSince(fast.startedAt);
+      const clockEl = document.querySelector('[data-clock="fasting"]');
+      if (clockEl) clockEl.textContent = formatFastClock(h);
+      // If we crossed into a new stage, re-render the whole card for fresh content
+      const card = document.querySelectorAll(".challenge-card.active")[0];
+      if (card && Math.floor(h * 60) % 60 === 0) renderChallenge();
+    }
+    if (alc.startedAt) {
+      const h = hoursSince(alc.startedAt);
+      const clockEl = document.querySelector('[data-clock="alcohol"]');
+      if (clockEl) clockEl.textContent = formatAlcoholClock(h);
+    }
+  }, 1000);
 }
 
 // ============ RENDER ============
@@ -4881,11 +5107,11 @@ function renderAll() {
   renderWeighCard();
   renderMonthProgress();
   renderProgress();
-  renderProgressView();
   renderWeight();
   renderHabitsEditor();
   renderLift();
-  renderWords();
+  renderAiden();
+  renderChallenge();
 }
 renderAll();
 showQuoteSplash(); // brief quote overlay on every app open
@@ -4909,6 +5135,22 @@ saveData = function () {
     setSyncStatus("syncing");
   }
 };
+
+// Flush the pending cloud push immediately when the app is being backgrounded.
+// Without this, a fresh workout entry could sit in localStorage but never reach
+// the cloud — and the next time you open on another device, pullFromCloud would
+// pull the older snapshot, looking like the data "didn't save".
+function flushCloudPushNow() {
+  if (!__authedUserId) return;
+  if (__cloudPushTimer) { clearTimeout(__cloudPushTimer); __cloudPushTimer = null; }
+  // Fire and forget — best-effort while the page is dying
+  try { pushToCloud(); } catch (e) {}
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") flushCloudPushNow();
+});
+window.addEventListener("pagehide", flushCloudPushNow);
+window.addEventListener("beforeunload", flushCloudPushNow);
 
 function setSyncStatus(state) {
   // Optional: update a sync pill if it exists in the DOM
@@ -4972,7 +5214,6 @@ async function pullFromCloud() {
       });
       if (rows.last_checkin_at) data.lastCheckin = rows.last_checkin_at;
       if (rows.shown_edu_tips) data.shownEduTips = rows.shown_edu_tips;
-      ensureSpanishMigration(); // ensure new Spanish-word feature works for older cloud data
       __origSaveData(); // save to localStorage without re-triggering push
       renderAll();
     } else {
