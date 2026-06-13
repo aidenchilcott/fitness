@@ -17,6 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js"></script>
 <title>AiDHDen</title>
 <style>
   :root {
@@ -363,16 +364,17 @@
     min-height: 0;
   }
   .habit-tile {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 14px;
+    display: flex; align-items: center; gap: 9px;
+    padding: 6px 12px;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 11px;
+    border-radius: 10px;
     cursor: pointer; user-select: none;
-    min-height: 38px;
+    min-height: 32px;
     flex: 1 1 0;
-    transition: background 0.15s;
+    transition: background 0.15s, transform 0.12s ease;
   }
+  .habit-tile:active { transform: scale(0.98); }
   .habit-tile.done {
     background: var(--accent-dim);
     border-color: rgba(16, 185, 129, 0.45);
@@ -1914,6 +1916,26 @@ function streakForHabit(habitId) {
   return n;
 }
 
+// Tiny confetti pop, fired from a specific element's centre.
+function popConfettiAt(el) {
+  if (typeof confetti !== "function" || !el) return;
+  const r = el.getBoundingClientRect();
+  const x = (r.left + r.width / 2) / window.innerWidth;
+  const y = (r.top + r.height / 2) / window.innerHeight;
+  try {
+    confetti({
+      particleCount: 28,
+      spread: 60,
+      startVelocity: 26,
+      scalar: 0.7,
+      ticks: 80,
+      origin: { x, y },
+      colors: ["#10b981", "#0b0b0f", "#d1fadf", "#ffffff"],
+      disableForReducedMotion: true,
+    });
+  } catch (e) {}
+}
+
 function renderToday() {
   const list = document.getElementById("habit-list");
   const today = getLog(todayKey());
@@ -1922,7 +1944,6 @@ function renderToday() {
   for (const cat of CATEGORIES) {
     const items = grouped[cat];
     if (items.length === 0) continue;
-    html += `<div class="group-heading-compact">${cat}</div>`;
     html += `<div class="habits-grid">`;
     html += items.map(h => {
       const done = !!today[h.id];
@@ -1942,9 +1963,11 @@ function renderToday() {
       const id = Number(el.dataset.id);
       const tk = todayKey();
       const log = getLog(tk);
-      const habit = data.habits.find(h => h.id === id);
-      if (log[id]) delete log[id]; else log[id] = true;
+      const wasDone = !!log[id];
+      if (wasDone) delete log[id]; else log[id] = true;
       if (Object.keys(log).length === 0) delete data.log[tk];
+      // Small confetti pop on the transition undone → done, originating from the tapped tile.
+      if (!wasDone) popConfettiAt(el);
       saveData(); renderAll();
     });
   });
