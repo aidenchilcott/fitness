@@ -4504,33 +4504,42 @@ let aidenState = { role: null, physioView: "list", physioInjuryId: null };
 function ensureAidenData() {
   if (!data.aidenChat) data.aidenChat = { chef: [], trainer: [], stretching: [] };
   if (!data.injuries) data.injuries = [];
-  if (typeof data.anthropicKey !== "string") data.anthropicKey = "";
+  if (typeof data.geminiKey !== "string") data.geminiKey = "";
+  // Migration: legacy field cleanup
+  if (typeof data.anthropicKey === "string") delete data.anthropicKey;
 }
 
-async function callClaude(systemPrompt, messages) {
+// Google Gemini call — browser-direct via the REST API. Free tier is plenty
+// for personal use (1500 requests/day on gemini-2.5-flash).
+async function callGemini(systemPrompt, messages) {
   ensureAidenData();
-  if (!data.anthropicKey) throw new Error("no-key");
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
+  if (!data.geminiKey) throw new Error("no-key");
+  const model = "gemini-2.5-flash";
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/"
+    + model + ":generateContent?key=" + encodeURIComponent(data.geminiKey);
+  // Convert our internal {role: "user"|"assistant", content} to Gemini's format
+  const contents = (messages || []).map(m => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
+  const body = {
+    systemInstruction: { parts: [{ text: systemPrompt }] },
+    contents,
+    generationConfig: { maxOutputTokens: 2048, temperature: 0.6 },
+  };
+  const res = await fetch(url, {
     method: "POST",
-    headers: {
-      "x-api-key": data.anthropicKey,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true",
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages,
-    }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
   if (!res.ok) {
     const errText = await res.text();
     throw new Error("api-error: " + errText);
   }
   const j = await res.json();
-  return (j.content || []).filter(c => c.type === "text").map(c => c.text).join("\n").trim();
+  const text = j?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("") || "";
+  if (!text) throw new Error("empty-response");
+  return text.trim();
 }
 
 // Light markdown → HTML (bold, bullets, headers, paragraphs). Forgiving.
@@ -4594,6 +4603,12 @@ function renderAidenHome(root) {
           </div>
         `).join("")}
       </div>
+      <div class="aiden-key-setup">
+        <div class="label">Google Gemini API Key</div>
+        <input type="password" id="aiden-key" placeholder="AIza..." value="${escapeHtml(data.geminiKey || "")}" autocomplete="off" />
+        <div class="help">Free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">aistudio.google.com/apikey</a> — sign in with Google, "Create API key", paste here. Free tier: 1500 calls/day. Stored only on this device.</div>
+        <button class="save-btn" id="aiden-key-save">${data.geminiKey ? "Update key" : "Save key"}</button>
+      </div>
     </div>
   `;
   root.querySelectorAll(".aiden-role-card").forEach(el => {
@@ -4604,12 +4619,18 @@ function renderAidenHome(root) {
       renderAiden();
     });
   });
+  document.getElementById("aiden-key-save").addEventListener("click", () => {
+    const v = document.getElementById("aiden-key").value.trim();
+    data.geminiKey = v;
+    saveData();
+    renderAiden();
+  });
 }
 
 function renderAidenChat(root, role) {
   const meta = AIDEN_ROLES.find(r => r.id === role);
   const history = data.aidenChat[role] || [];
-  const hasKey = !!data.anthropicKey;
+  const hasKey = !!data.geminiKey;
   root.innerHTML = `
     <div class="aiden-wrap">
       <div class="aiden-role-head">
@@ -4617,7 +4638,7 @@ function renderAidenChat(root, role) {
         <h2>${meta.name}</h2>
         ${history.length ? `<button class="clear-btn" id="ai-clear">Clear</button>` : ""}
       </div>
-      ${hasKey ? "" : `<div class="aiden-msg error">No Anthropic API key set. Go back and add one to enable ${meta.name}.</div>`}
+      ${hasKey ? "" : `<div class="aiden-msg error">No Gemini API key set. Go back and add one to enable ${meta.name}.</div>`}
       <div class="aiden-chat" id="aiden-chat">
         ${history.length === 0
           ? `<div class="aiden-empty">
@@ -4660,10 +4681,10 @@ function renderAidenChat(root, role) {
       const conv = data.aidenChat[role]
         .filter(m => !m.thinking)
         .map(m => ({ role: m.role, content: m.content }));
-      const reply = await callClaude(AIDEN_PROMPTS[role], conv);
+      const reply = await callGemini(AIDEN_PROMPTS[role], conv);
       data.aidenChat[role][thinkingIdx] = { role: "assistant", content: reply };
     } catch (e) {
-      data.aidenChat[role][thinkingIdx] = { role: "assistant", content: "Couldn't reach Claude: " + (e.message || e), error: true };
+      data.aidenChat[role][thinkingIdx] = { role: "assistant", content: "Couldn't reach Gemini: " + (e.message || e), error: true };
     }
     saveData(); renderAiden();
   };
@@ -4827,12 +4848,12 @@ function renderPhysioForm(root) {
     renderAiden();
     // Background: fetch the AI treatment plan
     try {
-      if (data.anthropicKey) {
+      if (data.geminiKey) {
         const summary = `Injury: ${name}. Area/muscle: ${muscleGroup || "unspecified"}. Pain type: ${painType || "unspecified"}. Intensity: ${initialPain}/10. Started: ${timeAgo(occurredAt)}.`;
-        const reply = await callClaude(AIDEN_PROMPTS.physio, [{ role: "user", content: summary }]);
+        const reply = await callGemini(AIDEN_PROMPTS.physio, [{ role: "user", content: summary }]);
         newInj.treatments = reply;
       } else {
-        newInj.treatments = "Add an Anthropic API key in the Ai-Den home to fetch a recovery plan.";
+        newInj.treatments = "Add a Gemini API key in the Ai-Den home to fetch a recovery plan.";
       }
     } catch (e) {
       newInj.treatments = "Couldn't fetch recovery plan: " + (e.message || e);
