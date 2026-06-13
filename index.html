@@ -1779,6 +1779,20 @@ function runMigrations() {
     if (data.habits.length !== before) dirty = true;
   }
 
+  // Move Creatine to the top of Nutrition (was at the bottom for older accounts).
+  if (Array.isArray(data.habits)) {
+    const creatineIdx = data.habits.findIndex(h => /^creatine$/i.test(h.name || ""));
+    const firstNutritionIdx = data.habits.findIndex(h => (h.cat || "") === "Nutrition");
+    if (creatineIdx !== -1 && firstNutritionIdx !== -1 && creatineIdx !== firstNutritionIdx) {
+      const [creatine] = data.habits.splice(creatineIdx, 1);
+      // Recompute first-nutrition position in case the splice shifted indexes.
+      const newFirstNutritionIdx = data.habits.findIndex(h => (h.cat || "") === "Nutrition");
+      const insertAt = newFirstNutritionIdx === -1 ? 0 : newFirstNutritionIdx;
+      data.habits.splice(insertAt, 0, creatine);
+      dirty = true;
+    }
+  }
+
   // Drop the Legs day (id 6).
   if (data.workouts && Array.isArray(data.workouts.days)) {
     const before = data.workouts.days.length;
