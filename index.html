@@ -333,25 +333,44 @@
   }
   .weigh-strip .strip-btn { padding: 6px 10px; font-size: 12px; }
 
+  /* Today view stretches to fill the viewport so habit tiles grow vertically
+     to use whatever space is available, instead of clustering at the top. */
+  #view-today.active {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 180px);
+  }
+  #view-today .weigh-strip { flex: 0 0 auto; }
+  #view-today #habit-list {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+  }
   /* Single-column compact habits list */
   .group-heading-compact {
     font-size: 12px; font-weight: 600;
     color: var(--text);
     margin: 14px 2px 6px;
+    flex: 0 0 auto;
   }
   .group-heading-compact:first-child { margin-top: 6px; }
   .habits-grid {
     display: flex; flex-direction: column;
-    gap: 3px;
+    gap: 5px;
+    flex: 1 1 0;
+    min-height: 0;
   }
   .habit-tile {
     display: flex; align-items: center; gap: 10px;
-    padding: 5px 12px;
+    padding: 8px 14px;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 9px;
+    border-radius: 11px;
     cursor: pointer; user-select: none;
-    min-height: 30px;
+    min-height: 38px;
+    flex: 1 1 0;
     transition: background 0.15s;
   }
   .habit-tile.done {
@@ -1779,16 +1798,18 @@ function runMigrations() {
     if (data.habits.length !== before) dirty = true;
   }
 
-  // Move Creatine to the top of Nutrition (was at the bottom for older accounts).
+  // Move Creatine to the top of the whole habits list (so it's first in Nutrition).
+  // Aggressive: any time Creatine isn't at index 0, fix it. Also force its category
+  // to "Nutrition" in case it drifted.
   if (Array.isArray(data.habits)) {
     const creatineIdx = data.habits.findIndex(h => /^creatine$/i.test(h.name || ""));
-    const firstNutritionIdx = data.habits.findIndex(h => (h.cat || "") === "Nutrition");
-    if (creatineIdx !== -1 && firstNutritionIdx !== -1 && creatineIdx !== firstNutritionIdx) {
+    if (creatineIdx > 0) {
       const [creatine] = data.habits.splice(creatineIdx, 1);
-      // Recompute first-nutrition position in case the splice shifted indexes.
-      const newFirstNutritionIdx = data.habits.findIndex(h => (h.cat || "") === "Nutrition");
-      const insertAt = newFirstNutritionIdx === -1 ? 0 : newFirstNutritionIdx;
-      data.habits.splice(insertAt, 0, creatine);
+      creatine.cat = "Nutrition";
+      data.habits.unshift(creatine);
+      dirty = true;
+    } else if (creatineIdx === 0 && data.habits[0].cat !== "Nutrition") {
+      data.habits[0].cat = "Nutrition";
       dirty = true;
     }
   }
