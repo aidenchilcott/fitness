@@ -473,12 +473,12 @@
   /* GIF card collapses to nothing if no asset is found — no placeholder text or icon. */
   .rest-overlay .rest-gif-card.empty { display: none; }
 
-  .rest-overlay .rest-section { margin-bottom: 22px; }
+  .rest-overlay .rest-section { margin-bottom: 18px; }
   .rest-overlay .rest-section-title {
     color: var(--muted);
-    font-size: 22px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.15em;
-    margin: 0 0 14px;
+    font-size: 13px; font-weight: 400;
+    letter-spacing: -0.01em;
+    margin: 0 0 8px;
   }
   /* "During lift" section is hidden until the first during-cue is scheduled to appear */
   .rest-overlay .rest-during-section {
@@ -1127,6 +1127,13 @@
   .day-picker-btn:active { transform: scale(0.99); }
   .day-picker-btn .name { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
   .day-picker-btn .meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  /* Done this week — green tint so it's obvious which sessions still need doing */
+  .day-picker-btn.done-week {
+    background: var(--accent-dim);
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+  .day-picker-btn.done-week .name { color: var(--accent); }
+  .day-picker-btn.done-week .meta { color: var(--accent); opacity: 0.8; }
 
   /* Focused exercise (session) view */
   .session-header { display: flex; align-items: center; gap: 10px; margin: 8px 0 12px; }
@@ -1741,10 +1748,10 @@ const DEFAULT_WORKOUTS = {
     { id: 106, name: "Cable lat pulldown" },
     { id: 107, name: "Seated cable row" },
     { id: 108, name: "Barbell bicep curl" },
-    { id: 109, name: "Dips" },
-    { id: 110, name: "Barbell curl" },
-    { id: 111, name: "Skullcrusher" },
-    { id: 112, name: "Hammer curl" },
+    { id: 109, name: "Seated barbell curl" },
+    { id: 110, name: "Skullcrusher" },
+    { id: 111, name: "Close-grip cable pulldown" },
+    { id: 112, name: "Single-arm bent-over cable extension" },
     { id: 113, name: "Incline dumbbell press" },
     { id: 114, name: "Seated Arnold press" },
     { id: 115, name: "Cable chest fly" },
@@ -1823,21 +1830,30 @@ function runMigrations() {
     if (data.workouts.days.length !== before) dirty = true;
   }
 
-  // Shoulders → Arms. Triggers on EITHER day name OR if exercise 109 is still
-  // the old overhead/shoulder press.
+  // Shoulders → Arms migration, plus refresh to the latest Arms lineup.
+  // Triggers if the day is still named Shoulders, OR if any of the 109–112 slots
+  // hold a deprecated exercise (overhead/shoulder/dips/barbell curl/hammer curl).
   if (data.workouts && Array.isArray(data.workouts.days)) {
     const armsDay = data.workouts.days.find(d => d.id === 3);
-    const ex109 = data.workouts.exercises && data.workouts.exercises.find(e => e.id === 109);
+    const exes = data.workouts.exercises || [];
+    const ex109 = exes.find(e => e.id === 109);
+    const ex110 = exes.find(e => e.id === 110);
+    const ex111 = exes.find(e => e.id === 111);
+    const ex112 = exes.find(e => e.id === 112);
     const dayNameLooksOld = armsDay && /shoulder/i.test(armsDay.name || "");
-    const exerciseLooksOld = ex109 && /overhead|shoulder/i.test(ex109.name || "");
-    if (armsDay && (dayNameLooksOld || exerciseLooksOld)) {
+    const slotsLookOld =
+      (ex109 && /(overhead|shoulder|^dips$|seated.*overhead)/i.test(ex109.name || "")) ||
+      (ex110 && /(lateral raise|barbell curl)/i.test(ex110.name || "")) ||
+      (ex111 && /(face pull|rope|standing.*raise)/i.test(ex111.name || "")) ||
+      (ex112 && /(hammer curl|cable lateral raise|single-arm.*lateral)/i.test(ex112.name || ""));
+    if (armsDay && (dayNameLooksOld || slotsLookOld)) {
       armsDay.name = "Arms";
       armsDay.exerciseIds = [109, 110, 111, 112];
       const newArmExercises = [
-        { id: 109, name: "Dips" },
-        { id: 110, name: "Barbell curl" },
-        { id: 111, name: "Skullcrusher" },
-        { id: 112, name: "Hammer curl" },
+        { id: 109, name: "Seated barbell curl" },
+        { id: 110, name: "Skullcrusher" },
+        { id: 111, name: "Close-grip cable pulldown" },
+        { id: 112, name: "Single-arm bent-over cable extension" },
       ];
       for (const ex of newArmExercises) {
         const existing = data.workouts.exercises.find(e => e.id === ex.id);
@@ -1941,11 +1957,11 @@ function renderToday() {
   const today = getLog(todayKey());
   const grouped = habitsByCat();
   let html = "";
-  for (const cat of CATEGORIES) {
-    const items = grouped[cat];
-    if (items.length === 0) continue;
+  // One unified grid so every tile is the same size regardless of category.
+  const allHabits = CATEGORIES.flatMap(cat => grouped[cat] || []);
+  if (allHabits.length > 0) {
     html += `<div class="habits-grid">`;
-    html += items.map(h => {
+    html += allHabits.map(h => {
       const done = !!today[h.id];
       return `
         <div class="habit-tile ${done ? "done" : ""}" data-id="${h.id}" title="${h.name}">
@@ -3923,6 +3939,27 @@ function renderLift() {
 
 function renderLiftList(root) {
   const days = data.workouts.days;
+  // Week starts on Monday at 00:00 local.
+  const weekStart = (() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    const dow = d.getDay();                           // 0 = Sun, 1 = Mon, …
+    const daysSinceMon = (dow + 6) % 7;               // Mon=0, Tue=1 … Sun=6
+    d.setDate(d.getDate() - daysSinceMon);
+    return d;
+  })();
+  const weekStartKey = localDateKey(weekStart);
+
+  const dayDoneThisWeek = (dayId) => {
+    if (!data.workouts.sessions) return false;
+    return data.workouts.sessions.some(s =>
+      s.dayId === dayId &&
+      s.date >= weekStartKey &&
+      Array.isArray(s.exercises) &&
+      s.exercises.some(e => Array.isArray(e.sets) && e.sets.some(set => Number(set.r) > 0))
+    );
+  };
+
   let html = `
     <div style="display: flex; justify-content: flex-end; align-items: center; margin: 4px 0 2px;">
       <button class="icon-btn" id="lift-edit-btn" aria-label="Edit workouts"><i class="ti ti-settings"></i></button>
@@ -3937,21 +3974,27 @@ function renderLiftList(root) {
       </div>
     `;
   } else {
-    html += `<p class="subtitle">Progressive Overload</p>`;
+    const doneCount = days.filter(d => dayDoneThisWeek(d.id)).length;
+    html += `<p class="subtitle">This week · ${doneCount} of ${days.length} done</p>`;
     html += days.map(d => {
       const last = lastSessionFor(d.id);
       const exCount = d.exerciseIds.length;
+      const doneThisWeek = dayDoneThisWeek(d.id);
       let meta;
       if (exCount === 0) meta = "No exercises — tap the gear to add some";
+      else if (doneThisWeek) meta = `${exCount} exercises · done this week`;
       else if (last) meta = `${exCount} exercises · last done ${formatRelativeDate(last.date)}`;
       else meta = `${exCount} exercises · never done`;
       return `
-        <button class="day-picker-btn" data-id="${d.id}"${exCount === 0 ? ' style="opacity:0.5;"' : ''}>
+        <button class="day-picker-btn ${doneThisWeek ? 'done-week' : ''}" data-id="${d.id}"${exCount === 0 ? ' style="opacity:0.5;"' : ''}>
           <div>
             <div class="name">${escapeHtml(d.name)}</div>
             <div class="meta">${meta}</div>
           </div>
-          <i class="ti ti-chevron-right" style="color: var(--muted); font-size: 22px;"></i>
+          ${doneThisWeek
+            ? `<i class="ti ti-circle-check" style="color: var(--accent); font-size: 24px;"></i>`
+            : `<i class="ti ti-chevron-right" style="color: var(--muted); font-size: 22px;"></i>`
+          }
         </button>
       `;
     }).join("");
@@ -5023,42 +5066,76 @@ function renderPhysioDetail(root) {
 
 // ============ CHALLENGE TAB (fasting + no alcohol) ============
 // Each milestone: { at: hours_since_start, stage, body }
+// Every single hour from 0–24 gets its own note. After 24h, daily milestones.
+// Each entry is a small evolution of the previous so progress feels continuous.
 const FASTING_BENEFITS = [
-  { at: 0,   stage: "Just started",      body: "Last meal is digesting. Insulin still elevated, blood glucose stable. Drink water." },
-  { at: 2,   stage: "Hour 2",            body: "Insulin starts dropping. Liver shifts focus from storing food to releasing energy from stores." },
-  { at: 4,   stage: "Hour 4",            body: "Food fully digested. Glycogen (stored carbs) becomes the primary fuel source." },
-  { at: 6,   stage: "Hour 6",            body: "Insulin near fasting baseline. Lipolysis begins — fat cells start releasing fatty acids into the blood." },
-  { at: 8,   stage: "Hour 8",            body: "Glycogen stores noticeably depleting. Fat oxidation ramps up. Hunger may peak around now and then pass." },
-  { at: 10,  stage: "Hour 10",           body: "Liver glycogen running low. Body shifts into fat-burning mode. Ketone production beginning." },
-  { at: 12,  stage: "Metabolic switch",  body: "Glycogen mostly depleted. Ketogenesis is now active — your brain starts using ketones for fuel alongside glucose." },
-  { at: 14,  stage: "Hour 14",           body: "Human Growth Hormone (HGH) starting to rise — preserves muscle, mobilises fat. Autophagy initiating: cells clean out damaged components." },
-  { at: 16,  stage: "Hour 16 — 16:8",    body: "Classic 16:8 finish line. Autophagy in full swing. HGH up 5×. Insulin sensitivity improving. Mental clarity often peaks here." },
-  { at: 18,  stage: "Hour 18",           body: "Deeper ketosis. Inflammation markers drop. Many people report sharper focus and stable energy without caffeine." },
-  { at: 20,  stage: "Hour 20",           body: "Stem cell production rising. Gut lining gets a break and starts repairing." },
-  { at: 24,  stage: "Hour 24 — full day",body: "Anti-inflammatory effects compound. BDNF (brain-derived neurotrophic factor) rising — protective for memory and learning. Glycogen fully depleted." },
-  { at: 30,  stage: "Hour 30",           body: "Deeper autophagy. Body is recycling old / damaged proteins more aggressively. This is the cellular cleanup window." },
-  { at: 36,  stage: "Hour 36",           body: "Ketone levels high. Significant reductions in oxidative stress. Mitochondrial repair active." },
-  { at: 42,  stage: "Hour 42",           body: "Insulin sensitivity reaches new highs. Some research suggests immune cell turnover starts here — old white blood cells recycled, new ones generated." },
-  { at: 48,  stage: "Hour 48 — 2 days",  body: "Peak autophagy window. Cellular regeneration in major organs. This is where the heavy maintenance happens. Drink electrolytes." },
-  { at: 60,  stage: "Hour 60",           body: "Deep ketosis. Body has fully adapted to fat-based fuel. Inflammation at multi-day lows." },
-  { at: 72,  stage: "Hour 72 — 3 days",  body: "Immune system 'reset' — Longo lab findings show full regeneration of immune cells. Stem cell production peaks. Break the fast slowly and carefully now." },
+  { at: 0,  stage: "Hour 0",  body: "Last meal is digesting. Insulin still elevated, blood glucose stable. Drink water — keep your stomach moving." },
+  { at: 1,  stage: "Hour 1",  body: "Stomach actively emptying. Digestive enzymes peaking. Carbs from the meal are being absorbed into the blood." },
+  { at: 2,  stage: "Hour 2",  body: "Insulin starting to drop. Liver shifts focus from storing food to releasing energy from stores." },
+  { at: 3,  stage: "Hour 3",  body: "Food has moved into the small intestine. Absorption window winding down. Blood sugar settling." },
+  { at: 4,  stage: "Hour 4",  body: "Food fully digested. Glycogen (stored carbs in liver + muscle) becomes the primary fuel source." },
+  { at: 5,  stage: "Hour 5",  body: "Insulin near fasting baseline. Fat cells begin releasing fatty acids — lipolysis is switching on." },
+  { at: 6,  stage: "Hour 6",  body: "Lipolysis ramping up. Fat oxidation visible in metabolism. Body's burning more fat than carbs now." },
+  { at: 7,  stage: "Hour 7",  body: "Liver glycogen depleting steadily. The body is in mixed-fuel mode, leaning toward fat." },
+  { at: 8,  stage: "Hour 8",  body: "Glycogen stores noticeably down. Fat oxidation accelerating. Hunger may peak around here and then pass." },
+  { at: 9,  stage: "Hour 9",  body: "First wave of growth hormone building. Ghrelin (hunger hormone) often peaks now — push through, it drops after." },
+  { at: 10, stage: "Hour 10", body: "Liver glycogen running low. Body shifts into fat-burning mode. Ketone production beginning." },
+  { at: 11, stage: "Hour 11", body: "Body still shifting into fat-burning mode. Ketone production now climbing. Brain starting to taste its first ketones." },
+  { at: 12, stage: "Hour 12", body: "Metabolic switch — ketogenesis is active. Your brain starts using ketones alongside glucose. This is the turning point." },
+  { at: 13, stage: "Hour 13", body: "Ketones rising further. Inflammation markers begin to drop. Energy stabilises — less of the post-meal slump." },
+  { at: 14, stage: "Hour 14", body: "Human Growth Hormone (HGH) rising sharply — preserves muscle, mobilises fat. Autophagy initiating: cells start cleaning out damaged components." },
+  { at: 15, stage: "Hour 15", body: "Insulin sensitivity improving. Many people report mental clarity sharpening here. HGH still climbing." },
+  { at: 16, stage: "Hour 16 — 16:8 finish", body: "Classic 16:8 milestone. Autophagy in full swing. HGH up ~5×. Mental clarity often peaks here." },
+  { at: 17, stage: "Hour 17", body: "Brain running cleanly on ketones. Energy stable, no carb-crash dips. Autophagy deepening." },
+  { at: 18, stage: "Hour 18", body: "Deeper ketosis. Inflammation markers continue to drop. Focus often described as 'quiet but sharp'." },
+  { at: 19, stage: "Hour 19", body: "Cortisol normalising after the early-fast spike. Body adapted — running smoothly on internal fuel." },
+  { at: 20, stage: "Hour 20", body: "Stem cell production starting to rise. Gut lining getting a break and beginning to repair." },
+  { at: 21, stage: "Hour 21", body: "BDNF (brain-derived neurotrophic factor) rising — protective for memory, learning, mood." },
+  { at: 22, stage: "Hour 22", body: "Glycogen near-fully depleted across all tissues. You are running almost entirely on fat + ketones." },
+  { at: 23, stage: "Hour 23", body: "Cellular cleanup intensifying. Old, damaged proteins being recycled at an accelerating pace." },
+  { at: 24, stage: "Hour 24 — full day", body: "Anti-inflammatory effects compound. BDNF still rising. Glycogen fully depleted. You've crossed the 24-hour line." },
+  { at: 30, stage: "Hour 30", body: "Deeper autophagy. Body recycling old proteins aggressively. This is the cellular cleanup window most people never reach." },
+  { at: 36, stage: "Hour 36", body: "Ketone levels high. Major drops in oxidative stress. Mitochondrial repair actively running." },
+  { at: 42, stage: "Hour 42", body: "Insulin sensitivity at new highs. Immune cell turnover beginning — old white blood cells recycled, new ones generated." },
+  { at: 48, stage: "Hour 48 — 2 days", body: "Peak autophagy window. Cellular regeneration in major organs. Drink electrolytes — sodium, potassium, magnesium." },
+  { at: 60, stage: "Hour 60", body: "Deep ketosis. Body fully adapted to fat-based fuel. Inflammation at multi-day lows." },
+  { at: 72, stage: "Hour 72 — 3 days", body: "Immune system 'reset' (Longo lab findings) — full regeneration of immune cells. Stem cell production peaks. Break the fast slowly and carefully now." },
 ];
 
+// Every hour for the first day, then daily milestones with smooth progression.
 const ALCOHOL_BENEFITS = [
-  { at: 1,        stage: "Hour 1",          body: "Liver begins processing remaining alcohol. Blood alcohol drops ~0.015% per hour." },
-  { at: 6,        stage: "Hour 6",          body: "Alcohol fully metabolised. Dehydration kicks in — drink water. REM sleep tonight will be deeper than usual." },
-  { at: 12,       stage: "Hour 12",         body: "Blood sugar stabilising. Cortisol normalising. Liver enzymes start to drop from acute load." },
-  { at: 24,       stage: "Day 1",           body: "Sleep quality already noticeably better. Hydration returning. Hunger and energy patterns start resetting." },
-  { at: 48,       stage: "Day 2",           body: "Withdrawal symptoms (if any) usually peak by now. Liver detoxification at full speed. Brain neurotransmitters beginning to rebalance." },
-  { at: 72,       stage: "Day 3",           body: "Cravings starting to fade. Skin looks brighter — alcohol-driven inflammation drops fast. Energy more even through the day." },
-  { at: 168,      stage: "Week 1",          body: "REM sleep significantly improved. Liver fat already reducing. Blood pressure trending down. Mood swings settling." },
-  { at: 336,      stage: "Week 2",          body: "Visible skin clarity. Average weight loss of 1–2 kg from cutting empty calories. Mental clarity sharper. Liver enzymes near normal." },
-  { at: 504,      stage: "Week 3",          body: "Sleep architecture (deep + REM) fully restored. Anxiety dropping. Workouts feel easier — recovery markedly better." },
-  { at: 720,      stage: "Day 30",          body: "Liver fat down ~15–20%. Blood pressure normalised. Immune function stronger. Risk of heart disease starts measurably falling." },
-  { at: 1440,     stage: "Day 60",          body: "Sustained weight loss + body composition shifts. Hormonal balance (testosterone, cortisol) much improved. Resting heart rate lower." },
-  { at: 2160,     stage: "Day 90",          body: "Liver enzymes fully normalised in most people. Mental clarity peaks. Significantly reduced inflammation across the body. Memory and focus sharper." },
-  { at: 4320,     stage: "6 months",        body: "Risk of mouth, throat, oesophagus, liver cancer starting to drop measurably. Brain function continues improving. Decision-making clearer." },
-  { at: 8760,     stage: "1 year",          body: "Cardiovascular risk normalised in most people. Most addictive pathways quiet. Sleep, weight, mood, energy at new baseline. Major win." },
+  { at: 0,    stage: "Hour 0",   body: "Streak started. Liver beginning to process whatever's left in your system. The clock starts now." },
+  { at: 1,    stage: "Hour 1",   body: "Liver actively breaking down alcohol. Blood alcohol drops ~0.015% per hour. Brain still mildly affected." },
+  { at: 2,    stage: "Hour 2",   body: "First wave of hydration loss showing. Drink water now — sets you up for a better tomorrow." },
+  { at: 3,    stage: "Hour 3",   body: "Alcohol-driven inflammation still elevated. Liver enzymes working hard. Sleep quality tonight already on track to be better than usual." },
+  { at: 4,    stage: "Hour 4",   body: "Acetaldehyde (the toxic byproduct) clearing from your tissues. Headache risk dropping if you're hydrating." },
+  { at: 6,    stage: "Hour 6",   body: "Alcohol fully metabolised in most people. Dehydration peaks around here — keep water going." },
+  { at: 8,    stage: "Hour 8",   body: "Liver finally off emergency duty. REM sleep tonight will be noticeably deeper than after a drinking night." },
+  { at: 10,   stage: "Hour 10",  body: "Blood sugar evening out. Cortisol normalising. Brain neurotransmitters starting to rebalance." },
+  { at: 12,   stage: "Hour 12",  body: "Liver enzymes dropping from the acute load. You're past the worst of any next-day grogginess." },
+  { at: 16,   stage: "Hour 16",  body: "Body well-hydrated again if you've kept water up. Mental clarity returning. Inflammation cooling." },
+  { at: 20,   stage: "Hour 20",  body: "Most physical signs of alcohol's last impact gone. Energy patterns through the day evening out." },
+  { at: 24,   stage: "Day 1",    body: "Sleep quality already noticeably better. Hydration restored. Hunger and energy patterns resetting." },
+  { at: 36,   stage: "Day 1.5",  body: "REM and deep sleep continuing to improve. Inflammation continues falling. Mood often steadier." },
+  { at: 48,   stage: "Day 2",    body: "Withdrawal symptoms (if any) usually peak by now and start subsiding. Liver detoxification at full speed." },
+  { at: 60,   stage: "Day 2.5",  body: "Brain neurotransmitters rebalancing further. Anxiety often easing." },
+  { at: 72,   stage: "Day 3",    body: "Cravings starting to fade. Skin looks brighter — alcohol-driven inflammation drops fast. Energy more even." },
+  { at: 96,   stage: "Day 4",    body: "Sleep architecture continuing to restore. Workouts feel easier. Liver enzymes dropping further." },
+  { at: 120,  stage: "Day 5",    body: "Mental clarity sharper. Reaction time and focus improving. Many people notice better gym recovery." },
+  { at: 144,  stage: "Day 6",    body: "Inflammation across the body still trending down. Hormonal balance stabilising." },
+  { at: 168,  stage: "Week 1",   body: "REM sleep significantly improved. Liver fat already reducing. Blood pressure trending down. Mood swings settling." },
+  { at: 240,  stage: "Day 10",   body: "Body composition shifts beginning — water weight + empty-calorie loss showing on the scale." },
+  { at: 336,  stage: "Week 2",   body: "Visible skin clarity. Average weight loss of 1–2 kg from cutting empty calories. Liver enzymes near normal." },
+  { at: 504,  stage: "Week 3",   body: "Sleep architecture (deep + REM) fully restored. Anxiety dropping. Workouts feel easier — recovery markedly better." },
+  { at: 720,  stage: "Day 30",   body: "Liver fat down ~15–20%. Blood pressure normalised. Immune function stronger. Heart disease risk starts measurably falling." },
+  { at: 1080, stage: "Day 45",   body: "Body composition shifts continuing. Resting heart rate often lower. Hormonal balance improving further." },
+  { at: 1440, stage: "Day 60",   body: "Sustained weight loss + body comp shifts. Hormonal balance (testosterone, cortisol) much improved." },
+  { at: 1800, stage: "Day 75",   body: "Mental clarity and decision-making continuing to sharpen. Energy levels far more consistent across the day." },
+  { at: 2160, stage: "Day 90",   body: "Liver enzymes fully normalised in most people. Mental clarity peaks. Significantly reduced systemic inflammation." },
+  { at: 2880, stage: "Day 120",  body: "Brain structure changes starting to consolidate. Long-term memory and emotional regulation improving." },
+  { at: 4320, stage: "6 months", body: "Risk of mouth, throat, oesophagus, liver cancer starting to drop measurably. Brain function continues improving." },
+  { at: 6480, stage: "9 months", body: "Most reversible damage now reversed. Self-image, identity around alcohol shifting. New baseline locked in." },
+  { at: 8760, stage: "1 year",   body: "Cardiovascular risk normalised in most people. Most addictive pathways quiet. Sleep, weight, mood, energy at a new baseline. Major win." },
 ];
 
 let __challengeTickerId = null;
@@ -5192,21 +5269,14 @@ function renderChallengeCard(cfg) {
         <button class="challenge-start-btn" data-id="${cfg.id}">
           <i class="ti ti-player-play"></i> ${cfg.startLabel}
         </button>
-        <div class="challenge-feed">
-          <div class="feed-cap">What to expect</div>
-          ${cfg.benefits.slice(0, 4).map(b => `
-            <div class="feed-row next">
-              <div class="h">${formatBenefitHourLabel(b.at)}</div>
-              <div class="b"><strong>${escapeHtml(b.stage)}</strong> — ${escapeHtml(b.body)}</div>
-            </div>
-          `).join("")}
-        </div>
       </div>
     `;
   }
   const cur = currentStage(cfg.benefits, cfg.hours);
-  const next = nextStage(cfg.benefits, cfg.hours);
-  const past = pastStages(cfg.benefits, cfg.hours);
+  // Show only milestones already reached — never spoil what's coming.
+  // Newest at the top, most recent ones (last 6) included.
+  const reached = cfg.benefits.filter(b => b.at <= cfg.hours);
+  const past = reached.slice(-6).reverse(); // newest first, max 6
   return `
     <div class="challenge-card active">
       <div class="challenge-head">
@@ -5225,13 +5295,8 @@ function renderChallengeCard(cfg) {
         <div class="text">${escapeHtml(cur.body)}</div>
       </div>
       <div class="challenge-feed">
-        <div class="feed-cap">${next ? "What's next" : "Milestones"}</div>
-        ${next ? `
-          <div class="feed-row next">
-            <div class="h">${formatBenefitHourLabel(next.at)}</div>
-            <div class="b"><strong>${escapeHtml(next.stage)}</strong> — ${escapeHtml(next.body)}</div>
-          </div>` : ""}
-        ${past.map(b => `
+        <div class="feed-cap">Milestones reached</div>
+        ${past.slice(1).map(b => `
           <div class="feed-row past">
             <div class="h">${formatBenefitHourLabel(b.at)}</div>
             <div class="b"><strong>${escapeHtml(b.stage)}</strong> — ${escapeHtml(b.body)}</div>
