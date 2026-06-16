@@ -473,6 +473,21 @@
   /* GIF card collapses to nothing if no asset is found — no placeholder text or icon. */
   .rest-overlay .rest-gif-card.empty { display: none; }
 
+  /* Reps + cadence target — sits above the section headers as the primary cue */
+  .rest-overlay .rest-targets {
+    background: var(--accent-dim);
+    border: 1px solid rgba(16, 185, 129, 0.45);
+    color: var(--accent);
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .rest-overlay .rest-targets:empty { display: none; }
+
   .rest-overlay .rest-section { margin-bottom: 18px; }
   .rest-overlay .rest-section-title {
     color: var(--muted);
@@ -1114,6 +1129,131 @@
     margin-bottom: 12px;
   }
 
+  /* Weigh-in: 7d / 30d toggle */
+  .weight-range-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 18px;
+  }
+  .weight-range-row h2 { margin: 0; }
+  .range-toggle {
+    display: flex; gap: 2px;
+    background: var(--card-2); border-radius: 999px;
+    padding: 3px;
+  }
+  .range-btn {
+    background: transparent; border: 0;
+    padding: 6px 14px; border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+    color: var(--muted);
+    cursor: pointer; font-family: inherit;
+    transition: background 0.15s, color 0.15s;
+  }
+  .range-btn.active {
+    background: var(--card);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  /* Warm-up tile — matches .day-picker-btn shape, subtle green accent */
+  .day-picker-btn.warmup-tile {
+    background: var(--accent-dim);
+    border-color: rgba(16, 185, 129, 0.35);
+  }
+  .day-picker-btn.warmup-tile .name { color: var(--accent); }
+
+  /* Warm-up screen (replaces the Lift list while running) */
+  .warmup-screen {
+    display: flex; flex-direction: column;
+    min-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 140px);
+    padding: 8px 0;
+  }
+  .warmup-screen.rest .warmup-body { background: var(--card-2); }
+  .warmup-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 0 14px;
+  }
+  .warmup-back {
+    background: var(--card-2); border: 1px solid var(--border);
+    border-radius: 10px; width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text); font-size: 18px; cursor: pointer;
+  }
+  .warmup-segidx {
+    font-size: 12px; color: var(--muted); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .warmup-body {
+    flex: 1 1 auto;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 28px 22px;
+    display: flex; flex-direction: column;
+    text-align: center;
+  }
+  .warmup-label {
+    font-size: 12px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.14em;
+    font-weight: 600; margin-bottom: 10px;
+  }
+  .warmup-name {
+    font-size: 28px; font-weight: 800;
+    letter-spacing: -0.02em; line-height: 1.1;
+    margin-bottom: 24px;
+  }
+  .warmup-clock {
+    font-size: 92px; font-weight: 800;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+  .warmup-screen.rest .warmup-clock { color: var(--accent); }
+  .warmup-track {
+    width: 100%; height: 6px;
+    background: var(--border); border-radius: 3px;
+    margin-bottom: auto;
+    overflow: hidden;
+  }
+  .warmup-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.25s linear;
+  }
+  .warmup-next {
+    margin-top: 28px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .warmup-next-label {
+    font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.14em;
+    font-weight: 600; margin-bottom: 4px;
+  }
+  .warmup-next-name {
+    font-size: 14px; color: var(--ink-2, var(--muted));
+    font-weight: 500;
+  }
+  .warmup-skip {
+    margin-top: 14px;
+    background: transparent; border: 0;
+    color: var(--muted); font-size: 13px; font-weight: 500;
+    cursor: pointer; padding: 10px;
+    font-family: inherit;
+  }
+
+  /* Warm-up complete screen */
+  .warmup-screen.complete { justify-content: center; align-items: center; }
+  .warmup-complete { text-align: center; padding: 40px 20px; }
+  .warmup-cta {
+    background: var(--accent); color: white; border: 0;
+    padding: 14px 30px; border-radius: 999px;
+    font-weight: 700; font-size: 15px;
+    cursor: pointer; font-family: inherit;
+  }
+
   /* Day picker (Lift list) */
   .day-picker-btn {
     display: flex; align-items: center; justify-content: space-between;
@@ -1525,7 +1665,13 @@
       <button class="mc-edit" id="mp-lg-edit">Edit goal</button>
     </div>
 
-    <h2>Last 30 days</h2>
+    <div class="weight-range-row">
+      <h2 id="weight-range-title">Last 30 days</h2>
+      <div class="range-toggle" id="weight-range-toggle" role="tablist">
+        <button class="range-btn" data-range="7">7d</button>
+        <button class="range-btn active" data-range="30">30d</button>
+      </div>
+    </div>
     <div class="card pad">
       <div id="weight-chart"></div>
     </div>
@@ -1668,6 +1814,8 @@
       <div class="rest-gif-card" id="rest-gif-card">
         <img class="rest-gif" id="rest-gif" alt="" style="display:none;" />
       </div>
+
+      <div class="rest-targets" id="rest-targets"></div>
 
       <div class="rest-section">
         <div class="rest-section-title">Before you start</div>
@@ -2490,24 +2638,27 @@ function renderWeighCard() {
   }
 }
 
+let __weightRangeDays = 30;
 function renderWeightChart() {
   const wrap = document.getElementById("weight-chart");
-  const cutoffDate = dateNDaysAgo(29);
+  const N = __weightRangeDays;            // 7 or 30
+  const lastIdx = N - 1;                  // 0..lastIdx
+  const cutoffDate = dateNDaysAgo(lastIdx);
   const entries = data.weights
     .filter(w => w.when.slice(0, 10) >= cutoffDate)
     .slice()
     .sort((a, b) => a.when.localeCompare(b.when));
 
   if (entries.length === 0) {
-    wrap.innerHTML = `<div class="muted" style="text-align:center; padding: 16px 0;">No weight entries in the last 30 days. Log one above to start the chart.</div>`;
+    wrap.innerHTML = `<div class="muted" style="text-align:center; padding: 16px 0;">No weight entries in the last ${N} days. Log one above to start the chart.</div>`;
     return;
   }
 
-  // Build day index (0..29) for each entry
+  // Build day index (0..lastIdx) for each entry
   const dayIndex = iso => {
     const today = new Date(); today.setHours(0,0,0,0);
     const d = new Date(iso); d.setHours(0,0,0,0);
-    return 29 - Math.round((today - d) / (24 * 3600 * 1000));
+    return lastIdx - Math.round((today - d) / (24 * 3600 * 1000));
   };
 
   const pts = entries.map(e => ({ i: dayIndex(e.when), kg: e.kg }));
@@ -2519,7 +2670,7 @@ function renderWeightChart() {
   const yMax = max + pad;
 
   const W = 320, H = 150, padX = 24, padY = 24;
-  const xFor = i => padX + (i / 29) * (W - 2 * padX);
+  const xFor = i => padX + (i / lastIdx) * (W - 2 * padX);
   const yFor = kg => H - padY - ((kg - yMin) / Math.max(yMax - yMin, 0.001)) * (H - 2 * padY);
 
   // Convert data points to screen coordinates
@@ -2563,7 +2714,7 @@ function renderWeightChart() {
       <text x="${padX - 4}" y="${yFor(min).toFixed(1) + 3}" font-size="9" fill="var(--muted)" text-anchor="end">${min.toFixed(1)}</text>
     </svg>
     <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px; padding: 0 4px;">
-      <span>30 days ago</span>
+      <span>${N} days ago</span>
       <span style="color: ${diffColor}; font-weight: 600;">${diffSign}${totalDiff} kg over period</span>
       <span>Today</span>
     </div>
@@ -2571,6 +2722,30 @@ function renderWeightChart() {
 }
 
 function renderWeight() {
+  // Wire the 7d / 30d toggle (only needs setup once but cheap to re-run)
+  const toggle = document.getElementById("weight-range-toggle");
+  if (toggle && !toggle.dataset.wired) {
+    toggle.dataset.wired = "1";
+    toggle.querySelectorAll(".range-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const days = Number(btn.dataset.range);
+        if (!days) return;
+        __weightRangeDays = days;
+        toggle.querySelectorAll(".range-btn").forEach(b => b.classList.toggle("active", b === btn));
+        const title = document.getElementById("weight-range-title");
+        if (title) title.textContent = `Last ${days} days`;
+        renderWeightChart();
+      });
+    });
+  }
+  // Sync active button state with the current range
+  if (toggle) {
+    toggle.querySelectorAll(".range-btn").forEach(b => {
+      b.classList.toggle("active", Number(b.dataset.range) === __weightRangeDays);
+    });
+  }
+  const title = document.getElementById("weight-range-title");
+  if (title) title.textContent = `Last ${__weightRangeDays} days`;
   renderWeightChart();
   const ul = document.getElementById("weight-list");
   if (data.weights.length === 0) {
@@ -3651,23 +3826,24 @@ function showRestOverlay(state) {
   const beforeEl = document.getElementById("rest-cues-before");
   const duringEl = document.getElementById("rest-cues-during");
   const duringSection = document.getElementById("rest-during-section");
+  const targetsEl = document.getElementById("rest-targets");
   beforeEl.innerHTML = "";
   duringEl.innerHTML = "";
   // "During lift" section is hidden until the before-cues have shown.
   duringSection.classList.remove("revealed");
 
-  // First cue is always reps + cadence — appears immediately so you know your target.
-  const targetsText = getTargetsForExercise(state.exerciseName);
+  // Reps + cadence cue sits above the section headers, always visible from t=0.
+  if (targetsEl) targetsEl.textContent = getTargetsForExercise(state.exerciseName);
+
   const cues = [
-    { text: targetsText,       at: 0,  container: beforeEl, type: "before", emphasis: true },
-    { text: cueSet.before[0],  at: 3,  container: beforeEl, type: "before" },
-    { text: cueSet.before[1],  at: 8,  container: beforeEl, type: "before" },
+    { text: cueSet.before[0],  at: 0,  container: beforeEl, type: "before" },
+    { text: cueSet.before[1],  at: 5,  container: beforeEl, type: "before" },
     { text: cueSet.during[0],  at: 20, container: duringEl, type: "during" },
     { text: cueSet.during[1],  at: 30, container: duringEl, type: "during" },
   ];
   cues.forEach(c => {
     const el = document.createElement("div");
-    el.className = "rest-cue" + (c.emphasis ? " emphasis" : "");
+    el.className = "rest-cue";
     el.textContent = c.text;
     c.container.appendChild(el);
     c.el = el;
@@ -3898,6 +4074,27 @@ function lastSessionFor(dayId, beforeDate = null) {
     .filter(s => s.dayId === dayId && (!beforeDate || s.date < beforeDate))
     .sort((a, b) => b.date.localeCompare(a.date))[0] || null;
 }
+// A session counts as "done" only when every exercise in the day has at least 4
+// sets logged with reps > 0. Partial sessions don't update the "last done" date.
+function isSessionComplete(session) {
+  if (!session) return false;
+  const day = data.workouts.days.find(d => d.id === session.dayId);
+  if (!day) return false;
+  const minSets = 4;
+  for (const exId of day.exerciseIds) {
+    const ex = (session.exercises || []).find(e => e.exerciseId === exId);
+    if (!ex) return false;
+    const goodSets = (ex.sets || []).filter(s => Number(s.r) > 0).length;
+    if (goodSets < minSets) return false;
+  }
+  return true;
+}
+function lastCompleteSessionFor(dayId, beforeDate = null) {
+  return data.workouts.sessions
+    .filter(s => s.dayId === dayId && (!beforeDate || s.date < beforeDate))
+    .filter(isSessionComplete)
+    .sort((a, b) => b.date.localeCompare(a.date))[0] || null;
+}
 function lastSetsForExercise(exerciseId, beforeDate = todayKey()) {
   const sessions = data.workouts.sessions
     .filter(s => s.date < beforeDate)
@@ -3933,7 +4130,144 @@ function renderLift() {
     case 'edit':     renderLiftEdit(root); break;
     case 'session':  renderLiftSession(root, liftState.dayId, liftState.exIdx); break;
     case 'complete': renderLiftComplete(root, liftState.dayId); break;
+    case 'warmup':   renderLiftWarmup(root); break;
     default:         renderLiftList(root);
+  }
+}
+
+// ============ WARM-UP ROUTINE ============
+// Same warm-up every day: 2 rounds of (push-ups → curls → overhead swings) with
+// 20s rest between each. Shoulders get 2:10, the others 2:00.
+const WARMUP_SEGMENTS = (() => {
+  const W = 120;   // push-ups + curls
+  const S = 130;   // overhead swings
+  const R = 20;    // rest
+  const round = [
+    { name: "Push-ups (×50)",                     duration: W },
+    { name: "Rest",                               duration: R, isRest: true },
+    { name: "Barbell bicep curls (×50)",          duration: W },
+    { name: "Rest",                               duration: R, isRest: true },
+    { name: "Overhead barbell swings (×50)",      duration: S },
+  ];
+  // Two rounds, with a 20s rest between the rounds but NOT after the final segment.
+  return [...round,
+          { name: "Rest", duration: R, isRest: true },
+          ...round];
+})();
+function warmupTotalSeconds() {
+  return WARMUP_SEGMENTS.reduce((sum, s) => sum + s.duration, 0);
+}
+
+function startWarmup() {
+  liftState = { mode: 'warmup', startedAt: Date.now() };
+  renderLift();
+}
+
+let __warmupTickerId = null;
+function clearWarmupTicker() {
+  if (__warmupTickerId) clearInterval(__warmupTickerId);
+  __warmupTickerId = null;
+}
+
+function renderLiftWarmup(root) {
+  clearWarmupTicker();
+  const total = warmupTotalSeconds();
+  const elapsed = Math.max(0, (Date.now() - (liftState.startedAt || Date.now())) / 1000);
+
+  // Find current segment + how far into it
+  let acc = 0;
+  let segIdx = 0;
+  let intoSeg = 0;
+  for (let i = 0; i < WARMUP_SEGMENTS.length; i++) {
+    const seg = WARMUP_SEGMENTS[i];
+    if (elapsed < acc + seg.duration) {
+      segIdx = i;
+      intoSeg = elapsed - acc;
+      break;
+    }
+    acc += seg.duration;
+    if (i === WARMUP_SEGMENTS.length - 1) {
+      // Past the last segment — complete
+      segIdx = WARMUP_SEGMENTS.length;
+    }
+  }
+
+  if (segIdx >= WARMUP_SEGMENTS.length) {
+    // Done — show complete screen
+    root.innerHTML = `
+      <div class="warmup-screen complete">
+        <div class="warmup-complete">
+          <i class="ti ti-circle-check" style="font-size: 56px; color: var(--accent);"></i>
+          <h1 style="margin: 12px 0 4px;">Complete</h1>
+          <p style="color: var(--muted); margin: 0 0 24px;">Warm-up done. Time to lift.</p>
+          <button class="warmup-cta" id="warmup-finish">Back to lifts</button>
+        </div>
+      </div>
+    `;
+    document.getElementById("warmup-finish").addEventListener("click", () => {
+      liftState = { mode: 'list' }; renderLift();
+    });
+    return;
+  }
+
+  const cur = WARMUP_SEGMENTS[segIdx];
+  const remaining = Math.max(0, cur.duration - intoSeg);
+  const next = WARMUP_SEGMENTS[segIdx + 1] || null;
+  const mins = Math.floor(remaining / 60);
+  const secs = Math.floor(remaining % 60);
+  const clockText = `${mins}:${String(secs).padStart(2, "0")}`;
+  const progressFrac = 1 - (remaining / cur.duration);
+
+  root.innerHTML = `
+    <div class="warmup-screen ${cur.isRest ? 'rest' : 'work'}">
+      <div class="warmup-head">
+        <button class="warmup-back" id="warmup-quit" aria-label="Quit warm-up"><i class="ti ti-x"></i></button>
+        <div class="warmup-segidx">${segIdx + 1} of ${WARMUP_SEGMENTS.length}</div>
+      </div>
+
+      <div class="warmup-body">
+        <div class="warmup-label">${cur.isRest ? "Rest" : "Now"}</div>
+        <div class="warmup-name">${cur.name}</div>
+        <div class="warmup-clock">${clockText}</div>
+
+        <div class="warmup-track">
+          <div class="warmup-fill" style="width: ${(progressFrac * 100).toFixed(2)}%;"></div>
+        </div>
+
+        ${next ? `
+          <div class="warmup-next">
+            <div class="warmup-next-label">Up next</div>
+            <div class="warmup-next-name">${next.name}${next.isRest ? "" : ` · ${Math.round(next.duration/60 * 10)/10}m`}</div>
+          </div>
+        ` : `<div class="warmup-next"><div class="warmup-next-label">Last one</div><div class="warmup-next-name">Then you're done</div></div>`}
+      </div>
+
+      <button class="warmup-skip" id="warmup-skip">Skip segment</button>
+    </div>
+  `;
+
+  document.getElementById("warmup-quit").addEventListener("click", () => {
+    if (!confirm("Quit warm-up?")) return;
+    clearWarmupTicker();
+    liftState = { mode: 'list' };
+    renderLift();
+  });
+  document.getElementById("warmup-skip").addEventListener("click", () => {
+    // Jump to next segment by shifting startedAt forward
+    const skippedRemaining = remaining;
+    liftState.startedAt = (liftState.startedAt || Date.now()) - skippedRemaining * 1000;
+    renderLift();
+  });
+
+  // Tick once per second to refresh the clock + fill + check segment crossover
+  __warmupTickerId = setInterval(() => {
+    if (liftState.mode !== 'warmup') { clearWarmupTicker(); return; }
+    renderLiftWarmup(root);
+  }, 250);
+
+  // Alert when segment ends
+  if (Math.ceil(remaining) <= 1 && !cur.isRest) {
+    try { navigator.vibrate && navigator.vibrate([100, 60, 100]); } catch (e) {}
   }
 }
 
@@ -3953,10 +4287,7 @@ function renderLiftList(root) {
   const dayDoneThisWeek = (dayId) => {
     if (!data.workouts.sessions) return false;
     return data.workouts.sessions.some(s =>
-      s.dayId === dayId &&
-      s.date >= weekStartKey &&
-      Array.isArray(s.exercises) &&
-      s.exercises.some(e => Array.isArray(e.sets) && e.sets.some(set => Number(set.r) > 0))
+      s.dayId === dayId && s.date >= weekStartKey && isSessionComplete(s)
     );
   };
 
@@ -3976,8 +4307,18 @@ function renderLiftList(root) {
   } else {
     const doneCount = days.filter(d => dayDoneThisWeek(d.id)).length;
     html += `<p class="subtitle">This week · ${doneCount} of ${days.length} done</p>`;
+    // Warm-up tile — same shape + size as the day pickers
+    html += `
+      <button class="day-picker-btn warmup-tile" id="lift-warmup-btn">
+        <div>
+          <div class="name">Warm up</div>
+          <div class="meta">14 min · 3 exercises × 2 rounds</div>
+        </div>
+        <i class="ti ti-flame" style="color: var(--accent); font-size: 24px;"></i>
+      </button>
+    `;
     html += days.map(d => {
-      const last = lastSessionFor(d.id);
+      const last = lastCompleteSessionFor(d.id);
       const exCount = d.exerciseIds.length;
       const doneThisWeek = dayDoneThisWeek(d.id);
       let meta;
@@ -4000,6 +4341,7 @@ function renderLiftList(root) {
     }).join("");
   }
   root.innerHTML = html;
+  document.getElementById("lift-warmup-btn").addEventListener("click", startWarmup);
   document.getElementById("lift-edit-btn").addEventListener("click", () => {
     liftState = { mode: 'edit' }; renderLift(); window.scrollTo({ top: 0 });
   });
