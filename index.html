@@ -28,16 +28,22 @@
     --muted: #8a8a8e;
     --accent: #10b981;
     --accent-dim: rgba(16, 185, 129, 0.12);
+    --accent-faint: rgba(16, 185, 129, 0.04);
     --accent-2: #2563eb;
     --danger: #dc2626;
     --border: #e5e5ea;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
+    /* Reusable subtle accent gradient — the "challenge card" look applied softly
+       across the app. Cards: top-tinted fading into white. Page: barely tinted. */
+    --surface-grad: linear-gradient(180deg, var(--accent-dim) 0%, var(--card) 60%);
+    --page-grad:    linear-gradient(180deg, var(--accent-faint) 0%, var(--bg) 380px);
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
     margin: 0;
-    background: var(--bg);
+    background: var(--page-grad);
+    background-attachment: fixed;
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", system-ui, sans-serif;
     font-size: 16px;
@@ -376,7 +382,7 @@
   }
   .habit-tile:active { transform: scale(0.98); }
   .habit-tile.done {
-    background: var(--accent-dim);
+    background: var(--surface-grad);
     border-color: rgba(16, 185, 129, 0.45);
   }
   .habit-tile .habit-icon {
@@ -475,7 +481,7 @@
 
   /* Reps + cadence target — sits above the section headers as the primary cue */
   .rest-overlay .rest-targets {
-    background: var(--accent-dim);
+    background: var(--surface-grad);
     border: 1px solid rgba(16, 185, 129, 0.45);
     color: var(--accent);
     border-radius: 14px;
@@ -888,7 +894,7 @@
     transition: transform 0.12s ease, border-color 0.12s ease;
   }
   .aiden-role-card:active { transform: scale(0.985); }
-  .aiden-role-card.physio { background: var(--accent-dim); border-color: rgba(16, 185, 129, 0.4); }
+  .aiden-role-card.physio { background: var(--surface-grad); border-color: rgba(16, 185, 129, 0.4); }
   .aiden-role-card i { font-size: 30px; color: var(--text); }
   .aiden-role-card .role-name { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
   .aiden-role-card .role-desc { font-size: 11px; color: var(--muted); line-height: 1.35; }
@@ -1156,7 +1162,7 @@
 
   /* Warm-up tile — matches .day-picker-btn shape, subtle green accent */
   .day-picker-btn.warmup-tile {
-    background: var(--accent-dim);
+    background: var(--surface-grad);
     border-color: rgba(16, 185, 129, 0.35);
   }
   .day-picker-btn.warmup-tile .name { color: var(--accent); }
@@ -1269,7 +1275,7 @@
   .day-picker-btn .meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
   /* Done this week — green tint so it's obvious which sessions still need doing */
   .day-picker-btn.done-week {
-    background: var(--accent-dim);
+    background: var(--surface-grad);
     border-color: rgba(16, 185, 129, 0.4);
   }
   .day-picker-btn.done-week .name { color: var(--accent); }
@@ -5083,11 +5089,27 @@ function renderAidenHome(root) {
       renderAiden();
     });
   });
-  document.getElementById("aiden-key-save").addEventListener("click", () => {
+  const keyBtn = document.getElementById("aiden-key-save");
+  keyBtn.addEventListener("click", () => {
     const v = document.getElementById("aiden-key").value.trim();
+    if (!v) {
+      keyBtn.textContent = "Paste a key first";
+      keyBtn.style.background = "var(--danger)";
+      setTimeout(() => { keyBtn.style.background = ""; keyBtn.textContent = data.geminiKey ? "Update key" : "Save key"; }, 1600);
+      return;
+    }
+    if (!/^AIza[\w-]{30,}/.test(v)) {
+      // Looks suspicious — warn but still save (user might know what they're doing)
+      keyBtn.textContent = "Saved — but key format looks off";
+      keyBtn.style.background = "#f59e0b";
+    } else {
+      keyBtn.textContent = "Saved ✓";
+      keyBtn.style.background = "var(--accent)";
+    }
     data.geminiKey = v;
     saveData();
-    renderAiden();
+    showSavedToast("Gemini key saved");
+    setTimeout(() => { keyBtn.style.background = ""; renderAiden(); }, 1100);
   });
 }
 
