@@ -4345,7 +4345,8 @@ function renderLiftList(root) {
   document.getElementById("lift-edit-btn").addEventListener("click", () => {
     liftState = { mode: 'edit' }; renderLift(); window.scrollTo({ top: 0 });
   });
-  root.querySelectorAll(".day-picker-btn").forEach(b => {
+  // Only bind the session opener to ACTUAL workout days (skip the warm-up tile).
+  root.querySelectorAll(".day-picker-btn[data-id]").forEach(b => {
     b.addEventListener("click", () => {
       const dayId = Number(b.dataset.id);
       const day = data.workouts.days.find(d => d.id === dayId);
