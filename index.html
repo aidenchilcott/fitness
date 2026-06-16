@@ -898,6 +898,13 @@
   .aiden-role-card i { font-size: 30px; color: var(--text); }
   .aiden-role-card .role-name { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
   .aiden-role-card .role-desc { font-size: 11px; color: var(--muted); line-height: 1.35; }
+  .aiden-key-hint {
+    margin-top: 18px; padding: 12px 14px;
+    background: var(--card-2); color: var(--muted);
+    border: 1px dashed var(--border); border-radius: 12px;
+    text-align: center; font-size: 13px;
+  }
+  .aiden-key-hint b { color: var(--text); font-weight: 600; }
   .aiden-key-setup {
     margin-top: 16px; padding: 14px;
     background: var(--card-2); border-radius: 12px;
@@ -978,7 +985,7 @@
     position: fixed;
     bottom: calc(var(--safe-bottom) + 70px);
     left: 0; right: 0;
-    padding: 10px 14px; 
+    padding: 10px 14px;
     background: var(--bg); border-top: 1px solid var(--border);
     display: flex; gap: 8px; z-index: 25;
   }
@@ -4409,8 +4416,19 @@ function renderLiftEdit(root) {
       <input id="new-day-input" placeholder="e.g. Glutes, Push, Pull, Legs" />
       <button class="btn wide" id="add-new-day-btn" style="margin-top: 8px;">Add day</button>
     </div>
+
+    <h2 style="margin-top: 26px;">Ai-Den AI</h2>
+    <p class="subtitle">Your Gemini API key powers the Chef, Trainer, Stretching and Physio AI roles.</p>
+    <div class="aiden-key-setup">
+      <div class="label">Google Gemini API Key</div>
+      <input type="password" id="aiden-key" placeholder="AIza..." value="${escapeHtml(data.geminiKey || "")}" autocomplete="off" />
+      <div class="help">Free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">aistudio.google.com/apikey</a> — sign in with Google, "Create API key", paste here. Free tier: 1500 calls/day. Stored only on this device.</div>
+      <button class="save-btn" id="aiden-key-save">${data.geminiKey ? "Update key" : "Save key"}</button>
+    </div>
   `;
   root.innerHTML = html;
+
+  wireGeminiKeyInput();
 
   document.getElementById("lift-done-edit").addEventListener("click", () => {
     liftState = { mode: 'list' }; renderLift();
@@ -5073,12 +5091,7 @@ function renderAidenHome(root) {
           </div>
         `).join("")}
       </div>
-      <div class="aiden-key-setup">
-        <div class="label">Google Gemini API Key</div>
-        <input type="password" id="aiden-key" placeholder="AIza..." value="${escapeHtml(data.geminiKey || "")}" autocomplete="off" />
-        <div class="help">Free at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">aistudio.google.com/apikey</a> — sign in with Google, "Create API key", paste here. Free tier: 1500 calls/day. Stored only on this device.</div>
-        <button class="save-btn" id="aiden-key-save">${data.geminiKey ? "Update key" : "Save key"}</button>
-      </div>
+      ${data.geminiKey ? "" : `<div class="aiden-key-hint">No Gemini key set. Go to <b>Lift → ⚙</b> to add one.</div>`}
     </div>
   `;
   root.querySelectorAll(".aiden-role-card").forEach(el => {
@@ -5089,27 +5102,33 @@ function renderAidenHome(root) {
       renderAiden();
     });
   });
-  const keyBtn = document.getElementById("aiden-key-save");
-  keyBtn.addEventListener("click", () => {
-    const v = document.getElementById("aiden-key").value.trim();
+}
+
+// Reusable wiring for the Gemini key input — used inside renderLiftEdit so the
+// key lives behind Lift → ⚙ instead of cluttering the Ai-Den home.
+function wireGeminiKeyInput() {
+  const input = document.getElementById("aiden-key");
+  const btn = document.getElementById("aiden-key-save");
+  if (!input || !btn) return;
+  btn.addEventListener("click", () => {
+    const v = input.value.trim();
     if (!v) {
-      keyBtn.textContent = "Paste a key first";
-      keyBtn.style.background = "var(--danger)";
-      setTimeout(() => { keyBtn.style.background = ""; keyBtn.textContent = data.geminiKey ? "Update key" : "Save key"; }, 1600);
+      btn.textContent = "Paste a key first";
+      btn.style.background = "var(--danger)";
+      setTimeout(() => { btn.style.background = ""; btn.textContent = data.geminiKey ? "Update key" : "Save key"; }, 1600);
       return;
     }
     if (!/^AIza[\w-]{30,}/.test(v)) {
-      // Looks suspicious — warn but still save (user might know what they're doing)
-      keyBtn.textContent = "Saved — but key format looks off";
-      keyBtn.style.background = "#f59e0b";
+      btn.textContent = "Saved — but key format looks off";
+      btn.style.background = "#f59e0b";
     } else {
-      keyBtn.textContent = "Saved ✓";
-      keyBtn.style.background = "var(--accent)";
+      btn.textContent = "Saved ✓";
+      btn.style.background = "var(--accent)";
     }
     data.geminiKey = v;
     saveData();
     showSavedToast("Gemini key saved");
-    setTimeout(() => { keyBtn.style.background = ""; renderAiden(); }, 1100);
+    setTimeout(() => { btn.style.background = ""; btn.textContent = "Update key"; }, 1400);
   });
 }
 
