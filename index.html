@@ -4154,24 +4154,25 @@ function renderLift() {
   }
 }
 
-// ============ WARM-UP ROUTINE ============
-// Same warm-up every day: 2 rounds of (push-ups → curls → overhead swings) with
-// 20s rest between each. Shoulders get 2:10, the others 2:00.
+// ============ HOME WORKOUT ROUTINE ============
+// 4 rounds of 4 exercises. Each exercise is 30s (4×30s = 2:00 per round).
+// 30s rest between rounds. Total runtime: 9:30.
+const HOMEWORKOUT_EXERCISES = ["Push-ups", "Bicep curls", "Overhead swings", "Squats"];
+const HOMEWORKOUT_ROUNDS = 4;
+const HOMEWORKOUT_EX_DURATION = 30;      // seconds per exercise
+const HOMEWORKOUT_REST_DURATION = 30;    // seconds between rounds
 const WARMUP_SEGMENTS = (() => {
-  const W = 120;   // push-ups + curls
-  const S = 130;   // overhead swings
-  const R = 20;    // rest
-  const round = [
-    { name: "Push-ups (×50)",                     duration: W },
-    { name: "Rest",                               duration: R, isRest: true },
-    { name: "Barbell bicep curls (×50)",          duration: W },
-    { name: "Rest",                               duration: R, isRest: true },
-    { name: "Overhead barbell swings (×50)",      duration: S },
-  ];
-  // Two rounds, with a 20s rest between the rounds but NOT after the final segment.
-  return [...round,
-          { name: "Rest", duration: R, isRest: true },
-          ...round];
+  const segs = [];
+  for (let r = 0; r < HOMEWORKOUT_ROUNDS; r++) {
+    HOMEWORKOUT_EXERCISES.forEach(ex => {
+      segs.push({ name: ex, duration: HOMEWORKOUT_EX_DURATION, round: r + 1 });
+    });
+    // 30s rest after every round except the final one
+    if (r < HOMEWORKOUT_ROUNDS - 1) {
+      segs.push({ name: "Rest", duration: HOMEWORKOUT_REST_DURATION, isRest: true });
+    }
+  }
+  return segs;
 })();
 function warmupTotalSeconds() {
   return WARMUP_SEGMENTS.reduce((sum, s) => sum + s.duration, 0);
@@ -4218,7 +4219,7 @@ function renderLiftWarmup(root) {
         <div class="warmup-complete">
           <i class="ti ti-circle-check" style="font-size: 56px; color: var(--accent);"></i>
           <h1 style="margin: 12px 0 4px;">Complete</h1>
-          <p style="color: var(--muted); margin: 0 0 24px;">Warm-up done. Time to lift.</p>
+          <p style="color: var(--muted); margin: 0 0 24px;">Home workout done. Nice work.</p>
           <button class="warmup-cta" id="warmup-finish">Back to lifts</button>
         </div>
       </div>
@@ -4236,16 +4237,20 @@ function renderLiftWarmup(root) {
   const secs = Math.floor(remaining % 60);
   const clockText = `${mins}:${String(secs).padStart(2, "0")}`;
   const progressFrac = 1 - (remaining / cur.duration);
+  // Top label: "Round X of 4" for exercises, "Rest — 30 seconds" for rest segments.
+  const topLabel = cur.isRest
+    ? "Rest"
+    : `Round ${cur.round} of ${HOMEWORKOUT_ROUNDS}`;
 
   root.innerHTML = `
     <div class="warmup-screen ${cur.isRest ? 'rest' : 'work'}">
       <div class="warmup-head">
-        <button class="warmup-back" id="warmup-quit" aria-label="Quit warm-up"><i class="ti ti-x"></i></button>
+        <button class="warmup-back" id="warmup-quit" aria-label="Quit home workout"><i class="ti ti-x"></i></button>
         <div class="warmup-segidx">${segIdx + 1} of ${WARMUP_SEGMENTS.length}</div>
       </div>
 
       <div class="warmup-body">
-        <div class="warmup-label">${cur.isRest ? "Rest" : "Now"}</div>
+        <div class="warmup-label">${topLabel}</div>
         <div class="warmup-name">${cur.name}</div>
         <div class="warmup-clock">${clockText}</div>
 
@@ -4256,7 +4261,7 @@ function renderLiftWarmup(root) {
         ${next ? `
           <div class="warmup-next">
             <div class="warmup-next-label">Up next</div>
-            <div class="warmup-next-name">${next.name}${next.isRest ? "" : ` · ${Math.round(next.duration/60 * 10)/10}m`}</div>
+            <div class="warmup-next-name">${next.isRest ? `Rest · ${next.duration}s` : `${next.name} · Round ${next.round}`}</div>
           </div>
         ` : `<div class="warmup-next"><div class="warmup-next-label">Last one</div><div class="warmup-next-name">Then you're done</div></div>`}
       </div>
@@ -4266,7 +4271,7 @@ function renderLiftWarmup(root) {
   `;
 
   document.getElementById("warmup-quit").addEventListener("click", () => {
-    if (!confirm("Quit warm-up?")) return;
+    if (!confirm("Quit home workout?")) return;
     clearWarmupTicker();
     liftState = { mode: 'list' };
     renderLift();
@@ -4330,8 +4335,8 @@ function renderLiftList(root) {
     html += `
       <button class="day-picker-btn warmup-tile" id="lift-warmup-btn">
         <div>
-          <div class="name">Warm up</div>
-          <div class="meta">14 min · 3 exercises × 2 rounds</div>
+          <div class="name">Home Workout</div>
+          <div class="meta">9.5 min · 4 exercises × 4 rounds</div>
         </div>
         <i class="ti ti-flame" style="color: var(--accent); font-size: 24px;"></i>
       </button>
