@@ -1742,6 +1742,12 @@
       </div>
 
       <div id="login-status"></div>
+
+      <!-- Escape hatch — always available so the user is never fully locked out -->
+      <button class="login-link" id="login-offline-btn" style="margin-top: 20px;">
+        Continue offline (no cloud sync)
+      </button>
+
       <div class="login-footer">
         Your data lives in your private Supabase project.<br/>
         Each family member gets their own account.
@@ -5893,26 +5899,42 @@ async function initAuth() {
     console.warn("Supabase library not loaded — running in local-only mode.");
     return;
   }
-  const { data: { session } } = await SB.auth.getSession();
-  if (session && session.user) {
-    __authedUserId = session.user.id;
+  // If the user has already chosen offline mode, skip auth entirely.
+  if (localStorage.getItem("fitness_offline") === "1") {
     hideLoginScreen();
-    await pullFromCloud();
-    await hydratePhotoUrls();
-  } else {
-    showLoginScreen();
+    return;
   }
-  SB.auth.onAuthStateChange(async (event, session) => {
-    if (event === "SIGNED_IN" && session && session.user) {
+  try {
+    const { data: { session } = { session: null }, error } = await SB.auth.getSession();
+    if (error) throw error;
+    if (session && session.user) {
       __authedUserId = session.user.id;
       hideLoginScreen();
-      await pullFromCloud();
-      await hydratePhotoUrls();
-    } else if (event === "SIGNED_OUT") {
-      __authedUserId = null;
+      try { await pullFromCloud(); } catch (e) { console.warn("Cloud pull failed:", e); }
+      try { await hydratePhotoUrls(); } catch (e) { console.warn("Photo hydrate failed:", e); }
+    } else {
       showLoginScreen();
     }
-  });
+    SB.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN" && session && session.user) {
+        __authedUserId = session.user.id;
+        hideLoginScreen();
+        try { await pullFromCloud(); } catch (e) { console.warn("Cloud pull failed:", e); }
+        try { await hydratePhotoUrls(); } catch (e) { console.warn("Photo hydrate failed:", e); }
+      } else if (event === "SIGNED_OUT") {
+        __authedUserId = null;
+        // Don't force the login screen back up if the user has opted offline.
+        if (localStorage.getItem("fitness_offline") !== "1") showLoginScreen();
+      }
+    });
+  } catch (e) {
+    // Auth itself is broken (project paused, network down, etc.) — don't lock
+    // the user out. Show the login screen with a clear error, but the offline
+    // bypass button is right there.
+    console.error("Auth init failed:", e);
+    showLoginScreen();
+    setLoginStatus("Auth error: " + (e.message || e) + ". Try 'Continue offline' below.", "error");
+  }
 }
 
 // ----- Two-step OTP login flow (works in PWA, no Safari redirect needed) -----
@@ -5936,12 +5958,19 @@ document.getElementById("login-btn").addEventListener("click", async () => {
   if (!SB) { setLoginStatus("Supabase failed to load. Check your connection.", "error"); return; }
   setLoginStatus("Sending…");
   // shouldCreateUser: true → creates account if first time
-  const { error } = await SB.auth.signInWithOtp({
-    email,
-    options: { shouldCreateUser: true }
-  });
+  let error;
+  try {
+    const res = await SB.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true }
+    });
+    error = res.error;
+  } catch (e) {
+    error = e;
+  }
   if (error) {
-    setLoginStatus("Error: " + error.message, "error");
+    // Surface the raw message so the user (or I) can see what's actually going wrong
+    setLoginStatus("Can't send code: " + (error.message || error) + ". Use 'Continue offline' below to skip.", "error");
     return;
   }
   __pendingEmail = email;
@@ -5967,11 +5996,21 @@ document.getElementById("login-verify-btn").addEventListener("click", async () =
     type: "email"
   });
   if (error) {
-    setLoginStatus("Code didn't match — double-check the email.", "error");
+    // Surface the real message so we can debug (rate limit, expired code, etc.)
+    setLoginStatus("Sign-in failed: " + (error.message || "unknown"), "error");
     return;
   }
   // onAuthStateChange will fire SIGNED_IN and pull data + hide screen
   setLoginStatus("✓ Signed in", "success");
+});
+
+// Continue offline — bypass auth entirely. Remembered so it persists on reload.
+document.getElementById("login-offline-btn").addEventListener("click", () => {
+  localStorage.setItem("fitness_offline", "1");
+  hideLoginScreen();
+  setLoginStatus("");
+  // Kick a render so the app is definitely visible
+  try { renderAll(); } catch (e) {}
 });
 
 // "Use a different email" — back to step 1
