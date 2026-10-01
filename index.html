@@ -1882,6 +1882,7 @@ const DEFAULT_HABITS = [
   { id: 1006, icon: "ti-snowflake",   name: "Cold shower",    cat: "Wellness"  },
   { id: 1002, icon: "ti-bolt",        name: "HIIT Workout",   cat: "Fitness"   },
   { id: 1001, icon: "ti-walk",        name: "10,000 steps",   cat: "Fitness"   },
+  { id: 1007, icon: "ti-pill",        name: "Creatine",       cat: "Nutrition" },
   { id: 1004, icon: "ti-meat",        name: "160g protein",   cat: "Nutrition" },
   { id: 1005, icon: "ti-flame",       name: "2200 cals",      cat: "Nutrition" },
   { id: 1003, icon: "ti-bottle-off",  name: "No alcohol",     cat: "Wellness"  },
@@ -1933,7 +1934,7 @@ function loadData() {
     const raw = localStorage.getItem(KEY);
     if (raw) return JSON.parse(raw);
   } catch (e) {}
-  return { habits: DEFAULT_HABITS.slice(), log: {}, weights: [], nextId: 1007 };
+  return { habits: DEFAULT_HABITS.slice(), log: {}, weights: [], nextId: 1008 };
 }
 function defaultWorkouts() {
   return JSON.parse(JSON.stringify(DEFAULT_WORKOUTS));
@@ -1950,7 +1951,7 @@ if (!data.workouts) {
 // Simplification migration: force the app down to the 6 daily habits and
 // strip the Lift workout data. Re-runs after every cloud pull so a stale
 // cloud snapshot can't restore the old habits.
-const HABITS_SCHEMA_VERSION = 3;
+const HABITS_SCHEMA_VERSION = 5;
 function runMigrations() {
   let dirty = false;
 
@@ -1977,7 +1978,7 @@ function runMigrations() {
     }
     data.habits = DEFAULT_HABITS.slice();
     data.log = newLog;
-    data.nextId = 1007;
+    data.nextId = 1008;
     data.habitsSchemaVersion = HABITS_SCHEMA_VERSION;
     dirty = true;
   }
@@ -2049,10 +2050,20 @@ function getLog(date) {
   return data.log[date];
 }
 function streakForHabit(habitId) {
+  // Calendar-day streak in LOCAL time. Rolls over at local midnight, not
+  // 24 hours after the last tick. If today isn't ticked yet but yesterday
+  // was, the streak is still alive and counted — it only breaks once a
+  // full calendar day passes without a tick.
   let n = 0;
   const d = new Date();
+  const todayK = localDateKey(d);
+  const todayTicked = !!(data.log[todayK] && data.log[todayK][habitId]);
+  if (!todayTicked) {
+    // Streak hasn't been extended today yet. Start counting from yesterday.
+    d.setDate(d.getDate() - 1);
+  }
   while (true) {
-    const k = d.toISOString().slice(0, 10);
+    const k = localDateKey(d);
     if (data.log[k] && data.log[k][habitId]) {
       n++;
       d.setDate(d.getDate() - 1);
