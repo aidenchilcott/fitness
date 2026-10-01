@@ -365,71 +365,98 @@
   .group-heading-compact:first-child { margin-top: 6px; }
   .habits-grid {
     display: flex; flex-direction: column;
-    gap: 5px;
+    gap: 10px;
     flex: 1 1 0;
     min-height: 0;
   }
+  /* Apple-style habit cards: generous padding, centered content, soft shadow,
+     no tick box — the whole card is the hit target. */
   .habit-tile {
-    display: flex; align-items: center; gap: 9px;
-    padding: 6px 12px;
+    position: relative;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    gap: 6px;
+    padding: 14px 18px;
     background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 20px;
     cursor: pointer; user-select: none;
-    min-height: 32px;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 56px;
     flex: 1 1 0;
-    transition: background 0.15s, transform 0.12s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 14px rgba(0, 0, 0, 0.03);
+    transition: transform 0.18s cubic-bezier(.2,.8,.2,1),
+                box-shadow 0.25s ease,
+                background 0.25s ease,
+                border-color 0.25s ease;
+    overflow: hidden;
   }
-  .habit-tile:active { transform: scale(0.98); }
+  .habit-tile::before {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 55%);
+    pointer-events: none;
+    opacity: 0.9;
+  }
+  .habit-tile:active {
+    transform: scale(0.975);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
   .habit-tile.done {
-    background: var(--surface-grad);
-    border-color: rgba(16, 185, 129, 0.45);
+    background: linear-gradient(180deg, rgba(16,185,129,0.14) 0%, rgba(16,185,129,0.05) 100%);
+    border-color: rgba(16, 185, 129, 0.28);
+    box-shadow: 0 1px 2px rgba(16,185,129,0.10), 0 6px 18px rgba(16,185,129,0.08);
   }
   .habit-tile .habit-icon {
-    font-size: 16px; color: var(--text);
-    width: 18px; text-align: center; flex-shrink: 0;
+    position: relative;
+    font-size: 22px; color: var(--text);
+    text-align: center;
+    opacity: 0.9;
+    transition: color 0.25s ease, transform 0.25s ease;
   }
-  .habit-tile.done .habit-icon { color: var(--accent); }
+  .habit-tile.done .habit-icon {
+    color: var(--accent);
+    transform: scale(1.05);
+  }
   .habit-tile .habit-name {
-    flex: 1; min-width: 0;
-    font-size: 13px; font-weight: 600;
-    line-height: 1.2; letter-spacing: -0.01em;
+    position: relative;
+    font-size: 15px; font-weight: 600;
+    line-height: 1.2; letter-spacing: -0.015em;
+    color: var(--text);
   }
-  .habit-tile .mini-check {
-    width: 18px; height: 18px; border-radius: 50%;
-    border: 1.5px solid var(--border);
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
+  .habit-tile.done .habit-name { color: var(--accent); }
+  .habit-tile .habit-streak {
+    position: relative;
+    font-size: 11px; font-weight: 600;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    opacity: 0.75;
   }
-  .habit-tile.done .mini-check {
-    background: var(--accent); border-color: var(--accent);
-    color: white;
-  }
-  .habit-tile.done .mini-check::after {
-    font-family: "tabler-icons"; content: "\ea5e";
-    font-size: 12px; font-weight: 400;
-  }
+  .habit-tile.done .habit-streak { color: var(--accent); opacity: 0.9; }
 
-  /* Landscape: lay all habits out in 3 columns so the whole list fits at a glance */
+  /* Landscape: 3 across, still centered, no tick box */
   @media (orientation: landscape) and (max-height: 600px) {
     .group-heading-compact { margin: 6px 2px 2px; font-size: 9px; }
     .habits-grid {
       flex-direction: row;
       flex-wrap: wrap;
-      gap: 4px;
+      gap: 6px;
     }
     .habits-grid .habit-tile {
-      flex: 1 1 calc(33.333% - 4px);
+      flex: 1 1 calc(33.333% - 6px);
       min-width: 0;
-      padding: 4px 8px;
-      min-height: 26px;
-      border-radius: 8px;
+      padding: 8px 10px;
+      min-height: 42px;
+      border-radius: 14px;
+      gap: 2px;
     }
-    .habits-grid .habit-tile .habit-name { font-size: 11px; }
-    .habits-grid .habit-tile .habit-icon { font-size: 14px; width: 16px; }
-    .habits-grid .habit-tile .mini-check { width: 14px; height: 14px; border-width: 1.5px; }
-    .habits-grid .habit-tile.done .mini-check::after { font-size: 9px; }
-    /* tighten card padding when in landscape so all 16 habits fit */
+    .habits-grid .habit-tile .habit-icon { font-size: 16px; }
+    .habits-grid .habit-tile .habit-name { font-size: 12px; }
+    .habits-grid .habit-tile .habit-streak { font-size: 9px; }
     h1 { font-size: 20px; margin: 4px 0 2px; }
     .group-heading-compact:first-child { margin-top: 4px; }
     .scroll { padding-top: 4px; }
@@ -783,13 +810,20 @@
     color: var(--muted); font-size: 14px;
     margin: 0 0 24px; line-height: 1.5;
   }
-  .login-screen input[type="email"] {
-    width: 100%; padding: 14px; font-size: 15px;
+  .login-screen input[type="email"],
+  .login-screen input[type="password"],
+  .login-screen input[type="tel"] {
+    width: 100%; padding: 14px; font-size: 22px;
     background: var(--card-2); border: 1px solid var(--border);
     border-radius: 12px; margin-bottom: 10px;
     text-align: center; box-sizing: border-box;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    font-variant-numeric: tabular-nums;
   }
-  .login-screen input[type="email"]:focus {
+  .login-screen input[type="email"]:focus,
+  .login-screen input[type="password"]:focus,
+  .login-screen input[type="tel"]:focus {
     outline: 2px solid var(--accent); outline-offset: 0;
   }
   .login-screen .btn {
@@ -1709,49 +1743,19 @@
   </section>
 
 
-  <!-- LIFT (progressive overload) -->
-  <section class="view" id="view-lift">
-    <!-- Populated by renderLift() -->
-  </section>
-
-  <section class="view" id="view-aiden">
-    <!-- Populated by renderAiden() -->
-  </section>
-
-
-  <!-- Login screen (sits on top of everything else when signed out) -->
-  <div id="login-screen" class="login-screen" role="dialog" aria-label="Sign in">
+  <!-- Login screen (sits on top of everything else when locked) -->
+  <div id="login-screen" class="login-screen" role="dialog" aria-label="Unlock">
     <div class="login-content">
       <div class="login-wordmark">
         <span class="adhd">A</span><span class="accent">i</span><span class="adhd">DHD</span><span class="accent">en</span>
       </div>
-      <h2 id="login-title">Welcome</h2>
-      <p class="login-sub" id="login-sub">Sign in to sync your data. We'll email you a sign-in code.</p>
+      <h2 id="login-title">Enter PIN</h2>
+      <p class="login-sub" id="login-sub">Enter your 4-digit PIN to unlock.</p>
 
-      <!-- Step 1: enter email -->
-      <div id="login-step-email">
-        <input type="email" id="login-email" placeholder="your@email.com" autocomplete="email" />
-        <button class="btn" id="login-btn">Send code</button>
-      </div>
-
-      <!-- Step 2: enter sign-in code from email (6–8 digits) -->
-      <div id="login-step-code" style="display: none;">
-        <input type="text" id="login-code" placeholder="Code from email" inputmode="numeric" maxlength="10" autocomplete="one-time-code" pattern="[0-9]*" />
-        <button class="btn" id="login-verify-btn">Verify code</button>
-        <button class="login-link" id="login-back-btn">← Use a different email</button>
-      </div>
+      <input type="password" id="login-pin" placeholder="••••" inputmode="numeric" maxlength="8" autocomplete="off" pattern="[0-9]*" />
+      <button class="btn" id="login-unlock-btn">Unlock</button>
 
       <div id="login-status"></div>
-
-      <!-- Escape hatch — always available so the user is never fully locked out -->
-      <button class="login-link" id="login-offline-btn" style="margin-top: 20px;">
-        Continue offline (no cloud sync)
-      </button>
-
-      <div class="login-footer">
-        Your data lives in your private Supabase project.<br/>
-        Each family member gets their own account.
-      </div>
     </div>
   </div>
 
@@ -1863,10 +1867,8 @@
   <!-- TABS -->
   <nav class="tabs">
     <div class="tab active" data-view="today"><i class="ti ti-checks ticon" aria-hidden="true"></i>Today</div>
-    <div class="tab" data-view="lift"><i class="ti ti-barbell ticon" aria-hidden="true"></i>Lift</div>
     <div class="tab" data-view="weight"><i class="ti ti-scale ticon" aria-hidden="true"></i>Weigh In</div>
     <div class="tab" data-view="challenge"><i class="ti ti-flame ticon" aria-hidden="true"></i>Challenge</div>
-    <div class="tab" data-view="aiden"><i class="ti ti-message-circle ticon" aria-hidden="true"></i>Ai-Den</div>
   </nav>
 
 <script>
@@ -1877,24 +1879,12 @@ const CATEGORIES = ["Nutrition", "Fitness", "Wellness"];
 
 // Array order = render order within each category. All names sentence case for consistency.
 const DEFAULT_HABITS = [
-  // Nutrition (Creatine first, then meals)
-  { id: 5,  icon: "ti-pill",        name: "Creatine",            cat: "Nutrition" },
-  { id: 1,  icon: "ti-meat",        name: "High-protein meal 1", cat: "Nutrition" },
-  { id: 2,  icon: "ti-meat",        name: "High-protein meal 2", cat: "Nutrition" },
-  { id: 3,  icon: "ti-meat",        name: "High-protein meal 3", cat: "Nutrition" },
-  { id: 4,  icon: "ti-meat",        name: "High-protein meal 4", cat: "Nutrition" },
-  { id: 18, icon: "ti-cake-off",    name: "No cheat meals",      cat: "Nutrition" },
-  // Fitness
-  { id: 10, icon: "ti-run",         name: "Run",                 cat: "Fitness" },
-  { id: 12, icon: "ti-barbell",     name: "Weights",             cat: "Fitness" },
-  // Wellness (Cold shower first)
-  { id: 16, icon: "ti-snowflake",   name: "Cold shower",            cat: "Wellness" },
-  { id: 13, icon: "ti-bed",         name: "8h sleep",               cat: "Wellness" },
-  { id: 14, icon: "ti-droplet",     name: "2L water",               cat: "Wellness" },
-  { id: 15, icon: "ti-book",        name: "Reading before bed",     cat: "Wellness" },
-  { id: 8,  icon: "ti-hourglass",   name: "12h fast",               cat: "Wellness" },
-  { id: 6,  icon: "ti-bottle-off",  name: "No alcohol",             cat: "Wellness" },
-  { id: 7,  icon: "ti-coffee",      name: "Max 2 coffees",          cat: "Wellness" },
+  { id: 1006, icon: "ti-snowflake",   name: "Cold shower",    cat: "Wellness"  },
+  { id: 1002, icon: "ti-bolt",        name: "HIIT Workout",   cat: "Fitness"   },
+  { id: 1001, icon: "ti-walk",        name: "10,000 steps",   cat: "Fitness"   },
+  { id: 1004, icon: "ti-meat",        name: "160g protein",   cat: "Nutrition" },
+  { id: 1005, icon: "ti-flame",       name: "2200 cals",      cat: "Nutrition" },
+  { id: 1003, icon: "ti-bottle-off",  name: "No alcohol",     cat: "Wellness"  },
 ];
 
 // Default lift days + exercises seeded on first run
@@ -1943,7 +1933,7 @@ function loadData() {
     const raw = localStorage.getItem(KEY);
     if (raw) return JSON.parse(raw);
   } catch (e) {}
-  return { habits: DEFAULT_HABITS.slice(), log: {}, weights: [], nextId: 18 };
+  return { habits: DEFAULT_HABITS.slice(), log: {}, weights: [], nextId: 1007 };
 }
 function defaultWorkouts() {
   return JSON.parse(JSON.stringify(DEFAULT_WORKOUTS));
@@ -1957,78 +1947,50 @@ if (!data.workouts) {
   saveData();
 }
 
-// All cleanup migrations — wrapped in a function so they re-run after every
-// cloud pull (otherwise pullFromCloud restores deprecated data we just deleted).
+// Simplification migration: force the app down to the 6 daily habits and
+// strip the Lift workout data. Re-runs after every cloud pull so a stale
+// cloud snapshot can't restore the old habits.
+const HABITS_SCHEMA_VERSION = 3;
 function runMigrations() {
   let dirty = false;
 
-  // Drop deprecated default habits.
-  if (Array.isArray(data.habits)) {
-    const before = data.habits.length;
-    const dropPatterns = [
-      /spanish word/i,
-      /10[,.]?000\s*steps/i,
-      /^calisthenics$/i,
-    ];
-    data.habits = data.habits.filter(h => !dropPatterns.some(p => p.test(h.name || "")));
-    if (data.habits.length !== before) dirty = true;
-  }
-
-  // Move Creatine to the top of the whole habits list (so it's first in Nutrition).
-  // Aggressive: any time Creatine isn't at index 0, fix it. Also force its category
-  // to "Nutrition" in case it drifted.
-  if (Array.isArray(data.habits)) {
-    const creatineIdx = data.habits.findIndex(h => /^creatine$/i.test(h.name || ""));
-    if (creatineIdx > 0) {
-      const [creatine] = data.habits.splice(creatineIdx, 1);
-      creatine.cat = "Nutrition";
-      data.habits.unshift(creatine);
-      dirty = true;
-    } else if (creatineIdx === 0 && data.habits[0].cat !== "Nutrition") {
-      data.habits[0].cat = "Nutrition";
-      dirty = true;
+  if (data.habitsSchemaVersion !== HABITS_SCHEMA_VERSION || !Array.isArray(data.habits) || data.habits.length !== DEFAULT_HABITS.length) {
+    // Replace the whole habit list with the new 6-habit lineup.
+    // Preserve existing log entries where the new habit matches by name.
+    const oldHabits = Array.isArray(data.habits) ? data.habits : [];
+    const nameToOldId = {};
+    for (const h of oldHabits) {
+      if (h && h.name) nameToOldId[h.name.trim().toLowerCase()] = h.id;
     }
-  }
-
-  // Drop the Legs day (id 6).
-  if (data.workouts && Array.isArray(data.workouts.days)) {
-    const before = data.workouts.days.length;
-    data.workouts.days = data.workouts.days.filter(d => !(d.id === 6 && /^legs$/i.test(d.name || "")));
-    if (data.workouts.days.length !== before) dirty = true;
-  }
-
-  // Shoulders → Arms migration, plus refresh to the latest Arms lineup.
-  // Triggers if the day is still named Shoulders, OR if any of the 109–112 slots
-  // hold a deprecated exercise (overhead/shoulder/dips/barbell curl/hammer curl).
-  if (data.workouts && Array.isArray(data.workouts.days)) {
-    const armsDay = data.workouts.days.find(d => d.id === 3);
-    const exes = data.workouts.exercises || [];
-    const ex109 = exes.find(e => e.id === 109);
-    const ex110 = exes.find(e => e.id === 110);
-    const ex111 = exes.find(e => e.id === 111);
-    const ex112 = exes.find(e => e.id === 112);
-    const dayNameLooksOld = armsDay && /shoulder/i.test(armsDay.name || "");
-    const slotsLookOld =
-      (ex109 && /(overhead|shoulder|^dips$|seated.*overhead)/i.test(ex109.name || "")) ||
-      (ex110 && /(lateral raise|barbell curl)/i.test(ex110.name || "")) ||
-      (ex111 && /(face pull|rope|standing.*raise)/i.test(ex111.name || "")) ||
-      (ex112 && /(hammer curl|cable lateral raise|single-arm.*lateral)/i.test(ex112.name || ""));
-    if (armsDay && (dayNameLooksOld || slotsLookOld)) {
-      armsDay.name = "Arms";
-      armsDay.exerciseIds = [109, 110, 111, 112];
-      const newArmExercises = [
-        { id: 109, name: "Seated barbell curl" },
-        { id: 110, name: "Skullcrusher" },
-        { id: 111, name: "Close-grip cable pulldown" },
-        { id: 112, name: "Single-arm bent-over cable extension" },
-      ];
-      for (const ex of newArmExercises) {
-        const existing = data.workouts.exercises.find(e => e.id === ex.id);
-        if (existing) existing.name = ex.name;
-        else data.workouts.exercises.push(ex);
+    // Remap log entries from old habit ids to new habit ids where names match.
+    const newLog = {};
+    for (const dateKey of Object.keys(data.log || {})) {
+      const entry = data.log[dateKey] || {};
+      const newEntry = {};
+      for (const newH of DEFAULT_HABITS) {
+        const oldId = nameToOldId[newH.name.trim().toLowerCase()];
+        if (oldId != null && entry[oldId] != null) {
+          newEntry[newH.id] = entry[oldId];
+        }
       }
-      dirty = true;
+      newLog[dateKey] = newEntry;
     }
+    data.habits = DEFAULT_HABITS.slice();
+    data.log = newLog;
+    data.nextId = 1007;
+    data.habitsSchemaVersion = HABITS_SCHEMA_VERSION;
+    dirty = true;
+  }
+
+  // Drop the Lift (workouts) data — section was removed.
+  if (data.workouts) {
+    delete data.workouts;
+    dirty = true;
+  }
+  // Drop the Ai-Den chat history too.
+  if (data.aidenChats) {
+    delete data.aidenChats;
+    dirty = true;
   }
 
   if (dirty) saveData();
@@ -2070,7 +2032,7 @@ document.querySelectorAll(".tab").forEach(t => {
     document.querySelectorAll(".view").forEach(x => x.classList.remove("active"));
     t.classList.add("active");
     document.getElementById("view-" + t.dataset.view).classList.add("active");
-    const titles = { lift: "Lift", weight: "Weigh In", challenge: "Challenge", aiden: "Ai-Den" };
+    const titles = { weight: "Weigh In", challenge: "Challenge" };
     if (t.dataset.view !== "today") {
       // For non-today tabs, set greeting plainly. renderToday() handles the count for Today.
       document.getElementById("greeting").textContent = titles[t.dataset.view];
@@ -2125,16 +2087,21 @@ function renderToday() {
   const grouped = habitsByCat();
   let html = "";
   // One unified grid so every tile is the same size regardless of category.
-  const allHabits = CATEGORIES.flatMap(cat => grouped[cat] || []);
+  // Render in explicit DEFAULT_HABITS/data.habits order (not grouped by cat).
+  const allHabits = data.habits.slice();
   if (allHabits.length > 0) {
     html += `<div class="habits-grid">`;
     html += allHabits.map(h => {
       const done = !!today[h.id];
+      const streak = streakForHabit(h.id);
+      const streakHtml = streak > 0
+        ? `<div class="habit-streak">${streak} day${streak === 1 ? "" : "s"}</div>`
+        : "";
       return `
-        <div class="habit-tile ${done ? "done" : ""}" data-id="${h.id}" title="${h.name}">
+        <div class="habit-tile ${done ? "done" : ""}" data-id="${h.id}" title="${h.name}${streak > 0 ? ` · ${streak}-day streak` : ""}">
           <i class="ti ${h.icon} habit-icon" aria-hidden="true"></i>
           <div class="habit-name">${h.name}</div>
-          <div class="mini-check"></div>
+          ${streakHtml}
         </div>
       `;
     }).join("");
@@ -5736,12 +5703,9 @@ function renderAll() {
   renderProgress();
   renderWeight();
   renderHabitsEditor();
-  renderLift();
-  renderAiden();
   renderChallenge();
 }
 renderAll();
-showQuoteSplash(); // brief quote overlay on every app open
 
 // ============ SUPABASE CLOUD SYNC ============
 const SB_URL = "https://kdmoognapnkwhanusxkl.supabase.co";
@@ -5898,142 +5862,53 @@ async function hydratePhotoUrls() {
   if (changed) renderWeight();
 }
 
-// ============ AUTH WIRING ============
-async function initAuth() {
-  if (!SB) {
-    console.warn("Supabase library not loaded — running in local-only mode.");
-    return;
-  }
-  // If the user has already chosen offline mode, skip auth entirely.
-  if (localStorage.getItem("fitness_offline") === "1") {
-    hideLoginScreen();
-    return;
-  }
-  try {
-    const { data: { session } = { session: null }, error } = await SB.auth.getSession();
-    if (error) throw error;
-    if (session && session.user) {
-      __authedUserId = session.user.id;
-      hideLoginScreen();
-      try { await pullFromCloud(); } catch (e) { console.warn("Cloud pull failed:", e); }
-      try { await hydratePhotoUrls(); } catch (e) { console.warn("Photo hydrate failed:", e); }
-    } else {
-      showLoginScreen();
-    }
-    SB.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_IN" && session && session.user) {
-        __authedUserId = session.user.id;
-        hideLoginScreen();
-        try { await pullFromCloud(); } catch (e) { console.warn("Cloud pull failed:", e); }
-        try { await hydratePhotoUrls(); } catch (e) { console.warn("Photo hydrate failed:", e); }
-      } else if (event === "SIGNED_OUT") {
-        __authedUserId = null;
-        // Don't force the login screen back up if the user has opted offline.
-        if (localStorage.getItem("fitness_offline") !== "1") showLoginScreen();
-      }
-    });
-  } catch (e) {
-    // Auth itself is broken (project paused, network down, etc.) — don't lock
-    // the user out. Show the login screen with a clear error, but the offline
-    // bypass button is right there.
-    console.error("Auth init failed:", e);
-    showLoginScreen();
-    setLoginStatus("Auth error: " + (e.message || e) + ". Try 'Continue offline' below.", "error");
-  }
-}
-
-// ----- Two-step OTP login flow (works in PWA, no Safari redirect needed) -----
-let __pendingEmail = null;
+// ============ LOCAL PIN GATE ============
+// Simple local unlock. No email, no cloud auth. PIN is hardcoded.
+const APP_PIN = "6663";
+const UNLOCKED_KEY = "fitness_unlocked";
 
 function setLoginStatus(text, kind) {
   const s = document.getElementById("login-status");
+  if (!s) return;
   s.textContent = text || "";
   s.className = kind || "";
 }
-function showLoginStep(step) {
-  document.getElementById("login-step-email").style.display = step === "email" ? "block" : "none";
-  document.getElementById("login-step-code").style.display  = step === "code"  ? "block" : "none";
-}
 
-// Step 1: send the 6-digit code
-document.getElementById("login-btn").addEventListener("click", async () => {
-  const email = document.getElementById("login-email").value.trim();
-  setLoginStatus("");
-  if (!email || !email.includes("@")) { setLoginStatus("Enter a valid email.", "error"); return; }
-  if (!SB) { setLoginStatus("Supabase failed to load. Check your connection.", "error"); return; }
-  setLoginStatus("Sending…");
-  // shouldCreateUser: true → creates account if first time
-  let error;
-  try {
-    const res = await SB.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: true }
-    });
-    error = res.error;
-  } catch (e) {
-    error = e;
-  }
-  if (error) {
-    // Surface the raw message so the user (or I) can see what's actually going wrong
-    setLoginStatus("Can't send code: " + (error.message || error) + ". Use 'Continue offline' below to skip.", "error");
-    return;
-  }
-  __pendingEmail = email;
-  document.getElementById("login-title").textContent = "Check your email";
-  document.getElementById("login-sub").textContent = `We sent a sign-in code to ${email}. It might take 30 seconds.`;
-  showLoginStep("code");
-  setLoginStatus("");
-  setTimeout(() => document.getElementById("login-code").focus(), 100);
-});
-
-// Step 2: verify the 6-digit code
-document.getElementById("login-verify-btn").addEventListener("click", async () => {
-  const tokenRaw = document.getElementById("login-code").value.trim();
-  const token = tokenRaw.replace(/\s+/g, "");
-  setLoginStatus("");
-  if (!token || token.length < 6) { setLoginStatus("Enter the code from your email.", "error"); return; }
-  if (!__pendingEmail) { setLoginStatus("Please request a new code.", "error"); showLoginStep("email"); return; }
-  if (!SB) { setLoginStatus("Supabase failed to load.", "error"); return; }
-  setLoginStatus("Verifying…");
-  const { error } = await SB.auth.verifyOtp({
-    email: __pendingEmail,
-    token,
-    type: "email"
-  });
-  if (error) {
-    // Surface the real message so we can debug (rate limit, expired code, etc.)
-    setLoginStatus("Sign-in failed: " + (error.message || "unknown"), "error");
-    return;
-  }
-  // onAuthStateChange will fire SIGNED_IN and pull data + hide screen
-  setLoginStatus("✓ Signed in", "success");
-});
-
-// Continue offline — bypass auth entirely. Remembered so it persists on reload.
-document.getElementById("login-offline-btn").addEventListener("click", () => {
+function unlockApp() {
+  localStorage.setItem(UNLOCKED_KEY, "1");
+  // Legacy flag so any lingering Supabase code paths treat us as offline.
   localStorage.setItem("fitness_offline", "1");
   hideLoginScreen();
   setLoginStatus("");
-  // Kick a render so the app is definitely visible
   try { renderAll(); } catch (e) {}
+}
+
+function initAuth() {
+  if (localStorage.getItem(UNLOCKED_KEY) === "1") {
+    hideLoginScreen();
+    return;
+  }
+  showLoginScreen();
+  setTimeout(() => {
+    const i = document.getElementById("login-pin");
+    if (i) i.focus();
+  }, 100);
+}
+
+document.getElementById("login-unlock-btn").addEventListener("click", () => {
+  const input = document.getElementById("login-pin");
+  const pin = (input.value || "").trim();
+  if (pin === APP_PIN) {
+    unlockApp();
+  } else {
+    setLoginStatus("Wrong PIN. Try again.", "error");
+    input.value = "";
+    input.focus();
+  }
 });
 
-// "Use a different email" — back to step 1
-document.getElementById("login-back-btn").addEventListener("click", () => {
-  __pendingEmail = null;
-  document.getElementById("login-code").value = "";
-  document.getElementById("login-title").textContent = "Welcome";
-  document.getElementById("login-sub").textContent = "Sign in to sync your data. We'll email you a sign-in code.";
-  showLoginStep("email");
-  setLoginStatus("");
-});
-
-// Enter key submits the active step
-document.getElementById("login-email").addEventListener("keydown", e => {
-  if (e.key === "Enter") document.getElementById("login-btn").click();
-});
-document.getElementById("login-code").addEventListener("keydown", e => {
-  if (e.key === "Enter") document.getElementById("login-verify-btn").click();
+document.getElementById("login-pin").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("login-unlock-btn").click();
 });
 
 initAuth();
