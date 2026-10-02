@@ -401,37 +401,38 @@
   /* Weight tab */
   .mp-clean {
     background: var(--card); border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 22px 22px 12px;
-    margin-bottom: 14px;
+    border-radius: 14px;
+    padding: 12px 14px 6px;
+    margin-bottom: 10px;
   }
   .mp-clean .mc-cap {
-    font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.16em;
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.14em;
     color: var(--muted);
-    margin: 0 0 10px;
+    margin: 0 0 2px;
   }
   .mp-clean .mc-pct {
-    font-size: 60px; font-weight: 800;
-    letter-spacing: -0.04em; line-height: 1;
+    font-size: 28px; font-weight: 800;
+    letter-spacing: -0.025em; line-height: 1;
     color: var(--text);
     font-variant-numeric: tabular-nums;
+    display: inline-block;
   }
   .mp-clean .mc-pct .sign {
-    font-size: 28px; font-weight: 700; color: var(--muted);
-    margin-left: 4px; vertical-align: 8px;
+    font-size: 15px; font-weight: 700; color: var(--muted);
+    margin-left: 2px; vertical-align: 4px;
   }
   .mp-clean .mc-pct.done { color: var(--accent); }
   .mp-clean .mc-sub {
-    font-size: 13px; color: var(--muted);
-    margin: 6px 0 18px;
+    font-size: 11px; color: var(--muted);
+    margin: 2px 0 8px;
     letter-spacing: -0.005em;
   }
   .mp-clean .mc-row {
     display: flex; justify-content: space-between;
     align-items: baseline;
-    padding: 11px 0;
-    font-size: 14px;
+    padding: 5px 0;
+    font-size: 12px;
     border-top: 0.5px solid var(--border);
   }
   .mp-clean .mc-row .mc-k { color: var(--muted); }
@@ -444,32 +445,11 @@
   .mp-clean .mc-edit {
     display: block; width: 100%;
     background: transparent; color: var(--accent-2);
-    border: none; font-size: 13px; font-weight: 600;
-    padding: 14px 0 4px;
+    border: none; font-size: 12px; font-weight: 600;
+    padding: 8px 0 2px;
     cursor: pointer; font-family: inherit;
     border-top: 0.5px solid var(--border);
-    margin-top: 4px;
-  }
-  .weight-range-row {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-top: 18px;
-  }
-  .weight-range-row h2 { margin: 0; }
-  .range-toggle {
-    display: flex; gap: 2px;
-    background: var(--card-2); border-radius: 999px;
-    padding: 3px;
-  }
-  .range-btn {
-    background: transparent; border: 0;
-    padding: 6px 14px; border-radius: 999px;
-    font-size: 12px; font-weight: 600;
-    color: var(--muted);
-    cursor: pointer; font-family: inherit;
-  }
-  .range-btn.active {
-    background: var(--card); color: var(--text);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    margin-top: 2px;
   }
   ul.list { list-style: none; padding: 0; margin: 0; }
   ul.list li {
@@ -521,13 +501,7 @@
       <button class="mc-edit" id="mp-lg-edit">Edit goal</button>
     </div>
 
-    <div class="weight-range-row">
-      <h2 id="weight-range-title">Last 30 days</h2>
-      <div class="range-toggle" id="weight-range-toggle" role="tablist">
-        <button class="range-btn" data-range="7">7d</button>
-        <button class="range-btn active" data-range="30">30d</button>
-      </div>
-    </div>
+    <h2 style="margin-top: 4px;">Progress</h2>
     <div class="card pad">
       <div id="weight-chart"></div>
     </div>
@@ -958,36 +932,88 @@ function renderWeighCard() {
   }
 }
 
-let __weightRangeDays = 30;
 function renderWeightChart() {
   const wrap = document.getElementById("weight-chart");
-  const N = __weightRangeDays;
-  const lastIdx = N - 1;
-  const cutoffDate = dateNDaysAgo(lastIdx);
-  const entries = data.weights
-    .filter(w => w.when.slice(0, 10) >= cutoffDate)
-    .slice()
-    .sort((a, b) => a.when.localeCompare(b.when));
-  if (entries.length === 0) {
-    wrap.innerHTML = `<div class="muted" style="text-align:center; padding: 16px 0;">No weight entries in the last ${N} days.</div>`;
+
+  if (!data.weights || data.weights.length === 0) {
+    wrap.innerHTML = `<div class="muted" style="text-align:center; padding: 16px 0;">No weight entries yet. Log one above to start the chart.</div>`;
     return;
   }
-  const dayIndex = iso => {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const d = new Date(iso); d.setHours(0,0,0,0);
-    return lastIdx - Math.round((today - d) / (24 * 3600 * 1000));
-  };
-  const pts = entries.map(e => ({ i: dayIndex(e.when), kg: e.kg }));
-  const kgs = pts.map(p => p.kg);
-  const min = Math.min(...kgs);
-  const max = Math.max(...kgs);
-  const pad = Math.max((max - min) * 0.25, 0.5);
-  const yMin = min - pad;
-  const yMax = max + pad;
-  const W = 320, H = 150, padX = 24, padY = 24;
-  const xFor = i => padX + (i / lastIdx) * (W - 2 * padX);
-  const yFor = kg => H - padY - ((kg - yMin) / Math.max(yMax - yMin, 0.001)) * (H - 2 * padY);
-  const sp = pts.map(p => ({ x: xFor(p.i), y: yFor(p.kg) }));
+
+  // Oldest first — the first weigh-in sits on the left of the chart.
+  const entries = data.weights.slice().sort((a, b) => a.when.localeCompare(b.when));
+  const first = entries[0];
+  const last = entries[entries.length - 1];
+  const startKg = Number(first.kg);
+  const latestKg = Number(last.kg);
+
+  // Current month's goal (if set) drives the target line + y-axis bottom.
+  const monthKey = getCurrentMonthKey();
+  const goalKg = (data.monthlyGoals || {})[monthKey] || null;
+
+  const firstTime = new Date(first.when).getTime();
+  const lastTime = new Date(last.when).getTime();
+  // If a goal is set, extend the x-axis out to end-of-month so the target
+  // line has somewhere to land. Otherwise, just span the data.
+  const now = new Date();
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).getTime();
+  const endTime = goalKg ? Math.max(endOfMonth, lastTime) : lastTime;
+  const span = Math.max(endTime - firstTime, 24 * 3600 * 1000);
+
+  // Y-axis: top is start weight + 2 kg, bottom is goal weight.
+  // When no goal is set, fall back to data range so the chart still renders.
+  const kgs = entries.map(e => Number(e.kg));
+  const rawMin = Math.min(...kgs);
+  const yMaxF = startKg + 2;
+  const yMinF = goalKg != null ? Math.min(goalKg, rawMin) - 0.5 : (rawMin - 1);
+  const yMax = Math.ceil(yMaxF);
+  const yMin = Math.floor(yMinF);
+  const yRange = Math.max(yMax - yMin, 1);
+
+  // Chart dimensions. Taller than before + proper left gutter for the kg labels.
+  const W = 340, H = 220;
+  const padLeft = 32, padRight = 12, padTop = 14, padBottom = 28;
+  const chartW = W - padLeft - padRight;
+  const chartH = H - padTop - padBottom;
+
+  const xFor = t => padLeft + ((t - firstTime) / span) * chartW;
+  const yFor = kg => padTop + ((yMax - kg) / yRange) * chartH;
+
+  // Horizontal gridline + kg label every 1 kg.
+  // If the range is huge (>12 kg), only label every 2 kg to avoid crowding — but keep every line.
+  const labelEvery = yRange > 12 ? 2 : 1;
+  let gridLines = "";
+  let yLabels = "";
+  for (let kg = yMin; kg <= yMax; kg++) {
+    const y = yFor(kg);
+    gridLines += `<line x1="${padLeft}" y1="${y.toFixed(1)}" x2="${(W - padRight).toFixed(1)}" y2="${y.toFixed(1)}" stroke="#e5e5ea" stroke-width="1"/>`;
+    if ((kg - yMin) % labelEvery === 0) {
+      yLabels += `<text x="${(padLeft - 5).toFixed(1)}" y="${(y + 3).toFixed(1)}" font-size="9" fill="#8a8a8e" text-anchor="end">${kg}</text>`;
+    }
+  }
+
+  // Target trajectory line: straight line from (first weigh-in, start weight)
+  // to (end of current month, goal weight). Light grey, dashed.
+  let targetSvg = "";
+  if (goalKg != null) {
+    const tx1 = xFor(firstTime), ty1 = yFor(startKg);
+    const tx2 = xFor(endTime),   ty2 = yFor(goalKg);
+    targetSvg = `
+      <line x1="${tx1.toFixed(1)}" y1="${ty1.toFixed(1)}" x2="${tx2.toFixed(1)}" y2="${ty2.toFixed(1)}"
+            stroke="#d1d1d6" stroke-width="1" stroke-dasharray="3 5" opacity="0.55"/>
+      <circle cx="${tx2.toFixed(1)}" cy="${ty2.toFixed(1)}" r="3" fill="#ffffff" stroke="#d1d1d6" stroke-width="1" opacity="0.7"/>
+      <text x="${(tx2 - 6).toFixed(1)}" y="${(ty2 + 3).toFixed(1)}" font-size="9" fill="#b0b0b5" text-anchor="end" font-weight="500">goal ${goalKg}</text>
+    `;
+  }
+
+  // Data points in screen coords.
+  const sp = entries.map(e => ({
+    x: xFor(new Date(e.when).getTime()),
+    y: yFor(Number(e.kg)),
+    kg: Number(e.kg),
+  }));
+  if (sp.length === 1) sp[0].x = padLeft + 6;
+
   function smoothPath(points) {
     if (points.length === 0) return "";
     if (points.length === 1) return `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
@@ -1005,51 +1031,51 @@ function renderWeightChart() {
     }
     return d;
   }
+
   const path = smoothPath(sp);
   const dots = sp.map(p => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="var(--accent)"/>`).join("");
-  const latest = pts[pts.length - 1];
-  const first = pts[0];
-  const totalDiff = (latest.kg - first.kg).toFixed(1);
-  const diffSign = totalDiff > 0 ? "+" : "";
-  const diffColor = totalDiff < 0 ? "var(--accent)" : (totalDiff > 0 ? "var(--danger)" : "var(--muted)");
+
+  // X-axis labels: first weigh-in date on the left, end-of-month on the right (or latest entry if no goal).
+  const firstDate = new Date(first.when).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const endDate = new Date(endTime).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+
+  // On-track status: compare actual vs target at today's point in time.
+  let statusHtml = "";
+  if (goalKg != null) {
+    const nowFrac = Math.max(0, Math.min(1, (Date.now() - firstTime) / span));
+    const expectedKg = startKg + (goalKg - startKg) * nowFrac;
+    const delta = latestKg - expectedKg;    // negative = ahead of target (losing faster than needed)
+    const onTrackCut = goalKg < startKg && latestKg <= expectedKg + 0.1;
+    const onTrackBulk = goalKg > startKg && latestKg >= expectedKg - 0.1;
+    const onTrack = onTrackCut || onTrackBulk;
+    const label = onTrack ? "on track" : (Math.abs(delta) < 0.1 ? "right on target" : `${Math.abs(delta).toFixed(1)} kg ${delta > 0 ? "behind" : "ahead"}`);
+    const color = onTrack ? "var(--accent)" : "var(--danger)";
+    statusHtml = `<span style="color: ${color}; font-weight: 600;">${label}</span>`;
+  } else {
+    const diff = Number((latestKg - startKg).toFixed(1));
+    const sign = diff > 0 ? "+" : "";
+    const col = diff < 0 ? "var(--accent)" : (diff > 0 ? "var(--danger)" : "var(--muted)");
+    statusHtml = `<span style="color: ${col}; font-weight: 600;">${sign}${diff.toFixed(1)} kg · set a goal to see your target</span>`;
+  }
+
   wrap.innerHTML = `
-    <svg viewBox="0 0 ${W} ${H}" style="width: 100%; height: auto; display: block;" preserveAspectRatio="none">
-      <line x1="${padX}" y1="${H - padY}" x2="${W - padX}" y2="${H - padY}" stroke="var(--border)" stroke-width="1"/>
-      <line x1="${padX}" y1="${padY}" x2="${padX}" y2="${H - padY}" stroke="var(--border)" stroke-width="1"/>
+    <svg viewBox="0 0 ${W} ${H}" style="width: 100%; height: auto; display: block;">
+      ${gridLines}
+      ${yLabels}
+      ${targetSvg}
       <path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       ${dots}
-      <text x="${padX - 4}" y="${yFor(max).toFixed(1) + 3}" font-size="9" fill="var(--muted)" text-anchor="end">${max.toFixed(1)}</text>
-      <text x="${padX - 4}" y="${yFor(min).toFixed(1) + 3}" font-size="9" fill="var(--muted)" text-anchor="end">${min.toFixed(1)}</text>
+      <text x="${padLeft.toFixed(1)}" y="${(H - 10).toFixed(1)}" font-size="10" fill="#8a8a8e" text-anchor="start">${firstDate}</text>
+      <text x="${(W - padRight).toFixed(1)}" y="${(H - 10).toFixed(1)}" font-size="10" fill="#8a8a8e" text-anchor="end">${endDate}</text>
     </svg>
-    <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px; padding: 0 4px;">
-      <span>${N} days ago</span>
-      <span style="color: ${diffColor}; font-weight: 600;">${diffSign}${totalDiff} kg over period</span>
-      <span>Today</span>
+    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 8px; padding: 0 4px;">
+      <span style="color: var(--muted);">${entries.length} entr${entries.length === 1 ? "y" : "ies"}</span>
+      ${statusHtml}
     </div>
   `;
 }
 
 function renderWeight() {
-  const toggle = document.getElementById("weight-range-toggle");
-  if (toggle && !toggle.dataset.wired) {
-    toggle.dataset.wired = "1";
-    toggle.querySelectorAll(".range-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const days = Number(btn.dataset.range);
-        if (!days) return;
-        __weightRangeDays = days;
-        toggle.querySelectorAll(".range-btn").forEach(b => b.classList.toggle("active", b === btn));
-        document.getElementById("weight-range-title").textContent = `Last ${days} days`;
-        renderWeightChart();
-      });
-    });
-  }
-  if (toggle) {
-    toggle.querySelectorAll(".range-btn").forEach(b => {
-      b.classList.toggle("active", Number(b.dataset.range) === __weightRangeDays);
-    });
-  }
-  document.getElementById("weight-range-title").textContent = `Last ${__weightRangeDays} days`;
   renderWeightChart();
   const ul = document.getElementById("weight-list");
   if (data.weights.length === 0) {
