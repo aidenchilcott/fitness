@@ -310,6 +310,68 @@
   }
   .today-head h1 { margin: 8px 0 4px; }
 
+  /* Calendar backfill — compact pills so every habit fits above the fold. */
+  .cal-grid {
+    display: flex; flex-direction: column;
+    gap: 10px;
+  }
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 2px;
+  }
+  .cal-weekdays .today-col { color: var(--text); }
+  .cal-row {
+    display: flex; flex-direction: column;
+    gap: 4px;
+  }
+  .cal-label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+  .cal-label .ti { font-size: 14px; color: var(--muted); }
+  .cal-label .cal-streak {
+    margin-left: auto;
+    font-size: 10px; font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .cal-label .cal-streak.live { color: var(--accent); }
+  .cal-cells {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .cal-cell {
+    height: 24px;
+    border-radius: 999px;
+    background: var(--card-2);
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.08s, background 0.18s, border-color 0.18s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .cal-cell:active { transform: scale(0.92); }
+  .cal-cell.on {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .cal-cell.today {
+    outline: 1.5px solid var(--text);
+    outline-offset: 2px;
+  }
+
   /* Challenge tab */
   .challenge-card {
     background: var(--card); border: 1px solid var(--border);
@@ -485,6 +547,13 @@
     <div id="habit-list"></div>
   </section>
 
+  <!-- CALENDAR · tap any pill to backfill a missed tick -->
+  <section class="view" id="view-calendar">
+    <div class="card pad" style="margin-top: 4px;">
+      <div class="cal-grid" id="calendar-grid"></div>
+    </div>
+  </section>
+
   <!-- CHALLENGE -->
   <section class="view" id="view-challenge"></section>
 
@@ -556,6 +625,7 @@
   <!-- TABS -->
   <nav class="tabs">
     <div class="tab active" data-view="today"><i class="ti ti-checks ticon" aria-hidden="true"></i>Today</div>
+    <div class="tab" data-view="calendar"><i class="ti ti-calendar ticon" aria-hidden="true"></i>Calendar</div>
     <div class="tab" data-view="weight"><i class="ti ti-scale ticon" aria-hidden="true"></i>Weigh In</div>
     <div class="tab" data-view="challenge"><i class="ti ti-flame ticon" aria-hidden="true"></i>Challenge</div>
   </nav>
@@ -566,6 +636,7 @@ const CATEGORIES = ["Nutrition", "Fitness", "Wellness"];
 
 const DEFAULT_HABITS = [
   { id: 1006, icon: "ti-snowflake",   name: "Cold shower",    cat: "Wellness"  },
+  { id: 1008, icon: "ti-sun",         name: "Sunscreen",      cat: "Wellness"  },
   { id: 1002, icon: "ti-bolt",        name: "HIIT Workout",   cat: "Fitness"   },
   { id: 1001, icon: "ti-walk",        name: "10,000 steps",   cat: "Fitness"   },
   { id: 1007, icon: "ti-pill",        name: "Creatine",       cat: "Nutrition" },
@@ -579,12 +650,12 @@ function loadData() {
     const raw = localStorage.getItem(KEY);
     if (raw) return JSON.parse(raw);
   } catch (e) {}
-  return { habits: DEFAULT_HABITS.slice(), log: {}, weights: [], nextId: 1008 };
+  return { habits: DEFAULT_HABITS.slice(), log: {}, weights: [], nextId: 1009 };
 }
 function saveData() { localStorage.setItem(KEY, JSON.stringify(data)); }
 let data = loadData();
 
-const HABITS_SCHEMA_VERSION = 5;
+const HABITS_SCHEMA_VERSION = 6;
 function runMigrations() {
   let dirty = false;
   if (data.habitsSchemaVersion !== HABITS_SCHEMA_VERSION || !Array.isArray(data.habits) || data.habits.length !== DEFAULT_HABITS.length) {
@@ -607,7 +678,7 @@ function runMigrations() {
     }
     data.habits = DEFAULT_HABITS.slice();
     data.log = newLog;
-    data.nextId = 1008;
+    data.nextId = 1009;
     data.habitsSchemaVersion = HABITS_SCHEMA_VERSION;
     dirty = true;
   }
@@ -645,7 +716,7 @@ document.querySelectorAll(".tab").forEach(t => {
     document.querySelectorAll(".view").forEach(x => x.classList.remove("active"));
     t.classList.add("active");
     document.getElementById("view-" + t.dataset.view).classList.add("active");
-    const titles = { weight: "Weigh In", challenge: "Challenge" };
+    const titles = { weight: "Weigh In", challenge: "Challenge", calendar: "Calendar" };
     if (t.dataset.view !== "today") {
       document.getElementById("greeting").textContent = titles[t.dataset.view];
     }
@@ -1292,8 +1363,68 @@ function startChallengeTicker() {
   }, 1000);
 }
 
+function renderCalendar() {
+  const grid = document.getElementById("calendar-grid");
+  if (!grid) return;
+  const DAYS = 7;
+  const days = [];
+  for (let i = DAYS - 1; i >= 0; i--) days.push(dateNDaysAgo(i));
+  const tk = todayKey();
+
+  // Weekday header row (M, T, W, …) with today bolded.
+  const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekdaysHtml = `
+    <div class="cal-weekdays">
+      ${days.map((d, i) => {
+        const dow = new Date(d + "T00:00:00").getDay();
+        const isToday = d === tk;
+        return `<div class="${isToday ? "today-col" : ""}">${DOW[dow][0]}</div>`;
+      }).join("")}
+    </div>
+  `;
+
+  const rowsHtml = data.habits.map(h => {
+    const streak = streakForHabit(h.id);
+    const streakLive = !!(data.log[tk] && data.log[tk][h.id]);
+    const streakHtml = streak > 0
+      ? `<div class="cal-streak ${streakLive ? "live" : ""}">${streak}d</div>`
+      : "";
+    const cells = days.map(d => {
+      const on = data.log[d] && data.log[d][h.id];
+      const isToday = d === tk;
+      return `<div class="cal-cell ${on ? "on" : ""} ${isToday ? "today" : ""}" data-date="${d}" data-id="${h.id}" title="${d}"></div>`;
+    }).join("");
+    return `
+      <div class="cal-row">
+        <div class="cal-label">
+          <i class="ti ${h.icon}"></i>
+          <span>${h.name}</span>
+          ${streakHtml}
+        </div>
+        <div class="cal-cells">${cells}</div>
+      </div>
+    `;
+  }).join("");
+
+  grid.innerHTML = weekdaysHtml + rowsHtml;
+
+  grid.querySelectorAll(".cal-cell").forEach(el => {
+    el.addEventListener("click", () => {
+      const date = el.dataset.date;
+      const id = Number(el.dataset.id);
+      if (!date || !id) return;
+      if (!data.log[date]) data.log[date] = {};
+      if (data.log[date][id]) delete data.log[date][id];
+      else data.log[date][id] = true;
+      if (Object.keys(data.log[date]).length === 0) delete data.log[date];
+      saveData(); renderAll();
+    });
+  });
+}
+
 function renderAll() {
   renderToday();
+  renderCalendar();
   renderWeighCard();
   renderMonthProgress();
   renderWeight();
