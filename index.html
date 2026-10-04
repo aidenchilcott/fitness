@@ -775,7 +775,6 @@ function renderToday() {
       : "";
     return `
       <div class="habit-tile ${done ? "done" : ""}" data-id="${h.id}" title="${h.name}${streak > 0 ? ` · ${streak}-day streak` : ""}">
-        <i class="ti ${h.icon} habit-icon" aria-hidden="true"></i>
         <div class="habit-name">${h.name}</div>
         ${streakHtml}
       </div>
