@@ -262,6 +262,36 @@
   }
   .modal-card .mc-confirm { background: var(--accent); color: white; }
 
+  /* Goals List modal */
+  .goals-card { max-width: 360px; text-align: left; }
+  .goals-card .mc-icon { text-align: center; }
+  .goals-card h3 { text-align: center; }
+  .goals-card p { text-align: center; }
+  .goals-inputs {
+    display: flex; flex-direction: column;
+    gap: 8px;
+    margin: 6px 0 10px;
+  }
+  .goals-input {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 14px;
+    background: var(--card-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+  .goals-input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+  .goals-error {
+    min-height: 16px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--danger);
+    margin-bottom: 8px;
+  }
+
   /* Login screen (auth gate) */
   .login-screen {
     position: fixed; inset: 0; z-index: 700;
@@ -309,6 +339,81 @@
     display: flex; justify-content: space-between; align-items: flex-start;
   }
   .today-head h1 { margin: 8px 0 4px; }
+
+  /* Motivation gallery */
+  .motiv-lock {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 60px 24px 20px;
+    text-align: center;
+    gap: 12px;
+  }
+  .motiv-lock-icon {
+    font-size: 42px; color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .motiv-lock h2 { margin: 0; font-size: 18px; font-weight: 700; }
+  .motiv-lock input {
+    width: 100%; max-width: 220px;
+    padding: 14px; font-size: 22px;
+    background: var(--card-2); border: 1px solid var(--border);
+    border-radius: 12px;
+    text-align: center; box-sizing: border-box;
+    font-weight: 700; letter-spacing: 0.3em;
+    font-variant-numeric: tabular-nums;
+  }
+  .motiv-lock input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+  .motiv-lock .btn { width: 100%; max-width: 220px; }
+  #motiv-status {
+    min-height: 16px; font-size: 13px;
+    color: var(--muted);
+  }
+  #motiv-status.error { color: var(--danger); }
+
+  .motiv-gallery { padding-top: 4px; }
+  .motiv-scroller {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 0 12px;
+    margin: 0 -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .motiv-scroller::-webkit-scrollbar { display: none; }
+  .motiv-slide {
+    flex: 0 0 85%;
+    scroll-snap-align: center;
+    aspect-ratio: 3 / 5;
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--card-2);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    position: relative;
+  }
+  .motiv-slide img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .motiv-slide .motiv-num {
+    position: absolute; top: 10px; left: 12px;
+    font-size: 11px; font-weight: 700;
+    background: rgba(0,0,0,0.5); color: #fff;
+    padding: 3px 8px; border-radius: 999px;
+    letter-spacing: 0.08em;
+  }
+  .motiv-lock-btn {
+    display: block;
+    margin: 20px auto 0;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px; font-weight: 600;
+    padding: 10px 18px; border-radius: 999px;
+    cursor: pointer; font-family: inherit;
+  }
 
   /* Calendar backfill — compact pills so every habit fits above the fold. */
   .cal-grid {
@@ -557,6 +662,23 @@
   <!-- CHALLENGE -->
   <section class="view" id="view-challenge"></section>
 
+  <!-- MOTIVATION · PIN-locked image gallery -->
+  <section class="view" id="view-motivation">
+    <div id="motiv-lock" class="motiv-lock">
+      <div class="motiv-lock-icon"><i class="ti ti-lock"></i></div>
+      <h2>Enter PIN to unlock</h2>
+      <input type="password" id="motiv-pin" placeholder="••••" inputmode="numeric" maxlength="8" autocomplete="off" pattern="[0-9]*" />
+      <button class="btn" id="motiv-unlock">Unlock</button>
+      <div id="motiv-status"></div>
+    </div>
+    <div id="motiv-gallery" class="motiv-gallery" style="display:none;">
+      <h2 style="margin-top: 4px;">Remember this</h2>
+      <p class="subtitle">Swipe through. Don't go backwards.</p>
+      <div class="motiv-scroller" id="motiv-scroller"></div>
+      <button class="motiv-lock-btn" id="motiv-relock"><i class="ti ti-lock"></i> Lock again</button>
+    </div>
+  </section>
+
   <!-- WEIGHT -->
   <section class="view" id="view-weight">
     <div class="mp-clean" id="month-progress-lg" style="display: none;">
@@ -608,6 +730,27 @@
     </div>
   </div>
 
+  <!-- Daily Goals List modal (5 goals, submit to tick) -->
+  <div id="goals-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-card goals-card">
+      <div class="mc-icon"><i class="ti ti-list-check"></i></div>
+      <h3>Today's goals</h3>
+      <p>Write 5 things you want to achieve today. Submit when done.</p>
+      <div class="goals-inputs">
+        <input type="text" class="goals-input" data-idx="0" placeholder="1." autocomplete="off" />
+        <input type="text" class="goals-input" data-idx="1" placeholder="2." autocomplete="off" />
+        <input type="text" class="goals-input" data-idx="2" placeholder="3." autocomplete="off" />
+        <input type="text" class="goals-input" data-idx="3" placeholder="4." autocomplete="off" />
+        <input type="text" class="goals-input" data-idx="4" placeholder="5." autocomplete="off" />
+      </div>
+      <div id="goals-error" class="goals-error"></div>
+      <div class="mc-btns">
+        <button id="goals-cancel" class="mc-cancel">Cancel</button>
+        <button id="goals-submit" class="mc-confirm">Submit</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Monthly goal modal -->
   <div id="goal-modal" class="modal-overlay" role="dialog" aria-modal="true">
     <div class="modal-card">
@@ -628,6 +771,7 @@
     <div class="tab" data-view="calendar"><i class="ti ti-calendar ticon" aria-hidden="true"></i>Calendar</div>
     <div class="tab" data-view="weight"><i class="ti ti-scale ticon" aria-hidden="true"></i>Weigh In</div>
     <div class="tab" data-view="challenge"><i class="ti ti-flame ticon" aria-hidden="true"></i>Challenge</div>
+    <div class="tab" data-view="motivation"><i class="ti ti-bolt ticon" aria-hidden="true"></i>Motivation</div>
   </nav>
 
 <script>
@@ -635,6 +779,7 @@ const KEY = "fitness_v10";
 const CATEGORIES = ["Nutrition", "Fitness", "Wellness"];
 
 const DEFAULT_HABITS = [
+  { id: 1009, icon: "ti-list-check",  name: "Goals List",     cat: "Wellness"  },
   { id: 1006, icon: "ti-snowflake",   name: "Cold shower",    cat: "Wellness"  },
   { id: 1008, icon: "ti-sun",         name: "Sunscreen",      cat: "Wellness"  },
   { id: 1002, icon: "ti-bolt",        name: "HIIT Workout",   cat: "Fitness"   },
@@ -644,18 +789,19 @@ const DEFAULT_HABITS = [
   { id: 1005, icon: "ti-flame",       name: "2200 cals",      cat: "Nutrition" },
   { id: 1003, icon: "ti-bottle-off",  name: "No alcohol",     cat: "Wellness"  },
 ];
+const GOALS_HABIT_ID = 1009;
 
 function loadData() {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) return JSON.parse(raw);
   } catch (e) {}
-  return { habits: DEFAULT_HABITS.slice(), log: {}, weights: [], nextId: 1009 };
+  return { habits: DEFAULT_HABITS.slice(), log: {}, weights: [], nextId: 1010 };
 }
 function saveData() { localStorage.setItem(KEY, JSON.stringify(data)); }
 let data = loadData();
 
-const HABITS_SCHEMA_VERSION = 6;
+const HABITS_SCHEMA_VERSION = 8;
 function runMigrations() {
   let dirty = false;
   if (data.habitsSchemaVersion !== HABITS_SCHEMA_VERSION || !Array.isArray(data.habits) || data.habits.length !== DEFAULT_HABITS.length) {
@@ -678,7 +824,7 @@ function runMigrations() {
     }
     data.habits = DEFAULT_HABITS.slice();
     data.log = newLog;
-    data.nextId = 1009;
+    data.nextId = 1010;
     data.habitsSchemaVersion = HABITS_SCHEMA_VERSION;
     dirty = true;
   }
@@ -716,7 +862,7 @@ document.querySelectorAll(".tab").forEach(t => {
     document.querySelectorAll(".view").forEach(x => x.classList.remove("active"));
     t.classList.add("active");
     document.getElementById("view-" + t.dataset.view).classList.add("active");
-    const titles = { weight: "Weigh In", challenge: "Challenge", calendar: "Calendar" };
+    const titles = { weight: "Weigh In", challenge: "Challenge", calendar: "Calendar", motivation: "Motivation" };
     if (t.dataset.view !== "today") {
       document.getElementById("greeting").textContent = titles[t.dataset.view];
     }
@@ -744,6 +890,62 @@ function streakForHabit(habitId) {
     } else break;
   }
   return n;
+}
+
+function openGoalsModal() {
+  const m = document.getElementById("goals-modal");
+  if (!m) return;
+  const tk = todayKey();
+  const existing = (data.goalsList && data.goalsList[tk]) || ["", "", "", "", ""];
+  const inputs = m.querySelectorAll(".goals-input");
+  inputs.forEach((inp, i) => { inp.value = existing[i] || ""; });
+  const errEl = document.getElementById("goals-error");
+  errEl.textContent = "";
+  m.classList.add("show");
+  setTimeout(() => { if (inputs[0]) inputs[0].focus(); }, 100);
+
+  const submitBtn = document.getElementById("goals-submit");
+  const cancelBtn = document.getElementById("goals-cancel");
+  const cleanup = () => {
+    m.classList.remove("show");
+    submitBtn.removeEventListener("click", onSubmit);
+    cancelBtn.removeEventListener("click", onCancel);
+    inputs.forEach(inp => inp.removeEventListener("keydown", onEnter));
+  };
+  const onSubmit = () => {
+    const vals = Array.from(inputs).map(i => i.value.trim());
+    if (vals.some(v => !v)) {
+      errEl.textContent = "Fill in all 5 goals before submitting.";
+      // focus the first empty one
+      const firstEmpty = Array.from(inputs).find(i => !i.value.trim());
+      if (firstEmpty) firstEmpty.focus();
+      return;
+    }
+    if (!data.goalsList) data.goalsList = {};
+    data.goalsList[tk] = vals;
+    if (!data.log[tk]) data.log[tk] = {};
+    const wasDone = !!data.log[tk][GOALS_HABIT_ID];
+    data.log[tk][GOALS_HABIT_ID] = true;
+    saveData();
+    cleanup();
+    renderAll();
+    if (!wasDone) {
+      const tile = document.querySelector(`.habit-tile[data-id="${GOALS_HABIT_ID}"]`);
+      if (tile) popConfettiAt(tile);
+    }
+  };
+  const onCancel = () => cleanup();
+  const onEnter = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const idx = Number(e.target.dataset.idx);
+      if (idx < inputs.length - 1) inputs[idx + 1].focus();
+      else onSubmit();
+    }
+  };
+  submitBtn.addEventListener("click", onSubmit);
+  cancelBtn.addEventListener("click", onCancel);
+  inputs.forEach(inp => inp.addEventListener("keydown", onEnter));
 }
 
 function popConfettiAt(el) {
@@ -785,6 +987,10 @@ function renderToday() {
   list.querySelectorAll(".habit-tile").forEach(el => {
     el.addEventListener("click", () => {
       const id = Number(el.dataset.id);
+      if (id === GOALS_HABIT_ID) {
+        openGoalsModal();
+        return;
+      }
       const tk = todayKey();
       const log = getLog(tk);
       const wasDone = !!log[id];
@@ -1421,6 +1627,69 @@ function renderCalendar() {
   });
 }
 
+// Motivation gallery (PIN-locked)
+const MOTIV_PIN = "6663";
+const MOTIV_UNLOCK_KEY = "motiv_unlocked";
+const MOTIV_IMAGES = 7;
+
+function renderMotivation() {
+  const lock = document.getElementById("motiv-lock");
+  const gallery = document.getElementById("motiv-gallery");
+  const scroller = document.getElementById("motiv-scroller");
+  if (!lock || !gallery || !scroller) return;
+
+  const unlocked = sessionStorage.getItem(MOTIV_UNLOCK_KEY) === "1"
+                || localStorage.getItem(MOTIV_UNLOCK_KEY) === "1";
+
+  if (unlocked) {
+    lock.style.display = "none";
+    gallery.style.display = "block";
+    if (!scroller.dataset.populated) {
+      let slides = "";
+      for (let i = 1; i <= MOTIV_IMAGES; i++) {
+        slides += `<div class="motiv-slide"><div class="motiv-num">${i} / ${MOTIV_IMAGES}</div><img src="/motivation/${i}.jpg" alt="motivation ${i}" loading="lazy"></div>`;
+      }
+      scroller.innerHTML = slides;
+      scroller.dataset.populated = "1";
+    }
+  } else {
+    lock.style.display = "flex";
+    gallery.style.display = "none";
+    delete scroller.dataset.populated;
+    scroller.innerHTML = "";
+  }
+}
+
+function setMotivStatus(text, kind) {
+  const s = document.getElementById("motiv-status");
+  if (!s) return;
+  s.textContent = text || "";
+  s.className = kind || "";
+}
+
+document.getElementById("motiv-unlock").addEventListener("click", () => {
+  const inp = document.getElementById("motiv-pin");
+  const pin = (inp.value || "").trim();
+  if (pin === MOTIV_PIN) {
+    localStorage.setItem(MOTIV_UNLOCK_KEY, "1");
+    inp.value = "";
+    setMotivStatus("");
+    renderMotivation();
+  } else {
+    setMotivStatus("Wrong PIN.", "error");
+    inp.value = "";
+    inp.focus();
+  }
+});
+document.getElementById("motiv-pin").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("motiv-unlock").click();
+});
+document.getElementById("motiv-relock").addEventListener("click", () => {
+  localStorage.removeItem(MOTIV_UNLOCK_KEY);
+  sessionStorage.removeItem(MOTIV_UNLOCK_KEY);
+  renderMotivation();
+});
+
 function renderAll() {
   renderToday();
   renderCalendar();
@@ -1428,6 +1697,7 @@ function renderAll() {
   renderMonthProgress();
   renderWeight();
   renderChallenge();
+  renderMotivation();
 }
 renderAll();
 
